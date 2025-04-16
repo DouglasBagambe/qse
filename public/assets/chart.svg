@@ -1,0 +1,237 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="highcharts-root" style="font-family: muli, sans-serif; font-size: 20
+px;" xmlns="http://www.w3.org/2000/svg" width="750" height="500" viewBox="0 0 750 500" aria-label="Interactive chart"
+    aria-hidden="false">
+    <desc aria-hidden="true">Created with Highcharts 10.3.1</desc>
+    <defs aria-hidden="true">
+        <clipPath id="highcharts-q6mzrm8-624-">
+            <rect x="0" y="0" width="730" height="377" fill="none"></rect>
+        </clipPath>
+    </defs>
+    <rect fill="#040347" class="highcharts-background" x="0" y="0" width="750" height="500" rx="0" ry="0"
+        aria-hidden="true"></rect>
+    <rect fill="none" class="highcharts-plot-background" x="10" y="10" width="730" height="377" aria-hidden="true">
+    </rect>
+    <g class="highcharts-pane-group" data-z-index="0" aria-hidden="true"></g>
+    <rect fill="none" class="highcharts-plot-border" data-z-index="1" x="10" y="10" width="730" height="377"
+        aria-hidden="true"></rect>
+    <g class="highcharts-series-group" data-z-index="3" aria-hidden="false">
+        <g class="highcharts-series highcharts-series-0 highcharts-pie-series" data-z-index="0.1" opacity="1"
+            transform="translate(10,10) scale(1 1)" clip-path="none" aria-hidden="false">
+            <path fill="#bd0d18"
+                d="M 364.97050812010497 43.70000300335286 A 144.8 144.8 0 0 1 502.67531566675495 143.6385749662431 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-0" tabindex="-1" role="img" aria-label="PRESALE, 20."
+                style="outline: none;"></path>
+            <path fill="#8806d0"
+                d="M 502.7201082466597 143.7762726896746 A 144.8 144.8 0 0 1 502.7647631064676 233.08598486317027 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-1" tabindex="-1" role="img" aria-label="TEAM, 10."
+                style="outline: none;"></path>
+            <path fill="#cb840c"
+                d="M 502.7201082466597 233.2237273103254 A 144.8 144.8 0 0 1 482.25778079223363 273.456770440504 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-2" tabindex="-1" role="img" aria-label="STAFF, 5."
+                style="outline: none;"></path>
+            <path fill="#d80586"
+                d="M 482.17276540706706 273.57398572337155 A 144.8 144.8 0 0 1 409.8333833306571 326.18444988133683 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-3" tabindex="-1" role="img" aria-label="MANUAL BURNING, 10."
+                style="outline: none;"></path>
+            <path fill="#19acbd"
+                d="M 409.6956764870334 326.22921441497607 A 144.8 144.8 0 0 1 320.3859570709467 326.25567927865836 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-4" tabindex="-1" role="img" aria-label="GAME, 10."
+                style="outline: none;"></path>
+            <path fill="#6cba4f"
+                d="M 320.2482237216469 326.2109963653311 A 144.8 144.8 0 0 1 280.01934905374515 305.7404749425334 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-5" tabindex="-1" role="img" aria-label="DEVELOPMENT, 5."
+                style="outline: none;"></path>
+            <path fill="#6cba4f"
+                d="M 279.90215108866465 305.655435685518 A 144.8 144.8 0 0 1 220.20002542965054 188.5858162347784 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-6" tabindex="-1" role="img" aria-label="LIQUIDITY, 15."
+                style="outline: none;"></path>
+            <path fill="#d681af"
+                d="M 220.2000120134113 188.4410162414333 A 144.8 144.8 0 0 1 247.77683577062703 103.49547207322743 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-7" tabindex="-1" role="img" aria-label="NFT, 10."
+                style="outline: none;"></path>
+            <path fill="#83e426"
+                d="M 247.8618988959636 103.3782914307957 A 144.8 144.8 0 0 1 279.76334572137216 71.44551368108233 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-8" tabindex="-1" role="img" aria-label="CHARITY, 5."
+                style="outline: none;"></path>
+            <path fill="#dec68e"
+                d="M 279.88044280650564 71.36033556824809 A 144.8 144.8 0 0 1 364.79887570496726 43.70013967887277 L 365 188.5 A 0 0 0 0 0 365 188.5 Z"
+                transform="translate(0,0)" stroke="#ffffff" stroke-width="1" opacity="1" stroke-linejoin="round"
+                class="highcharts-point highcharts-color-9" tabindex="-1" role="img"
+                aria-label="DEVELOPMENT OF FUTURE PROJECT, 10." style="outline: none;"></path>
+        </g>
+        <g class="highcharts-markers highcharts-series-0 highcharts-pie-series" data-z-index="0.1" opacity="1"
+            transform="translate(10,10) scale(1 1)" clip-path="none" aria-hidden="true"></g>
+    </g><text x="375" text-anchor="middle" class="highcharts-title" data-z-index="4"
+        style="color: rgb(51, 51, 51); font-size: 18px; fill: rgb(51, 51, 51);" y="24" aria-hidden="true"></text><text
+        x="375" text-anchor="middle" class="highcharts-subtitle" data-z-index="4"
+        style="color: rgb(102, 102, 102); fill: rgb(102, 102, 102);" y="24" aria-hidden="true"></text><text x="10"
+        text-anchor="start" class="highcharts-caption" data-z-index="4"
+        style="color: rgb(102, 102, 102); fill: rgb(102, 102, 102);" y="497" aria-hidden="true"></text>
+    <g class="highcharts-data-labels highcharts-series-0 highcharts-pie-series" data-z-index="6" opacity="1"
+        transform="translate(10,10) scale(1 1)" aria-hidden="true">
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-0" stroke="#bd0d18" stroke-width="1"
+            d="M 472.7448621007243 47.08382938325918 C 467.7448621007243 47.08382938325918 457.1647275594598 61.64613528200823 453.63801604570494 66.50023724825792 L 450.1113045319501 71.3543392145076">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-1" stroke="#8806d0" stroke-width="1"
+            d="M 544.8 188.50000000000003 C 539.8 188.50000000000003 521.8 188.50000000000003 515.8 188.50000000000003 L 509.8 188.50000000000003">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-2" stroke="#cb840c" stroke-width="1"
+            d="M 525.7479404281266 267.8575393544728 C 520.7479404281266 267.8575393544728 504.709822992736 259.68571035916096 499.3637838476058 256.9617673607237 L 494.0177447024756 254.2378243622864">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-3" stroke="#d80586" stroke-width="1"
+            d="M 472.7448621007243 329.9161706167408 C 467.7448621007243 329.9161706167408 457.1647275594597 315.35386471799177 453.6380160457049 310.4997627517421 L 450.11130453195005 305.6456607854924">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-4" stroke="#19acbd" stroke-width="1"
+            d="M 360 363.3 C 365 363.3 364.99999999999994 345.3 364.99999999999994 339.3 L 364.99999999999994 333.3">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-5" stroke="#6cba4f" stroke-width="1"
+            d="M 275.1047704520448 341.3 C 280.1047704520448 341.3 293.814289640839 328.209822992736 296.53823263927626 322.8637838476058 L 299.26217563771354 317.5177447024756">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-6" stroke="#6cba4f" stroke-width="1"
+            d="M 204.25205957187325 267.8575393544727 C 209.25205957187325 267.8575393544727 225.29017700726382 259.68571035916085 230.63621615239404 256.96176736072357 L 235.98225529752426 254.2378243622863">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-7" stroke="#d681af" stroke-width="1"
+            d="M 193.75532095160716 134.4838293832591 C 198.75532095160716 134.4838293832591 215.87433824491995 140.04613528200815 221.58067734269088 141.90023724825784 L 227.2870164404618 143.75433921450752">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-8" stroke="#83e426" stroke-width="1"
+            d="M 236.3977346485916 64.89773464859138 C 241.3977346485916 64.89773464859138 254.12565670994945 77.62565670994924 258.3682973970687 81.86829739706853 L 262.610938084188 86.11093808418782">
+        </path>
+        <path fill="none" class="highcharts-data-label-connector highcharts-color-9" stroke="#dec68e" stroke-width="1"
+            d="M 305.9838293832594 22.25532095160706 C 310.9838293832594 22.25532095160706 316.54613528200844 39.37433824491984 318.4002372482581 45.08067734269076 L 320.2543392145078 50.787016440461684">
+        </path>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-0" data-z-index="1"
+            style="cursor: pointer;" transform="translate(478,37)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Presale</tspan>: 20.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-1" data-z-index="1"
+            style="cursor: pointer;" transform="translate(550,179)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Team</tspan>: 10.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-2" data-z-index="1"
+            style="cursor: pointer;" transform="translate(531,258)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Staff</tspan>: 5.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-3" data-z-index="1"
+            style="cursor: pointer;" transform="translate(478,320)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Manual Burning</tspan>: 10.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-4" data-z-index="1"
+            style="cursor: pointer;" transform="translate(271,353)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Game</tspan>: 10.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-5" data-z-index="1"
+            style="cursor: pointer;" transform="translate(135,331)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Developement</tspan>: 5.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-6" data-z-index="1"
+            style="cursor: pointer;" transform="translate(94,258)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Liquidity</tspan>: 15.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-7" data-z-index="1"
+            style="cursor: pointer;" transform="translate(117,124)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Nft</tspan>: 10.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-8" data-z-index="1"
+            style="cursor: pointer;" transform="translate(135,55)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Charity</tspan>: 5.0 %
+            </text></g>
+        <g class="highcharts-label highcharts-data-label highcharts-data-label-color-9" data-z-index="1"
+            style="cursor: pointer;" transform="translate(133,12)"><text x="5" data-z-index="1" y="16"
+                style="color:#ffff; font-size: 13px; font-weight: bold; fill:#ffff;">
+                <tspan style="font-weight: bold;">Developement of future<tspan dy="14" x="5">​</tspan>project</tspan>:
+                10.0 %
+            </text></g>
+    </g>
+    <g class="highcharts-legend highcharts-no-tooltip" data-z-index="7" transform="translate(104,399)"
+        aria-hidden="true">
+        <rect fill="none" class="highcharts-legend-box" rx="0" ry="0" x="0" y="0" width="542" height="86"></rect>
+        <g data-z-index="1">
+            <g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-0" data-z-index="1"
+                    transform="translate(8,3)"><text x="21" text-anchor="start" data-z-index="2" y="15"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 13px; font-weight: bold; fill:#ffff;">Presale</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#bd0d18" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-1" data-z-index="1"
+                    transform="translate(281.021484375,3)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 13px; font-weight: bold; fill:#ffff;">Team</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#8806d0" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-2" data-z-index="1"
+                    transform="translate(8,18)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 13px; font-weight: bold; fill:#ffff;">Staff</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#cb840c" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-3" data-z-index="1"
+                    transform="translate(281.021484375,18)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 13px; font-weight: bold; fill:#ffff;">Manual
+                        Burning</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#d80586" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-4" data-z-index="1"
+                    transform="translate(8,33)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 14px; font-weight: bold; fill:#ffff;">Game</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#19acbd" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-5" data-z-index="1"
+                    transform="translate(281.021484375,33)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 14px; font-weight: bold; fill:#ffff;">Developement</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#6cba4f" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-6" data-z-index="1"
+                    transform="translate(8,48)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 14px; font-weight: bold; fill:#ffff;">Liquidity</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#6cba4f" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-7" data-z-index="1"
+                    transform="translate(281.021484375,48)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 14px; font-weight: bold; fill:#ffff;">Nft</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#d681af" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-8" data-z-index="1"
+                    transform="translate(8,63)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 14px; font-weight: bold; fill:#ffff;">Charity</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#83e426" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+                <g class="highcharts-legend-item highcharts-pie-series highcharts-color-9" data-z-index="1"
+                    transform="translate(281.021484375,63)"><text x="21" y="15" text-anchor="start" data-z-index="2"
+                        style="color: rgb(51, 51, 51); cursor: pointer; font-size: 14px; font-weight: bold; fill:#ffff;">Developement
+                        of future project</text>
+                    <rect x="2" y="4" width="12" height="12" fill="#dec68e" rx="6" ry="6" class="highcharts-point"
+                        data-z-index="3"></rect>
+                </g>
+            </g>
+        </g>
+    </g><text x="740" class="highcharts-credits" text-anchor="end" data-z-index="8" y="495"
+        style="cursor: pointer; color: rgb(153, 153, 153); font-size: 9px; fill: rgb(153, 153, 153);"
+        aria-label="Chart credits: Highcharts.com" aria-hidden="false"></text>
+</svg>

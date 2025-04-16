@@ -1,0 +1,38 @@
+.spin {
+  width: 100px;
+  height: 100px;
+  background: url(/assets/spin.png) no-repeat 0 0;
+  background-size: cover;
+
+  animation: spin 100s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+
+.spin {
+  width: 100px;
+  height: 100px;
+  background: url(/public/assets/dainellogo.svg) no-repeat 0 0;
+  background-size: cover;
+
+  animation: spin 100s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+} */
