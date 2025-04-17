@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 const TokenomicsChart = () => {
-  const [activeSegment, setActiveSegment] = useState<number | null>(null);
+  const [activeSegment, setActiveSegment] = useState(null);
 
   const tokenomicsData = [
-    { name: "Development and Operations", value: 40, color: "#4A90E2" },
-    { name: "Community Incentives", value: 20, color: "#50E3C2" },
-    { name: "Research & Development", value: 20, color: "#F5A623" },
-    { name: "Partnerships and Marketing", value: 15, color: "#7ED321" },
-    { name: "Reserve Fund", value: 5, color: "#BD10E0" },
+    { name: "Development & Operations", value: 40, color: "#0086FF" },
+    { name: "Community Incentives", value: 20, color: "#45C2FF" },
+    { name: "Research & Development", value: 20, color: "#0049B7" },
+    { name: "Partnerships & Marketing", value: 15, color: "#2E75D4" },
+    { name: "Reserve Fund", value: 5, color: "#94CCFF" },
   ];
 
   const total = tokenomicsData.reduce((sum, item) => sum + item.value, 0);
@@ -61,12 +61,23 @@ const TokenomicsChart = () => {
   });
 
   return (
-    <div className="w-full max-w-5xl mx-auto shadow-none">
-      <div className="p-6">
-        <div className="flex flex-col lg:flex-row gap-8">
+    <section className="bg-white py-20 px-4">
+      {/* Header Section */}
+      <div className="max-w-5xl mx-auto mb-16">
+        <h1 className="text-5xl font-bold text-center mb-6 text-blue-600">
+          Tokenomics
+        </h1>
+        <p className="text-center text-gray-600 text-lg max-w-3xl mx-auto">
+          Our token distribution is designed to ensure sustainable growth and
+          development of the Quantum SEC ecosystem.
+        </p>
+      </div>
+
+      <div className="w-full max-w-5xl mx-auto">
+        <div className="flex flex-col md:flex-row gap-12 items-center">
           {/* Chart Section */}
-          <div className="w-full lg:w-1/2 items-center">
-            <div className="relative">
+          <div className="w-full md:w-1/2 flex justify-center">
+            <div className="relative w-full max-w-md">
               <svg viewBox="-120 -120 240 240" className="w-full">
                 {segments.map((segment, index) => (
                   <g key={segment.name}>
@@ -80,91 +91,116 @@ const TokenomicsChart = () => {
                       className="transition-all duration-300 hover:opacity-90"
                       transform={activeSegment === index ? `scale(1.05)` : ""}
                     />
-                    <text
-                      x={segment.labelX}
-                      y={segment.labelY}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fill="white"
-                      fontSize="12"
-                      className="font-bold"
-                    >
-                      {segment.value}%
-                    </text>
                   </g>
                 ))}
+                <circle cx="0" cy="0" r="60" fill="white" />
                 <text
                   x="0"
                   y="-15"
                   textAnchor="middle"
-                  fill="white"
-                  fontSize="8"
+                  fill="#0052CC"
+                  fontSize="10"
                   className="font-bold"
                 >
                   TOTAL SUPPLY
                 </text>
                 <text
                   x="0"
-                  y="5"
+                  y="10"
                   textAnchor="middle"
-                  fill="white"
-                  fontSize="10"
+                  fill="#0052CC"
+                  fontSize="14"
                   className="font-bold"
                 >
-                  1,000,000,000
+                  100,000,000
                 </text>
                 <text
                   x="0"
-                  y="25"
+                  y="30"
                   textAnchor="middle"
-                  fill="white"
-                  fontSize="8"
+                  fill="#0052CC"
+                  fontSize="10"
                   className="font-bold"
                 >
-                  QSE TOKENS
+                  QSE
                 </text>
               </svg>
             </div>
           </div>
 
           {/* Legend and Info Section */}
-          <div className="w-full lg:w-1/2 mt-12">
-            <div className="space-y-3">
+          <div className="w-full md:w-1/2">
+            <h3 className="text-xl font-semibold mb-4 text-blue-800">
+              Token Allocation
+            </h3>
+
+            <div className="space-y-2 mb-8">
               {tokenomicsData.map((item, index) => (
                 <div
                   key={item.name}
-                  className={`flex items-center justify-between p-2 rounded transition-all duration-300 ${
-                    activeSegment === index ? "bg-opacity-20 bg-white" : ""
-                  }`}
+                  className={`flex items-center justify-between p-2 rounded transition-all duration-300 border-b border-gray-100`}
                   onMouseEnter={() => setActiveSegment(index)}
                   onMouseLeave={() => setActiveSegment(null)}
                 >
                   <div className="flex items-center space-x-3">
                     <div
-                      className={`w-4 h-4 rounded transition-transform duration-300 ${
-                        activeSegment === index ? "scale-125" : ""
-                      }`}
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="font-medium text-white">{item.name}</span>
+                      className="w-full h-1.5 rounded-full bg-gray-200 flex-grow"
+                      style={{ maxWidth: "100px" }}
+                    >
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${item.value}%`,
+                          backgroundColor: item.color,
+                          maxWidth: "250px",
+                        }}
+                      />
+                    </div>
+                    <span className="font-medium text-gray-700">
+                      {item.name}
+                    </span>
                   </div>
-                  <span className="font-bold text-white">{item.value}%</span>
+                  <span className="font-bold text-blue-700">{item.value}%</span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 text-sm text-white opacity-80 space-y-2">
-              <div>Burn Rate: 2% Monthly transaction fees</div>
-              <div>
-                Distribution Timeline: Development, partnerships and incentives
-                over 5 years
+            {/* Token Details Box */}
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <h4 className="text-lg font-semibold mb-4 text-blue-800">
+                Token Details
+              </h4>
+              <div className="grid grid-cols-2 gap-y-4">
+                <div>
+                  <p className="text-sm text-gray-500">Token Name</p>
+                  <p className="font-medium">Quantum SEC</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Symbol</p>
+                  <p className="font-medium">QSE</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Total Supply</p>
+                  <p className="font-medium">100,000,000 QSE</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Token Type</p>
+                  <p className="font-medium">ERC-20</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Initial Price</p>
+                  <p className="font-medium">$0.05 USD</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Vesting Period</p>
+                  <p className="font-medium">12 Months</p>
+                </div>
               </div>
-              <div>30% initial circulating supply in phase 1 for liquidity</div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

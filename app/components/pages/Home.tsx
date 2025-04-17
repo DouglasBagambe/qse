@@ -9,6 +9,12 @@
 import React, { useState } from "react";
 import RoadmapSection from "../RoadmapSection";
 import TokenomicsChart from "../TokenomicsChart";
+import TeamSection from "../TeamSection";
+import FAQSection from "../FAQSection";
+import NewsletterSection from "../NewsletterSection";
+import QSEEcosystem from "../QSEEcosystem";
+import TokenSale from "../TokenSale";
+import CoreValues from "../CoreValues";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -66,302 +72,324 @@ const Home = () => {
 
   return (
     <>
-      <section className="bg-[#040347] text-white lg:pt-[100px] lg:pb-[50px] py-[50px]">
-        <div className="max-w-[1300px] mx-auto p-5 pt-[4.5rem]">
-          <div className="flex lg:flex-row gap-[80px] flex-col">
-            <div className="flex-1">
-              <div>
-                <h1 className="lg:text-[2.5rem] font-bold text-[1.8rem] pr-7">
-                  Revolutionizing Blockchain Security with Quantum-Resistant AI
-                </h1>
-                <p className="lg:text-[18px] text-[16px] mt-7 pr-7">
-                  The QuantumSEC (QSE) Token merges quantum computing and
-                  artificial intelligence to revolutionize industries like
-                  finance, renewable energy, supply chain logistics, and
-                  cybersecurity. Built on a quantum-resistant blockchain with an
-                  AI-driven consensus mechanism, QSE delivers unmatched
-                  efficiency, security, and scalability. <br />
-                  <br />
-                  This isn't just a cryptocurrency—it's the foundation of a
-                  decentralized quantum AI revolution. QSE is poised to become
-                  the leading token for the quantum AI era. Don't just witness
-                  the future—be a part of it.
-                </p>
-                <div className="flex flex-col gap-4 mt-8">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-[16px] flex items-center">
-                      <span className="text-blue-400 mr-2">🔹</span>
-                      Early Investors Get Exclusive Bonuses
-                    </p>
-                    <p className="text-[16px] flex items-center">
-                      <span className="text-blue-400 mr-2">🔹</span>
-                      AI & Quantum Security-Powered Transactions
-                    </p>
-                    <p className="text-[16px] flex items-center">
-                      <span className="text-blue-400 mr-2">🔹</span>
-                      Limited Supply with Deflationary Tokenomics
-                    </p>
-                  </div>
-                  <div className="flex md:flex-row flex-col lg:gap-2 gap-5 mt-[20px]">
-                    <button
-                      onClick={handlePDFView}
-                      className="px-6 button-g py-2 rounded-[15px] min-w-[300px] text-center bg-gradient-to-r from-[#a42e9a] to-[#5951f6] hover:opacity-90 transition-opacity"
-                    >
-                      Whitepaper
-                    </button>
-                  </div>
-                </div>
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-12">
+        {/* Grid Background - with reduced opacity */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url('/grid-bg.jpg')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "blur(12px)",
+            opacity: "0.8", // Reduced opacity to increase contrast with text
+          }}
+        ></div>
+
+        <div className="container mx-auto px-4 py-16 relative z-10 flex flex-col items-center">
+          <div className="text-center max-w-4xl mx-auto mb-16">
+            {/* Enhanced heading with stronger gradient, text shadow and larger size */}
+            <h1
+              className="text-6xl md:text-7xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-800"
+              style={{
+                textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              Revolutionizing Blockchain Security with Quantum-Resistant AI
+            </h1>
+
+            {/* Darker text color, increased weight, and slight shadow */}
+            <p
+              className="text-xl md:text-2xl mb-10 text-blue-900 max-w-3xl mx-auto font-semibold"
+              style={{ textShadow: "0 1px 1px rgba(255,255,255,0.5)" }}
+            >
+              The QuantumSEC (QSE) Token merges quantum computing and artificial
+              intelligence to revolutionize industries like finance, renewable
+              energy, supply chain logistics, and cybersecurity.
+            </p>
+
+            {/* Increased contrast on feature bullets */}
+            <div className="flex flex-wrap gap-8 justify-center mb-12">
+              <div className="flex items-center text-blue-800 font-semibold">
+                <div className="w-3 h-3 rounded-full bg-blue-600 mr-2"></div>
+                <span>Early Investors Get Exclusive Bonuses</span>
+              </div>
+              <div className="flex items-center text-blue-800 font-semibold">
+                <div className="w-3 h-3 rounded-full bg-blue-600 mr-2"></div>
+                <span>AI & Quantum Security-Powered Transactions</span>
+              </div>
+              <div className="flex items-center text-blue-800 font-semibold">
+                <div className="w-3 h-3 rounded-full bg-blue-600 mr-2"></div>
+                <span>Limited Supply with Deflationary Tokenomics</span>
               </div>
             </div>
-            <div className="flex-1">
-              <img
-                className="w-full h-[auto]"
-                src="/assets/banner.gif"
-                width="100%"
-                alt="QSE Token - Quantum AI Revolution"
-              />
+
+            {/* Enhanced buttons with stronger hover effect */}
+            <div className="flex flex-col md:flex-row gap-6 justify-center">
+              <button
+                onClick={openPurchaseModal}
+                className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg hover:shadow-xl hover:translate-y-1 transition-all duration-300 text-xl shadow-md"
+              >
+                Buy Token
+              </button>
+              <button
+                onClick={handlePDFView}
+                className="px-10 py-4 bg-white text-blue-800 font-bold rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-300 border-2 border-blue-300 text-xl shadow-sm"
+              >
+                Read Whitepaper
+              </button>
             </div>
           </div>
-        </div>
-      </section>
-      <section className="bg-[#040347] text-white">
-        <div className="max-w-[1200px] mx-auto p-5">
-          <div className="grid lg:grid-cols-4 grid-cols-2">
-            <div className="text-center lg:mb-0 mb-[50px]">
-              <span className="bg-[#5964da] w-[80px] h-[80px] flex justify-center items-center mx-auto mb-3 inline-block px-[20px] py-[20px] rounded-full">
-                <FontAwesomeIcon
-                  icon={faChartLine}
-                  className="text-[30px] text-[#09090a]"
-                />
-              </span>
-              <p className="text-[15px] mb-3">Security</p>
-              <p>End-to-End Encryption</p>
-            </div>
 
-            <div className="text-center lg:mb-0 mb-[50px]">
-              <span className="bg-[#5964da] w-[80px] h-[80px] flex justify-center items-center mx-auto mb-3 inline-block px-[20px] py-[20px] rounded-full">
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="text-[30px] text-[#09090a]"
-                />
-              </span>
-              <p className="text-[15px] mb-3">Authentication</p>
-              <p>Multi-Factor Security</p>
-            </div>
-
-            <div className="text-center lg:mb-0 mb-[50px]">
-              <span className="bg-[#5964da] w-[80px] h-[80px] flex justify-center items-center mx-auto mb-3 inline-block px-[20px] py-[20px] rounded-full">
-                <FontAwesomeIcon
-                  icon={faGlobe}
-                  className="text-[30px] text-[#09090a]"
-                />
-              </span>
-              <p className="text-[15px] mb-3">Detection</p>
-              <p>Real-Time Monitoring</p>
-            </div>
-
-            <div className="text-center lg:mb-0 mb-[50px]">
-              <span className="bg-[#5964da] w-[80px] h-[80px] flex justify-center items-center mx-auto mb-3 inline-block px-[20px] py-[20px] rounded-full">
-                <FontAwesomeIcon
-                  icon={faCreditCard}
-                  className="text-[30px] text-[#09090a]"
-                />
-              </span>
-              <p className="text-[15px] mb-3">Payments</p>
-              <p>Secure Integration</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section
-        className="bg-[#040347] text-white lg:py-[50px] pb-[50px]"
-        id="buy"
-      >
-        <div className="max-w-[1200px] mx-auto p-5">
-          <div className="flex lg:flex-row flex-col lg:gap-[150px] gap-[50px]">
-            <div className="flex-1 flex justify-center items-center">
-              <img src="assets/banner-2.png" className="w-full h-[auto] ball" />
-            </div>
-            <div className="flex-1">
-              <div>
-                <h1 className="lg:text-[2.5rem] font-bold text-[2rem] pr-7">
-                  Why Choose QSE Token?
-                </h1>
-                <p className="lg:text-[18px] text-[16px] mt-4 pr-7">
-                  QSE Token combines blockchain security, pilot AI, and quantum
-                  technology to create a safer, more efficient EV charging
-                  ecosystem. We focus on privacy-first payments, minimal data
-                  collection, and quantum-resistant security to ensure your
-                  transactions are safe and private.
+          {/* Enhanced stats bar with stronger background */}
+          <div className="w-full max-w-3xl mx-auto bg-white/90 backdrop-filter backdrop-blur-lg rounded-xl p-6 border-2 border-blue-200 shadow-xl">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-3">
+                <p className="text-blue-700 text-sm uppercase font-bold tracking-wider mb-1">
+                  PRESALE ENDS IN
                 </p>
-                <button
-                  onClick={openPurchaseModal}
-                  className="buytoken px-6 py-2 text-white rounded-[15px] lg:min-w-[300px] min-w-[250px] text-center py-3 inline-block mt-[30px] px-[40px] bg-gradient-to-r from-[#a42e9a] to-[#5951f6]"
-                >
-                  Buy Token
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="lg:py-[100px] py-[50px]">
-        <div className="max-w-[1300px] mx-auto p-5">
-          <h3 className="lg:text-[25px] text-black text-[22px] mb-[50px] text-center font-bold">
-            Core Features
-          </h3>
-          <div className="grid lg:grid-cols-4 lg:gap-[80px] gap-[30px] grid-cols-1">
-            <div className="text-center">
-              <div className="bg-[#313a82] scale-100 hover:scale-110 hover:bg-[#0E34F0] cursor-pointer ease-in duration-500 text-white px-6 pt-8 pb-3 custom-shadow rounded-[20px] h-full md:w-full h-[22rem]">
-                <img
-                  src="assets/cybersecurity.webp"
-                  className="h-[60px] mb-1 inline-block mx-auto"
-                />
-                <p className="mb-4 text-[20px]">Secure Mobile Application</p>
-                <p className="mb-4 text-[15px] flex text-center justify-center">
-                  Simple, privacy-centered payments that make sense to everyday
-                  EV owners. Pay with QSE tokens or credit/debit cards with
-                  minimal data collection.
+                <p className="text-3xl font-extrabold text-blue-900">
+                  14:23:42:01
                 </p>
               </div>
-            </div>
-            <div className="text-center">
-              <div className="bg-[#313a82] scale-100 hover:scale-110 hover:bg-[#0E34F0] cursor-pointer ease-in duration-500 text-white px-6 pt-8 pb-3 custom-shadow rounded-[20px] h-full md:w-full h-[22rem]">
-                <img
-                  src="assets/smartcontract.webp"
-                  className="h-[60px] mb-1 inline-block mx-auto"
-                />
-                <p className="mb-1 text-[20px]">End-to-End Encryption</p>
-                <p className="mb-2 text-[15px]">
-                  Advanced encryption protocols ensure your transactions and
-                  data remain secure throughout the entire charging process.
+              <div className="p-3 border-x-2 border-blue-200">
+                <p className="text-blue-700 text-sm uppercase font-bold tracking-wider mb-1">
+                  TOKEN PRICE
                 </p>
+                <p className="text-3xl font-extrabold text-blue-900">$0.05</p>
               </div>
-            </div>
-            <div className="text-center">
-              <div className="bg-[#313a82] scale-100 hover:scale-110 hover:bg-[#0E34F0] cursor-pointer ease-in duration-500 text-white px-6 pt-8 pb-3 cutom-shadow rounded-[20px] h-full md:w-full h-[22rem]">
-                <img
-                  src="assets/NFTs.webp"
-                  className="h-[60px] mb-1 inline-block mx-auto"
-                />
-                <p className="mb-3 text-[20px]">Real-Time Monitoring</p>
-                <p className="mb-4 text-[15px]">
-                  Advanced threat detection and real-time anomaly monitoring
-                  ensure your charging sessions remain secure and efficient.
+              <div className="p-3">
+                <p className="text-blue-700 text-sm uppercase font-bold tracking-wider mb-1">
+                  RAISED
                 </p>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="bg-[#313a82] scale-100 hover:scale-110 hover:bg-[#0E34F0] cursor-pointer ease-in duration-500 text-white px-6 pt-8 pb-3 cutom-shadow rounded-[20px] h-full md:w-full h-[22rem]">
-                <img
-                  src="assets/graph.webp"
-                  className="h-[60px] mb-1 inline-block mx-auto"
-                />
-                <p className="mb-4 text-[20px]">Compliance Management</p>
-                <p className="mb-4 text-[15px]">
-                  Comprehensive compliance management system ensuring adherence
-                  to regulatory requirements while maintaining user privacy.
+                <p className="text-3xl font-extrabold text-blue-900">
+                  $3.2M / $5M
                 </p>
               </div>
             </div>
           </div>
         </div>
       </section>
+      {/* About Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center mb-16 text-blue-900">
+            About Quantum SEC
+          </h2>
 
-      <section
-        className="bg-[#040347] text-white pt-[90px] lg:pb-[70px]"
-        id="value"
-      >
-        <div className="max-w-[900px] mx-auto p-5">
-          <h4 className="text-white lg:text-[35px] text-[22px] text-center lg:mb-[50px] mb-[30px]">
-            Our Core Values
-          </h4>
-          <div className="flex lg:flex-row flex-col py-[50px] items-center lg:gap-[150px] gap-[50px]">
-            <div className="flex-1">
-              <h1 className="lg:text-[2.5rem] lg:text-left text-center uppercase mb-[50px] font-bold text-[2rem] pr-7">
-                OUR VISION
-              </h1>
-              <p className="lg:text-[18px] lg:text-left text-center text-[16px] mt-4 lg:pr-7">
-                HCISS, LLC (BSECAENERGY) imagines a world where QSE powers a
-                safer, greener EV charging scene. By 2028, we want top-notch
-                security and sustainability in e-mobility.
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <p className="text-lg text-gray-700">
+              QSE Token combines blockchain security, pilot AI, and quantum
+              technology to create a safer, more efficient EV charging
+              ecosystem. We focus on privacy-first payments, minimal data
+              collection, and quantum-resistant security to ensure your
+              transactions are safe and private.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-blue-500 text-2xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <h3 className="text-xl text-blue-600 font-medium text-center mb-2">
+                Seamless Payments
+              </h3>
+              <p className="text-gray-600 text-center">
+                Our blockchain enables instant, secure transactions across
+                charging networks worldwide.
               </p>
+              <div className="h-1 w-full bg-gradient-to-r from-blue-300 to-blue-600 mt-4 rounded-full"></div>
             </div>
-            <div className="flex-1">
-              <img
-                src="assets/rainbow.gif"
-                className="lg:h-[300px] h-[250px]"
-              />
-            </div>
-          </div>
-          <div className="flex lg:flex-row flex-col items-center py-[50px] lg:gap-[150px] gap-[50px]">
-            <div className="flex-1 lg:order-1 order-2">
-              <img src="assets/mission1.gif" className="h-[300px]" />
-            </div>
-            <div className="flex-1 lg:order-2 order-1">
-              <h1 className="lg:text-[2.5rem] lg:text-left text-center uppercase mb-[50px] font-bold text-[2rem] pr-7">
-                OUR MISSION
-              </h1>
-              <p className="lg:text-[18px] lg:text-left text-center text-[16px] mt-4 lg:pr-7">
-                Our mission is to speed up EV adoption by delivering advanced
-                yet careful AI and Quantum solutions. We respect user data and
-                want to support people in many cultures who seek clean energy
-                and trust.
+
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-blue-500 text-2xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <h3 className="text-xl text-blue-600 font-medium text-center mb-2">
+                Global Coverage
+              </h3>
+              <p className="text-gray-600 text-center">
+                Access the same payment system for charging your electric
+                vehicle around the globe.
               </p>
+              <div className="h-1 w-full bg-gradient-to-r from-blue-300 to-blue-600 mt-4 rounded-full"></div>
             </div>
-          </div>
-          <div className="flex lg:flex-row items-center flex-col pt-[65px] lg:gap-[150px] gap-[50px]">
-            <div className="flex-1">
-              <h1 className="lg:text-[2.2rem] lg:text-left text-center mb-[50px] text-[2rem] pr-7">
-                Our Promise
-              </h1>
-              <p className="lg:text-[18px] lg:text-left text-center text-[16px] mt-4 lg:pr-7">
-                We promise simple, secure EV charging for all communities, with
-                a focus on privacy, real-world pilot tests, mindful tech
-                adoption, and a blend of AI and Quantum technology.
+
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-blue-500 text-2xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <h3 className="text-xl text-blue-600 font-medium text-center mb-2">
+                Low Transaction Fees
+              </h3>
+              <p className="text-gray-600 text-center">
+                Pay less with our optimized blockchain that minimizes
+                transaction costs.
               </p>
+              <div className="h-1 w-full bg-gradient-to-r from-blue-300 to-blue-600 mt-4 rounded-full"></div>
             </div>
-            <div className="flex-1">
-              <img src="assets/value.gif" className="w-full h-full" />
+
+            <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 mx-auto">
+                <span className="text-blue-500 text-2xl">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <h3 className="text-xl text-blue-600 font-medium text-center mb-2">
+                Sustainability Mission
+              </h3>
+              <p className="text-gray-600 text-center">
+                Every transaction contributes to our sustainable energy and
+                carbon offset initiatives.
+              </p>
+              <div className="h-1 w-full bg-gradient-to-r from-blue-300 to-blue-600 mt-4 rounded-full"></div>
             </div>
           </div>
         </div>
       </section>
-      <section
-        className="bg-[#040347] text-white pt-[6.9rem] lg:pb-[50px]"
-        id="tokenomics"
-      >
-        <h1 className="text-4xl font-bold text-center mb-5">Tokenomics</h1>
+
+      <section id="value">
+        <CoreValues />
+      </section>
+
+      {/* The Future of QSE */}
+      <section className="py-20 bg-gradient-to-r from-blue-900 to-indigo-800 text-white">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="lg:w-1/2">
+              <h2 className="text-3xl font-bold mb-6">
+                The Future of Quantum SEC
+              </h2>
+              <p className="mb-8 text-blue-100">
+                Quantum SEC is more than just a cryptocurrency - it's a complete
+                ecosystem designed to accelerate the adoption of sustainable
+                energy and services.
+              </p>
+
+              <ul className="space-y-4">
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-300">✓</span>
+                  <span>Direct integration with charging networks</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-300">✓</span>
+                  <span>Smart contracts for automated payments</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-300">✓</span>
+                  <span>Energy trading capabilities</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-3 text-blue-300">✓</span>
+                  <span>Carbon offset through renewable investments</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="lg:w-1/2">
+              <div className="bg-blue-800 bg-opacity-30 rounded-2xl p-8 backdrop-filter backdrop-blur-sm border border-blue-700 border-opacity-30">
+                <img
+                  src="/assets/spin.png"
+                  alt="Quantum Technology"
+                  className="w-full max-w-md mx-auto"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* QSE Ecosystem Section */}
+      <section id="ecosystem">
+        <QSEEcosystem />
+      </section>
+      {/* Tokenomics Section */}
+      <section id="tokenomics">
         <TokenomicsChart />
+      </section>
+
+      {/* Token Sale Section */}
+      <section id="token-sale">
+        <TokenSale />
       </section>
       <section id="roadmap">
         <RoadmapSection />
       </section>
+      {/* Team Section */}
+      <section id="team">
+        <TeamSection />
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq">
+        <FAQSection />
+      </section>
+
+      {/* Newsletter Section */}
+      <section id="newsletter">
+        <NewsletterSection />
+      </section>
+
       <section className="bg-[#040347] text-white pt-[30px] pb-[50px]">
         <div className="max-w-[1700px] mx-auto p-5">
-          <h1 className="text-4xl font-bold text-center mb-10">
-            2025 Outcome Goals
-          </h1>
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-8 mb-20">
-            <div className="text-center p-6 bg-[#313a82] rounded-lg">
-              <h3 className="text-xl font-bold mb-3">Global Reach</h3>
-              <p>Offer QSE-charging in 15+ regions</p>
-            </div>
-            <div className="text-center p-6 bg-[#313a82] rounded-lg">
-              <h3 className="text-xl font-bold mb-3">User Adoption</h3>
-              <p>Aim for 500,000 active users</p>
-            </div>
-            <div className="text-center p-6 bg-[#313a82] rounded-lg">
-              <h3 className="text-xl font-bold mb-3">Eco Efforts</h3>
-              <p>Handle around 1 million daily transactions without lag</p>
-            </div>
-            <div className="text-center p-6 bg-[#313a82] rounded-lg">
-              <h3 className="text-xl font-bold mb-3">Scalability</h3>
-              <p>Have at least 30% of stations using renewables</p>
-            </div>
-          </div>
-
           <h1 className="text-4xl font-bold text-center mb-20">
             Partners & Collaborators
           </h1>

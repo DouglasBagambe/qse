@@ -1,16 +1,7 @@
-/* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from "react";
-import {
-  Instagram,
-  Twitter,
-  Facebook,
-  MessageCircle,
-  Send,
-  Linkedin,
-} from "lucide-react";
 
 const Footer = () => {
   const handleDownload = () => {
@@ -26,148 +17,183 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#0d0d2b] pt-[50px] pb-[30px] text-white body-font">
-      <div className="max-w-[1300px] px-5 lg:pt-[50px] mx-auto">
-        <div className="flex flex-wrap md:text-left text-center order-first">
-          <div className="lg:w-1/4 md:w-1/2 w-full px-4 lg:mt-0 mt-[30px]">
-            <a href="index.html">
-              <div className="spin"></div>
-              <span className="flex m-auto text-center mt-2 inline-block text-xl ml-5 md:ml-[1.5rem]">
-                QSE
-              </span>
+    <footer className="bg-[#10152b] py-16 text-white">
+      <div className="container mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+          {/* Logo and Description Column */}
+          <div>
+            <div className="flex items-center mb-8">
+              <a href="#" className="flex items-center">
+                <div className="w-8 h-8">
+                  <div className="spin"></div>
+                </div>
+                <span className="ml-6 text-xl font-medium">Quantum-SEC</span>
+              </a>
+            </div>
+            <p className="text-gray-400 text-sm mb-4">
+              Revolutionizing utility payments through blockchain technology,
+              starting with EV charging infrastructure.
+            </p>
+            <a
+              href="#top"
+              className="text-[#0095FF] flex items-center hover:underline"
+            >
+              Back to top
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 ml-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 10l7-7m0 0l7 7m-7-7v18"
+                />
+              </svg>
             </a>
           </div>
-          <div className="lg:w-1/4 md:w-1/2 w-full px-4 lg:mt-0 mt-[30px]">
-            <h2 className="title-font font-medium text-white tracking-widest text-sm mb-3">
-              Application
-            </h2>
-            <nav className="flex flex-col justify-center md:items-start items-center  list-none mb-10">
-              <a href="" className="mb-2 inline-block">
-                <div className="flex items-center">
-                  <img src="assets/app.png" className="h-5 w-5 mr-2 " />
-                  <p>App Store</p>
-                </div>
-              </a>
-              <a href=" " className="mb-2 inline-block">
-                <div className="flex items-center">
-                  <img src="assets/play.png" className="h-5 w-5 mr-2" />
-                  <p>Play Store</p>
-                </div>
-              </a>
-            </nav>
-          </div>
-          <div className="lg:w-1/4 md:w-1/2 w-full px-4 lg:mt-0 mt-[30px]">
-            <h2 className="title-font font-medium text-white tracking-widest text-sm mb-3">
-              Conditions
-            </h2>
-            <nav className="list-none mb-10">
+
+          {/* Quick Links Column */}
+          <div>
+            <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
+            <ul className="space-y-3">
               <li>
                 <a
-                  href="#"
-                  className="text-white hover:text-white cursor-pointer"
+                  href="#about"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  About
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#tokenomics"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Tokenomics
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#roadmap"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Roadmap
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#team"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Team
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#faq"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  FAQ
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Resources Column */}
+          <div>
+            <h3 className="text-lg font-semibold mb-6">Resources</h3>
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="#whitepaper"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Whitepaper
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#smart-contract"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Smart Contract
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#token-audit"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Token Audit
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#blog"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#press-kit"
+                  className="text-gray-400 hover:text-white transition"
+                >
+                  Press Kit
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal Column */}
+          <div>
+            <h3 className="text-lg font-semibold mb-6">Legal</h3>
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="#terms"
+                  className="text-gray-400 hover:text-white transition"
                 >
                   Terms of Service
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
-                  className="text-white hover:text-white cursor-pointer"
-                >
-                  Anti Fraud Policy
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-white hover:text-white cursor-pointer"
-                >
-                  Cookie Policy
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-white hover:text-white cursor-pointer"
-                >
-                  Terms of Credits
-                </a>
-              </li>
-              <li>
-                <a
-                  href="javsscript:void(0);"
-                  className="text-white hover:text-white cursor-pointer"
+                  href="#privacy"
+                  className="text-gray-400 hover:text-white transition"
                 >
                   Privacy Policy
                 </a>
               </li>
               <li>
                 <a
-                  href="javsscript:void(0);"
-                  className="text-white hover:text-white cursor-pointer"
+                  href="#cookie"
+                  className="text-gray-400 hover:text-white transition"
                 >
-                  Terms of Use
+                  Cookie Policy
                 </a>
               </li>
               <li>
                 <a
-                  href="javsscript:void(0);"
-                  className="text-white hover:text-white cursor-pointer"
+                  href="#disclaimer"
+                  className="text-gray-400 hover:text-white transition"
                 >
-                  Terms of Exchange
+                  Disclaimer
                 </a>
               </li>
-            </nav>
-          </div>
-          <div className="lg:w-1/4 md:w-1/2 w-full px-4 lg:mt-0 mt-[30px]">
-            <h2 className="title-font font-medium text-white tracking-widest text-sm mb-5">
-              Follow Us
-            </h2>
-            <div className="grid xl:grid-cols-6 lg:grid-cols-5 md:grid-cols-5 grid-cols-4 mt-3 gap-2">
-              <a href="#" className="mb-2 mx-auto">
-                <div className="border border-[#952dc0] hover:bg-[#952dc0] transition-colors duration-300 rounded-full w-[45px] h-[45px] flex items-center justify-center">
-                  <Instagram className="text-[#952dc0] hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2 mx-auto">
-                <div className="border border-[#952dc0] hover:bg-[#952dc0] transition-colors duration-300 rounded-full w-[45px] h-[45px] flex items-center justify-center">
-                  <Twitter className="text-[#952dc0] hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2 mx-auto">
-                <div className="border border-[#952dc0] hover:bg-[#952dc0] transition-colors duration-300 rounded-full w-[45px] h-[45px] flex items-center justify-center">
-                  <Facebook className="text-[#952dc0] hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2 mx-auto">
-                <div className="border border-[#952dc0] hover:bg-[#952dc0] transition-colors duration-300 rounded-full w-[45px] h-[45px] flex items-center justify-center">
-                  <MessageCircle className="text-[#952dc0] hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2 mx-auto">
-                <div className="border border-[#952dc0] hover:bg-[#952dc0] transition-colors duration-300 rounded-full w-[45px] h-[45px] flex items-center justify-center">
-                  <Send className="text-[#952dc0] hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2 mx-auto">
-                <div className="border border-[#952dc0] hover:bg-[#952dc0] transition-colors duration-300 rounded-full w-[45px] h-[45px] flex items-center justify-center">
-                  <Linkedin className="text-[#952dc0] hover:text-white w-5 h-5" />
-                </div>
-              </a>
-            </div>
-            <div className="flex justify-center">
-              <button
-                onClick={handleDownload}
-                className="text-white border border-[#952dc0] rounded-full px-6 py-2 mt-8 inline-block hover:bg-[#952dc0] transition-colors duration-300"
-              >
-                Download Whitepaper
-              </button>
-            </div>
+            </ul>
           </div>
         </div>
-        <p className="text-center text-white pt-[50px]">
-          ©2025 QSE. All rights reserved
-        </p>
+
+        {/* Copyright */}
+        <div className="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+          &copy; 2025 Quantum-SEC. All rights reserved.
+        </div>
       </div>
     </footer>
   );

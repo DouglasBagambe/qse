@@ -18,16 +18,16 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 * {
@@ -38,17 +38,25 @@ code {
 
 .buytoken:hover {
   background: #9c0bf0;
-  box-shadow: 0 0 10px #218ef3, 0 0 30px #21c6f3, 0 0 60px #2128f3;
+  box-shadow:
+    0 0 10px #218ef3,
+    0 0 30px #21c6f3,
+    0 0 60px #2128f3;
 }
 
 .cutom-shadow {
-  box-shadow: 0 5px 5px rgb(0 0 0 / 30%), 1px -1px 2px rgb(0 0 0 / 40%);
+  box-shadow:
+    0 5px 5px rgb(0 0 0 / 30%),
+    1px -1px 2px rgb(0 0 0 / 40%);
 }
 
 .button-g:hover {
   color: #fff;
   background: #9c0bf0;
-  box-shadow: 0 0 10px #218ef3, 0 0 30px #21c6f3, 0 0 60px #2128f3;
+  box-shadow:
+    0 0 10px #218ef3,
+    0 0 30px #21c6f3,
+    0 0 60px #2128f3;
 }
 
 .ball {
@@ -69,8 +77,8 @@ code {
 }
 
 .spin {
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   background: url(/assets/dainellogo.svg) no-repeat 0 0;
   background-size: cover;
 
