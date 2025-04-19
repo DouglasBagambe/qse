@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 // Newsletter Section Component
 import React, { useState } from "react";
 
