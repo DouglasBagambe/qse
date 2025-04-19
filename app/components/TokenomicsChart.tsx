@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const TokenomicsChart = () => {
-  const [activeSegment, setActiveSegment] = useState(null);
+  const [activeSegment, setActiveSegment] = useState<number | null>(null);
 
   const tokenomicsData = [
     { name: "Development & Operations", value: 40, color: "#0086FF" },
