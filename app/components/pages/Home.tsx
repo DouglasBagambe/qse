@@ -2,8 +2,6 @@
 
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useState } from "react";
@@ -99,7 +97,7 @@ const Home = () => {
             </h1>
 
             {/* Darker text color, increased weight, and slight shadow */}
-            <p
+            {/* <p
               className="text-xl md:text-2xl mb-10 text-blue-900 max-w-3xl mx-auto font-semibold"
               style={{ textShadow: "0 1px 1px rgba(255,255,255,0.5)" }}
             >
@@ -108,7 +106,7 @@ const Home = () => {
               energy, supply chain logistics, and cybersecurity.
             </p>
 
-            {/* Increased contrast on feature bullets */}
+            {/* Increased contrast on feature bullets *
             <div className="flex flex-wrap gap-8 justify-center mb-12">
               <div className="flex items-center text-blue-800 font-semibold">
                 <div className="w-3 h-3 rounded-full bg-blue-600 mr-2"></div>
@@ -122,7 +120,7 @@ const Home = () => {
                 <div className="w-3 h-3 rounded-full bg-blue-600 mr-2"></div>
                 <span>Limited Supply with Deflationary Tokenomics</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Enhanced buttons with stronger hover effect */}
             <div className="flex flex-col md:flex-row gap-6 justify-center">
@@ -307,51 +305,47 @@ const Home = () => {
         </div>
       </section>
 
-      <section id="value">
+      {/* <section id="value">
         <CoreValues />
-      </section>
+      </section> */}
 
       {/* The Future of QSE */}
-      <section className="py-20 bg-gradient-to-r from-blue-900 to-indigo-800 text-white">
+      <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="lg:w-1/2">
-              <h2 className="text-3xl font-bold mb-6">
+          <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-white p-8 flex flex-col lg:flex-row items-center gap-8 overflow-hidden">
+            <div className="lg:w-3/4">
+              <h2 className="text-2xl font-bold mb-4">
                 The Future of Quantum SEC
               </h2>
-              <p className="mb-8 text-blue-100">
+              <p className="mb-6 text-blue-50">
                 Quantum SEC is more than just a cryptocurrency - it's a complete
                 ecosystem designed to accelerate the adoption of sustainable
                 energy and services.
               </p>
 
-              <ul className="space-y-4">
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-300">✓</span>
+              <ul className="space-y-3">
+                <li className="flex items-center">
+                  <span className="mr-2 text-blue-200">✓</span>
                   <span>Direct integration with charging networks</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-300">✓</span>
+                <li className="flex items-center">
+                  <span className="mr-2 text-blue-200">✓</span>
                   <span>Smart contracts for automated payments</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-300">✓</span>
+                <li className="flex items-center">
+                  <span className="mr-2 text-blue-200">✓</span>
                   <span>Energy trading capabilities</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="mr-3 text-blue-300">✓</span>
+                <li className="flex items-center">
+                  <span className="mr-2 text-blue-200">✓</span>
                   <span>Carbon offset through renewable investments</span>
                 </li>
               </ul>
             </div>
 
-            <div className="lg:w-1/2">
-              <div className="bg-blue-800 bg-opacity-30 rounded-2xl p-8 backdrop-filter backdrop-blur-sm border border-blue-700 border-opacity-30">
-                <img
-                  src="/assets/spin.png"
-                  alt="Quantum Technology"
-                  className="w-full max-w-md mx-auto"
-                />
+            <div className="lg:w-1/4 flex justify-center">
+              <div className="relative w-32 h-32">
+                <div className="spin w-full h-full"></div>
               </div>
             </div>
           </div>
@@ -388,7 +382,7 @@ const Home = () => {
         <NewsletterSection />
       </section>
 
-      <section className="bg-[#040347] text-white pt-[30px] pb-[50px]">
+      {/* <section className="bg-[#040347] text-white pt-[30px] pb-[50px]">
         <div className="max-w-[1700px] mx-auto p-5">
           <h1 className="text-4xl font-bold text-center mb-20">
             Partners & Collaborators
@@ -426,7 +420,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       {/* Token Purchase Modal */}
       {showPurchaseModal && (
         <TokenPurchaseModal
