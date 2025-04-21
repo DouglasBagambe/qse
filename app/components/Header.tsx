@@ -104,7 +104,6 @@ const Header = () => {
             <div className="flex-shrink-0">
               <a href="/" className="flex items-center group">
                 <div className="w-10 h-10 relative -mt-4 mr-2">
-                  <div className="absolute inset-0 bg-blue-400 rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-8 h-8">
                       <div className="spin"></div>
