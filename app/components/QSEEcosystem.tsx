@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
+
 import React from "react";
 import { FileText, Lightbulb, PieChart, Navigation } from "lucide-react";
+import { useRouter } from "next/navigation"; // Changed from 'next/router' to 'next/navigation'
 
 const QSEEcosystem = () => {
   // Function to handle PDF viewing
@@ -28,9 +32,11 @@ const QSEEcosystem = () => {
         <body>
           <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
         </body>
+      </html>
       `);
     }
   };
+
   const handleTokenTheoryPDFView = () => {
     const pdfPath = `${window.location.origin}/assets/token-theory/HCISS - QSE Token Theory.pdf`;
     const newWindow = window.open("", "_blank");
@@ -56,8 +62,15 @@ const QSEEcosystem = () => {
         <body>
           <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
         </body>
+      </html>
       `);
     }
+  };
+
+  const router = useRouter();
+
+  const handleTokenTheoryView = () => {
+    window.open("/token-theory", "_blank");
   };
 
   // Function to scroll to section
@@ -151,7 +164,7 @@ const QSEEcosystem = () => {
             </p>
             <div className="flex justify-start">
               <button
-                onClick={handleTokenTheoryPDFView}
+                onClick={handleTokenTheoryView}
                 className="group inline-flex items-center text-blue-600 font-medium text-lg bg-blue-50 px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300"
               >
                 Learn more

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-html-link-for-pages */
-// app/components/Header.tsx
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import TokenPurchaseModal from "./TokenPurchaseModal";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,6 +13,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname(); // Get current path for active link highlighting
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -50,10 +52,6 @@ const Header = () => {
     setMobileMenuOpen(false);
   };
 
-  const handleNavLinkClick = () => {
-    closeMobileMenu();
-  };
-
   const openPurchaseModal = (e: React.MouseEvent) => {
     e.stopPropagation();
     closeMobileMenu();
@@ -81,13 +79,95 @@ const Header = () => {
     }
   };
 
+  const handleTokenTheoryPDFView = () => {
+    const pdfPath = `${window.location.origin}/assets/token-theory/HCISS - QSE Token Theory.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE Token Theory</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
+  // Function to navigate to a section on the home page
+  const navigateToHomeSection = (sectionId: string) => {
+    // If we're already on the home page, just scroll to the section
+    if (pathname === "/" || pathname === "") {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // If we're on another page, navigate to the home page with the section hash
+      window.location.href = `/${sectionId ? "#" + sectionId : ""}`;
+    }
+  };
+
+  // Check if we're at the top of the page (for highlighting home link)
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  useEffect(() => {
+    const checkIfTop = () => {
+      setIsAtTop(window.scrollY < 50);
+    };
+
+    window.addEventListener("scroll", checkIfTop);
+    checkIfTop(); // Check on initial load
+
+    return () => window.removeEventListener("scroll", checkIfTop);
+  }, []);
+
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "#ecosystem", label: "Ecosystem" },
-    { href: "#tokenomics", label: "Token Info" },
-    { href: "#roadmap", label: "Roadmap" },
-    { href: "#", label: "Whitepaper", isWhitepaper: true },
+    { id: "home", href: "/", label: "Home", isHomePage: true },
+    {
+      id: "ecosystem",
+      href: "#ecosystem",
+      label: "Ecosystem",
+      isSection: true,
+    },
+    { id: "whitepaper", href: "#", label: "Whitepaper", isWhitepaper: true },
+    {
+      id: "token-theory",
+      href: "/token-theory",
+      label: "Token Theory",
+      isTokenTheory: true,
+    },
   ];
+
+  // Function to determine if a link is active
+  const isLinkActive = (link: any): boolean => {
+    // For the home link
+    if (link.isHomePage && pathname === "/" && isAtTop) {
+      return true;
+    }
+
+    // For section links on the home page
+    if (link.isSection && pathname === "/") {
+      const hash = window.location.hash;
+      return (
+        hash === link.href ||
+        (hash === "" && link.id === "ecosystem" && !isAtTop)
+      );
+    }
+
+    // For the token theory page
+    if (link.isTokenTheory && pathname === "/token-theory") {
+      return true;
+    }
+
+    return false;
+  };
 
   return (
     <>
@@ -102,7 +182,14 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <a href="/" className="flex items-center group">
+              <a
+                href="/"
+                className="flex items-center group"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = "/";
+                }}
+              >
                 <div className="w-10 h-10 relative -mt-4 mr-2">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-8 h-8">
@@ -118,22 +205,27 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
-              {navLinks.map((link, index) => (
+              {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  onClick={
-                    link.isWhitepaper
-                      ? (e) => {
-                          e.preventDefault();
-                          handlePDFView();
-                        }
-                      : undefined
-                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+
+                    if (link.isHomePage) {
+                      window.location.href = "/";
+                    } else if (link.isWhitepaper) {
+                      handlePDFView();
+                    } else if (link.isTokenTheory) {
+                      window.open("/token-theory", "_blank");
+                    } else if (link.isSection) {
+                      navigateToHomeSection(link.id);
+                    }
+                  }}
                   className={`relative px-4 py-2 text-white font-medium text-sm lg:text-base transition-all duration-300
-  after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-  after:bg-blue-300 after:transition-all after:duration-300
-  hover:text-blue-200 hover:after:w-full ${index === 0 ? "text-blue-200 after:w-full" : ""}`}
+                    after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
+                    after:bg-blue-300 after:transition-all after:duration-300
+                    hover:text-blue-200 hover:after:w-full ${isLinkActive(link) ? "text-blue-200 after:w-full" : ""}`}
                 >
                   {link.label}
                 </a>
@@ -230,24 +322,34 @@ const Header = () => {
         >
           <div className="absolute inset-0 bg-blue-500/5 bg-opacity-10 backdrop-filter backdrop-blur-sm"></div>
           <nav className="relative z-10">
-            {navLinks.map((link, index) => (
+            {navLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 onClick={(e) => {
-                  if (link.isWhitepaper) {
-                    e.preventDefault();
+                  e.preventDefault();
+
+                  if (link.isHomePage) {
+                    window.location.href = "/";
+                  } else if (link.isWhitepaper) {
                     handlePDFView();
+                  } else if (link.isTokenTheory) {
+                    window.open("/token-theory", "_blank");
+                  } else if (link.isSection) {
+                    navigateToHomeSection(link.id);
                   }
-                  handleNavLinkClick();
+
+                  closeMobileMenu();
                 }}
                 className={`block py-4 px-6 text-white border-b border-blue-700/50 
-          hover:bg-blue-700/30 transition-all duration-200 font-medium
-          flex items-center ${index === 0 ? "text-blue-300" : ""}`}
+                    hover:bg-blue-700/30 transition-all duration-200 font-medium
+                    flex items-center ${isLinkActive(link) ? "text-blue-300" : ""}`}
               >
                 <span className="relative overflow-hidden group">
                   {link.label}
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                  <span
+                    className={`absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform transition-transform duration-300 ${isLinkActive(link) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                  ></span>
                 </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
