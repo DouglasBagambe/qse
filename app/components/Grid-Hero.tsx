@@ -112,7 +112,6 @@ const TunnelWithSpinningLogos = () => {
     <div className="relative w-full h-full">
       {/* White background */}
       <div className="absolute inset-0 bg-white"></div>
-
       {/* Main SVG with tunnel - now stretched to fill the container */}
       <svg
         viewBox={`0 0 ${width} ${height}`}
@@ -148,10 +147,9 @@ const TunnelWithSpinningLogos = () => {
           />
         ))}
       </svg>
-
-      {/* Top Left Spinning Logo */}
+      {/* Top Left Spinning Logo - ONLY ON MEDIUM+ SCREENS */}
       <div
-        className="absolute top-10 -left-24 animate-spin"
+        className="absolute top-10 -left-24 animate-spin hidden md:block"
         style={{
           width: "300px",
           height: "300px",
@@ -164,9 +162,9 @@ const TunnelWithSpinningLogos = () => {
         }}
       />
 
-      {/* Bottom Right Spinning Logo */}
+      {/* Bottom Right Spinning Logo - ONLY ON MEDIUM+ SCREENS */}
       <div
-        className="absolute bottom-10 -right-24 animate-spin"
+        className="absolute bottom-10 -right-24 animate-spin hidden md:block"
         style={{
           width: "300px",
           height: "300px",

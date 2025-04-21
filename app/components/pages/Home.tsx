@@ -75,19 +75,19 @@ const Home = () => {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center">
               <button
                 onClick={openPurchaseModal}
-                className="justify-center px-8 py-3 md:px-10 md:py-4 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] text-white font-semibold rounded-lg hover:shadow-[0_0_15px_#2563EB] active:translate-y-1 transition-all duration-300 text-lg md:text-xl shadow-lg w-full sm:w-auto relative overflow-hidden group"
+                className="flex items-center justify-center px-8 py-3 md:px-10 md:py-4 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] text-white font-semibold rounded-lg hover:shadow-[0_0_15px_#2563EB] active:translate-y-1 transition-all duration-300 text-lg md:text-xl shadow-lg w-full sm:w-auto relative overflow-hidden group"
               >
-                <span className="relative left-2 z-10">Buy Token</span>
-                <span className="absolute left-4 right-4 top-1/2 transform -translate-y-1/2 text-white gap-2">
+                <span className="relative z-10 flex items-center gap-2">
                   <Coins size={25} />
+                  <span>Buy Token</span>
                 </span>
                 <span className="absolute inset-0 bg-gradient-to-r from-[#1E40AF] to-[#2563EB] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
               </button>
               <button
                 onClick={handlePDFView}
-                className="justify-center px-8 py-3 md:px-10 md:py-4 bg-white text-[#2563EB] font-semibold rounded-lg hover:bg-[#E5E7EB] active:bg-[#D1D5DB] transition-all duration-300 border-2 border-[#2563EB] text-lg md:text-xl shadow-sm w-full sm:w-auto group relative overflow-hidden"
+                className="flex items-center justify-center px-8 py-3 md:px-10 md:py-4 bg-white text-[#2563EB] font-semibold rounded-lg hover:bg-[#E5E7EB] active:bg-[#D1D5DB] transition-all duration-300 border-2 border-[#2563EB] text-lg md:text-xl shadow-sm w-full sm:w-auto group relative overflow-hidden"
               >
-                <span className="relative z-10 group-hover:text-[#1E40AF] transition-colors duration-300 flex items-center gap-2">
+                <span className="relative z-10 group-hover:text-[#1E40AF] transition-colors duration-300 flex items-center justify-center gap-2">
                   <FileText size={25} />
                   <span>Read Whitepaper</span>
                 </span>
