@@ -241,7 +241,7 @@ const Home = () => {
         <TokenomicsChart />
       </section>
 
-      <section id="token-sale" className="">
+      <section id="tokensale" className="">
         <TokenSale />
       </section>
       <hr className="border-t border-gray-300" />

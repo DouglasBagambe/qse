@@ -60,12 +60,33 @@ const Header = () => {
     setShowPurchaseModal(true);
   };
 
+  const handlePDFView = () => {
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE-Token EVCI Whitepaper</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "#core-values", label: "Core Values" },
-    { href: "#token-info", label: "Token Info" },
-    { href: "#road-maps", label: "Roadmap" },
-    { href: "#whitepaper", label: "Whitepaper" },
+    { href: "#ecosystem", label: "Ecosystem" },
+    { href: "#tokenomics", label: "Token Info" },
+    { href: "#roadmap", label: "Roadmap" },
+    { href: "#", label: "Whitepaper", isWhitepaper: true },
   ];
 
   return (
@@ -102,10 +123,18 @@ const Header = () => {
                 <a
                   key={link.label}
                   href={link.href}
+                  onClick={
+                    link.isWhitepaper
+                      ? (e) => {
+                          e.preventDefault();
+                          handlePDFView();
+                        }
+                      : undefined
+                  }
                   className={`relative px-4 py-2 text-white font-medium text-sm lg:text-base transition-all duration-300
-                  after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-                  after:bg-blue-300 after:transition-all after:duration-300
-                  hover:text-blue-200 hover:after:w-full ${index === 0 ? "text-blue-200 after:w-full" : ""}`}
+  after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
+  after:bg-blue-300 after:transition-all after:duration-300
+  hover:text-blue-200 hover:after:w-full ${index === 0 ? "text-blue-200 after:w-full" : ""}`}
                 >
                   {link.label}
                 </a>
@@ -206,10 +235,16 @@ const Header = () => {
               <a
                 key={link.label}
                 href={link.href}
-                onClick={handleNavLinkClick}
+                onClick={(e) => {
+                  if (link.isWhitepaper) {
+                    e.preventDefault();
+                    handlePDFView();
+                  }
+                  handleNavLinkClick();
+                }}
                 className={`block py-4 px-6 text-white border-b border-blue-700/50 
-                        hover:bg-blue-700/30 transition-all duration-200 font-medium
-                        flex items-center ${index === 0 ? "text-blue-300" : ""}`}
+          hover:bg-blue-700/30 transition-all duration-200 font-medium
+          flex items-center ${index === 0 ? "text-blue-300" : ""}`}
               >
                 <span className="relative overflow-hidden group">
                   {link.label}
@@ -234,25 +269,30 @@ const Header = () => {
             <div className="mt-6 mb-4 px-4">
               <button
                 onClick={openPurchaseModal}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-lg shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 flex items-center justify-center group"
+                className="w-full py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 text-white font-bold rounded-lg relative overflow-hidden shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 group"
               >
-                <span className="mr-2 group-hover:translate-x-1 transition-transform duration-300">
-                  Buy Token
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 group-hover:scale-110 transition-transform duration-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                  />
-                </svg>
+                <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-300 opacity-0 group-hover:opacity-100 transition-all duration-300"></span>
+                <span className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSI1MDAiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjAuMTUiLz48L3N2Zz4=')] opacity-20"></span>
+                <div className="relative flex items-center justify-center">
+                  <span className="inline-flex items-center mr-2 transform group-hover:translate-x-0 group-hover:scale-105 transition-all duration-300">
+                    Buy Token
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 transform group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </div>
+                <span className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-cyan-300 to-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></span>
               </button>
             </div>
           </nav>
