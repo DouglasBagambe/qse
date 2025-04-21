@@ -166,12 +166,12 @@ const TeamSection = () => {
   };
 
   return (
-    <section className="py-12 bg-white">
+    <section className="bg-blue-700 overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-white p-8 md:p-12 overflow-hidden relative">
+        <div className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-700 text-white p-8 md:p-12 overflow-hidden relative">
           {/* Background design elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full opacity-20 -mr-20 -mt-20"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400 rounded-full opacity-10 -ml-40 -mb-40"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-700 rounded-full opacity-20 -mr-20 -mt-20"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-700 rounded-full opacity-10 -ml-40 -mb-40"></div>
 
           <div className="relative z-10">
             {/* Section header */}
@@ -182,7 +182,7 @@ const TeamSection = () => {
               transition={{ duration: 0.8 }}
               className="text-center mb-12"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
+              <h2 className="text-5xl md:text-5xl font-bold mb-4 bg-clip-text text-white">
                 THE TEAM
               </h2>
               <div className="w-20 h-1 bg-blue-300 mx-auto mb-6"></div>

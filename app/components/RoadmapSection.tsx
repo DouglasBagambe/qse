@@ -8,15 +8,12 @@ const RoadmapSection = () => {
       date: "Q1 2025",
       title: "Foundation and Pilot",
       description:
-        "We establish the foundational technology and launch our pilot program with select EV charging stations.",
+        "We establish the foundational infrastructure and launch our initial pilot program.",
       tasks: [
-        { text: "Initial setup and team formation", completed: true },
-        { text: "Whitepaper and tokenomics development", completed: true },
-        {
-          text: "Pilot program with select charging stations",
-          completed: true,
-        },
-        { text: "Smart contract development and audit", completed: false },
+        { text: "Infrastructure Setup", completed: true },
+        { text: "Smart Contract Basics", completed: true },
+        { text: "Small Pilot Launch", completed: true },
+        { text: "Stakeholder Onboarding", completed: false },
       ],
     },
     {
@@ -24,25 +21,25 @@ const RoadmapSection = () => {
       date: "Q2 2025",
       title: "Careful Expansion",
       description:
-        "Expand our network and begin public token sale while establishing key partnerships.",
+        "Expand our pilot program and begin implementing key features for growth.",
       tasks: [
-        { text: "Token presale and public ICO", completed: false },
-        { text: "Scaling pilot to 100+ charging stations", completed: false },
-        { text: "Energy trading trials initiation", completed: false },
-        { text: "Community incentives program launch", completed: false },
+        { text: "Scaling the Pilot", completed: false },
+        { text: "Energy Trading Trials", completed: false },
+        { text: "Interoperability", completed: false },
+        { text: "Community Incentives", completed: false },
       ],
     },
     {
       phase: "Phase 3",
       date: "Q3 2025",
-      title: "Security and Optimization",
+      title: "Deeper Security and Optimization",
       description:
-        "Enhance platform security and optimize for mass adoption with advanced technology.",
+        "Enhance platform security and optimize with advanced technologies.",
       tasks: [
-        { text: "AI integration for usage optimization", completed: false },
-        { text: "Quantum security enhancements", completed: false },
-        { text: "Layer-2 solutions for scalability", completed: false },
-        { text: "Cross-chain interoperability", completed: false },
+        { text: "AI and Quantum Testing", completed: false },
+        { text: "Privacy Enhancements", completed: false },
+        { text: "Layer-2 Solutions", completed: false },
+        { text: "Data Insights", completed: false },
       ],
     },
     {
@@ -50,15 +47,12 @@ const RoadmapSection = () => {
       date: "Q4 2025",
       title: "Wider Adoption",
       description:
-        "Achieve global scale and establish Quantum-SEC as the standard for charging payments worldwide.",
+        "Scale deployment and improve user experience for broader market adoption.",
       tasks: [
-        { text: "Global expansion to major markets", completed: false },
-        { text: "UX enhancements and mobile app", completed: false },
-        { text: "Integration with major EV manufacturers", completed: false },
-        {
-          text: "Sustainability reporting and carbon credits",
-          completed: false,
-        },
+        { text: "Full-scale, Gradual Deployment", completed: false },
+        { text: "Collaborations", completed: false },
+        { text: "User Experience Boost", completed: false },
+        { text: "Network Assessment", completed: false },
       ],
     },
   ];
@@ -66,12 +60,13 @@ const RoadmapSection = () => {
   return (
     <section className="bg-blue-700 py-20 px-4 overflow-hidden">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-5xl font-bold text-center mb-6 text-blue-300">
-          Roadmap
+        <h1 className="text-5xl font-bold text-center mb-6 text-white">
+          ROADMAP
         </h1>
+        <div className="w-20 h-1 bg-blue-300 mx-auto mb-6"></div>
         <p className="text-center text-white/80 text-lg mb-16 max-w-3xl mx-auto">
-          Our strategic plan to revolutionize utility payments globally,
-          focusing on electric vehicle charging infrastructure.
+          Our strategic plan to revolutionize EV charging with the QSE Token
+          through a pilot-first approach.
         </p>
 
         {/* Roadmap content */}

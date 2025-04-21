@@ -64,9 +64,10 @@ const TokenomicsChart = () => {
     <section className="bg-white py-20 px-4">
       {/* Header Section */}
       <div className="max-w-5xl mx-auto mb-16">
-        <h1 className="text-5xl font-bold text-center mb-6 text-blue-600">
-          Tokenomics
-        </h1>
+        <h2 className="text-5xl font-bold text-center mb-6 text-blue-600">
+          TOKENOMICS
+        </h2>
+        <div className="w-20 h-1 bg-blue-300 mx-auto mb-6"></div>
         <p className="text-center text-gray-600 text-lg max-w-3xl mx-auto">
           Our token distribution is designed to ensure sustainable growth and
           development of the Quantum SEC ecosystem.

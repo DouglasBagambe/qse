@@ -5,10 +5,11 @@ const TokenSale = () => {
     <div className="bg-blue-700 py-16 px-4 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-4">
-            <span className="text-blue-300">Token</span> Sale
+          <h2 className="text-5xl font-bold text-center mb-6 text-white">
+            TOKEN SALE
           </h2>
-          <p className="max-w-3xl mx-auto text-sm">
+          <div className="w-20 h-1 bg-blue-300 mx-auto mb-6"></div>
+          <p className="text-center text-white/80 text-lg mb-16 max-w-3xl mx-auto">
             Join our ICO and be part of the energy payment revolution. Limited
             tokens available at the current price.
           </p>
