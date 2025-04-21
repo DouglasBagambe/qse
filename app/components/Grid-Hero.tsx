@@ -151,7 +151,7 @@ const TunnelWithSpinningLogos = () => {
 
       {/* Top Left Spinning Logo */}
       <div
-        className="absolute top-36 -left-24 animate-spin"
+        className="absolute top-10 -left-24 animate-spin"
         style={{
           width: "300px",
           height: "300px",
