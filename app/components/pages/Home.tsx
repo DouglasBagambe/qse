@@ -117,11 +117,12 @@ const Home = () => {
             <p className="text-base md:text-lg text-gray-700">
               The QSE Token Ecosystem was created with one goal in mind: to make
               digital security simple, powerful, and accessible for everyone.
-              Backed by industry leaders in AI, cybersecurity, and blockchain,
-              we're building a future where individuals and organizations can
-              safely adopt technology without fear. Whether you're a startup, a
-              clean energy innovator, or an investor looking to fuel the next
-              wave of secure digital growth—QSE is your gateway.
+              Backed by industry leaders in Cybersecurity , Quantum Mechanics,
+              AI, and Blockchain, we are building a future where individuals and
+              organizations can safely adopt technology without fear. Whether
+              you're a startup, a clean energy innovator, or an investor looking
+              to fuel the next wave of secure digital growth—QSE is your
+              gateway.
             </p>
           </div>
 
