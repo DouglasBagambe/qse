@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // TokenTheoryPage.tsx
 
 "use client";
@@ -20,11 +19,12 @@ import { motion, AnimatePresence } from "framer-motion";
 const TokenTheoryPage = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 1000); // This creates a 1-second artificial delay
     return () => clearTimeout(timer);
   }, []);
 
@@ -246,25 +246,45 @@ financial future.`,
 
   const goToSection = (index: React.SetStateAction<number>) => {
     setCurrentSection(index);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } },
+    visible: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } },
   };
 
   const contentVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.7,
+        ease: "easeOut",
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-b from-blue-700 to-blue-900 min-h-screen flex items-center justify-center">
+      <div className="bg-white min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
-          <h2 className="mt-4 text-2xl text-white font-bold">
+          <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+          <h2 className="mt-4 text-2xl text-blue-700 font-bold">
             Loading QuantumSEC
           </h2>
         </div>
@@ -274,33 +294,100 @@ financial future.`,
 
   return (
     <motion.div
-      className="bg-gradient-to-b from-blue-700 to-blue-900 min-h-screen text-white"
+      className="bg-white min-h-screen"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
+      {/* Home Button - Fixed at the top */}
+      <motion.div
+        className="fixed top-6 right-6 z-50"
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 260, damping: 20 }}
+      >
+        <button
+          onClick={goToHome}
+          className="bg-white text-blue-600 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 group"
+          aria-label="Go to home page"
+        >
+          <Home
+            size={24}
+            className="group-hover:text-blue-800 transition-colors"
+          />
+        </button>
+      </motion.div>
+
+      {/* Mobile sidebar toggle */}
+      <motion.div
+        className="fixed top-6 left-6 z-50 block lg:hidden"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.5, type: "spring" }}
+      >
+        <button
+          onClick={toggleSidebar}
+          className="bg-white text-blue-600 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          aria-label="Toggle sidebar"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h7"
+            />
+          </svg>
+        </button>
+      </motion.div>
+
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar with 3D effect */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="flex flex-col lg:flex-row gap-8 relative">
+          {/* Sidebar - hidden on mobile unless toggled */}
           <motion.div
-            className="lg:w-1/4"
+            className={`fixed lg:relative top-0 left-0 h-full lg:h-auto w-3/4 lg:w-1/4 z-40 lg:z-0 bg-white lg:bg-transparent transform lg:transform-none transition-transform duration-300 ease-in-out ${
+              isSidebarOpen
+                ? "translate-x-0"
+                : "-translate-x-full lg:translate-x-0"
+            }`}
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <div
-              className="bg-blue-800 bg-opacity-30 rounded-2xl p-6 backdrop-filter backdrop-blur-lg border border-blue-600/30 shadow-lg transform hover:translate-z-10 transition-all duration-300"
-              style={{
-                boxShadow:
-                  "0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(59, 130, 246, 0.3)",
-              }}
-            >
-              <h2 className="text-xl font-bold mb-4 flex items-center">
-                <div className="bg-blue-500 p-2 rounded-lg mr-2">
+            <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 h-full lg:h-auto overflow-auto">
+              {/* Close button for mobile */}
+              <button
+                onClick={toggleSidebar}
+                className="absolute top-4 right-4 lg:hidden text-gray-500 hover:text-gray-800"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              <h2 className="text-xl font-bold mb-6 flex items-center text-blue-800">
+                <div className="bg-blue-100 p-2 rounded-lg mr-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
+                    className="h-5 w-5 text-blue-600"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -329,20 +416,22 @@ financial future.`,
                         onClick={() => goToSection(index)}
                         className={`text-left w-full py-3 px-4 rounded-xl transition-all duration-300 flex items-center ${
                           index === currentSection
-                            ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg"
-                            : "hover:bg-blue-700/40 text-blue-100"
+                            ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md"
+                            : "hover:bg-gray-50 text-gray-700"
                         }`}
                       >
                         <div
                           className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 ${
                             index === currentSection
-                              ? "bg-white text-blue-600"
-                              : "bg-blue-800 text-blue-200"
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-100 text-gray-600"
                           }`}
                         >
                           {section.id}
                         </div>
-                        <span className="line-clamp-1">{section.title}</span>
+                        <span className="line-clamp-1 font-medium">
+                          {section.title}
+                        </span>
                       </button>
                     </motion.li>
                   ))}
@@ -350,86 +439,110 @@ financial future.`,
               </div>
 
               {/* Progress indicator */}
-              <div className="mt-6">
-                <div className="text-sm text-blue-200 mb-2">Progress</div>
-                <div className="h-2 bg-blue-800 rounded-full overflow-hidden">
+              <div className="mt-8">
+                <div className="text-sm text-gray-600 mb-2 font-medium">
+                  Progress
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-blue-400 to-cyan-300 transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
                     style={{
                       width: `${(currentSection / (sections.length - 1)) * 100}%`,
                     }}
                   ></div>
                 </div>
-                <div className="text-xs text-blue-300 mt-2">
+                <div className="text-xs text-gray-500 mt-2">
                   Section {currentSection + 1} of {sections.length}
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Main Content Area with glass morphism and 3D card effect */}
+          {/* Overlay for mobile sidebar */}
+          {isSidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+              onClick={toggleSidebar}
+            ></div>
+          )}
+
+          {/* Main Content Area with elevated card effect */}
           <motion.div
-            className="lg:w-3/4"
+            className="lg:w-3/4 w-full"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <div
-              className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-gray-800"
-              style={{
-                boxShadow:
-                  "0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(59, 130, 246, 0.2)",
-              }}
-            >
+            <div className="bg-white rounded-3xl p-8 shadow-xl relative overflow-hidden border border-gray-100">
               {/* Background decorative elements */}
-              <div className="absolute -right-24 -top-24 w-64 h-64 bg-blue-400 opacity-10 rounded-full blur-3xl"></div>
-              <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-cyan-400 opacity-10 rounded-full blur-3xl"></div>
+              <div className="absolute -right-24 -top-24 w-64 h-64 bg-blue-200 opacity-10 rounded-full blur-3xl"></div>
+              <div className="absolute -left-20 -bottom-20 w-72 h-72 bg-blue-100 opacity-20 rounded-full blur-3xl"></div>
 
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSection}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
                   className="relative z-10"
                 >
                   {/* Section header with visual elements */}
-                  <div className="flex flex-col md:flex-row md:items-center mb-8 gap-4">
-                    <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-4 rounded-2xl mr-4 text-white shadow-lg transform transition-transform hover:scale-105">
+                  <motion.div
+                    className="flex flex-col md:flex-row md:items-center mb-10 gap-4"
+                    variants={contentVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <motion.div
+                      variants={itemVariants}
+                      className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-2xl mr-4 text-blue-600 shadow-md transform transition-transform hover:scale-105 border border-blue-200"
+                    >
                       {sections[currentSection].icon}
-                    </div>
+                    </motion.div>
 
-                    <div>
+                    <motion.div variants={itemVariants}>
                       <div className="text-sm font-mono text-blue-500 mb-1">
                         Section {sections[currentSection].id}
                       </div>
-                      <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-800 to-blue-600">
+                      <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800">
                         {sections[currentSection].title}
                       </h2>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
 
-                  {/* Content with styled typography */}
-                  <div
-                    className="prose prose-lg max-w-none prose-headings:text-blue-700 prose-strong:text-blue-800 prose-strong:font-bold"
+                  {/* Content with subtle animation and styled typography */}
+                  <motion.div
+                    className="prose prose-lg max-w-none prose-headings:text-blue-700 prose-strong:text-blue-700 prose-strong:font-bold"
                     dangerouslySetInnerHTML={{
                       __html: sections[currentSection].content,
                     }}
+                    variants={contentVariants}
+                    initial="hidden"
+                    animate="visible"
                   />
 
                   {/* Navigation Buttons with enhanced design */}
-                  <div className="mt-12 flex flex-col sm:flex-row justify-between gap-4">
+                  <motion.div
+                    className="mt-16 flex flex-col sm:flex-row justify-between gap-4"
+                    variants={contentVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
+                      variants={itemVariants}
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.4)",
+                      }}
                       whileTap={{ scale: 0.95 }}
                       onClick={goToPrevious}
                       disabled={currentSection === 0}
                       className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-xl sm:w-auto w-full
                         ${
                           currentSection === 0
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-blue-700 to-blue-600 text-white shadow-lg hover:shadow-blue-300/30"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-blue-300/30"
                         } 
                         transition-all duration-300`}
                     >
@@ -449,14 +562,16 @@ financial future.`,
 
                           if (dotIndex >= 0 && dotIndex < sections.length) {
                             return (
-                              <button
+                              <motion.button
                                 key={idx}
                                 className={`h-3 rounded-full transition-all ${
                                   dotIndex === currentSection
                                     ? "w-6 bg-blue-600"
-                                    : "w-3 bg-blue-300"
+                                    : "w-3 bg-blue-200"
                                 }`}
                                 onClick={() => goToSection(dotIndex)}
+                                whileHover={{ scale: 1.2 }}
+                                whileTap={{ scale: 0.9 }}
                               />
                             );
                           }
@@ -466,22 +581,26 @@ financial future.`,
                     </div>
 
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
+                      variants={itemVariants}
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.4)",
+                      }}
                       whileTap={{ scale: 0.95 }}
                       onClick={goToNext}
                       disabled={currentSection === sections.length - 1}
                       className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-xl sm:w-auto w-full
                         ${
                           currentSection === sections.length - 1
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg hover:shadow-blue-300/30"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-blue-300/30"
                         } 
                         transition-all duration-300`}
                     >
                       <span>Next</span>
                       <ChevronRight size={20} />
                     </motion.button>
-                  </div>
+                  </motion.div>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -489,20 +608,38 @@ financial future.`,
         </div>
       </div>
 
-      {/* Fixed floating action button */}
-      <motion.div
-        className="fixed bottom-8 right-8 z-50"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 1, type: "spring" }}
-      >
-        <button
-          onClick={goToHome}
-          className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
-        >
-          <Home size={24} />
-        </button>
-      </motion.div>
+      {/* Section indicators on mobile (bottom of screen) */}
+      <div className="fixed bottom-6 left-0 right-0 flex justify-center lg:hidden z-30">
+        <div className="bg-white rounded-full shadow-lg px-4 py-2 flex space-x-1">
+          {Array.from({ length: Math.min(7, sections.length) }).map(
+            (_, idx) => {
+              const dotIndex =
+                currentSection < 3
+                  ? idx
+                  : currentSection > sections.length - 4
+                    ? sections.length - 7 + idx
+                    : currentSection - 3 + idx;
+
+              if (dotIndex >= 0 && dotIndex < sections.length) {
+                return (
+                  <motion.button
+                    key={idx}
+                    className={`h-2 rounded-full transition-all ${
+                      dotIndex === currentSection
+                        ? "w-6 bg-blue-600"
+                        : "w-2 bg-gray-200"
+                    }`}
+                    onClick={() => goToSection(dotIndex)}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                  />
+                );
+              }
+              return null;
+            }
+          )}
+        </div>
+      </div>
 
       {/* Add global styles */}
       <style jsx global>{`
@@ -510,11 +647,11 @@ financial future.`,
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(59, 130, 246, 0.1);
+          background: rgba(243, 244, 246, 0.8);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(59, 130, 246, 0.5);
+          background: rgba(59, 130, 246, 0.3);
           border-radius: 10px;
         }
         @keyframes float {
@@ -526,6 +663,28 @@ financial future.`,
           }
           100% {
             transform: translateY(0px);
+          }
+        }
+
+        /* Animated word entrance */
+        .word-animation span {
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(10px);
+          animation: fadeInUp 0.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Add more responsiveness */
+        @media (max-width: 640px) {
+          .prose {
+            font-size: 16px;
           }
         }
       `}</style>
