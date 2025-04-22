@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/components/TokenPurchaseModal.tsx
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useWeb3, PaymentMethod } from "./Web3Provider";
+import { ArrowRight, CheckCircle, AlertCircle, X, Wallet } from "lucide-react";
 
 interface TokenPurchaseModalProps {
   isOpen: boolean;
@@ -17,19 +19,16 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
 }) => {
   const [paymentAmount, setPaymentAmount] = useState<string>("");
   const [qseAmount, setQseAmount] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
   const [purchaseCompleted, setPurchaseCompleted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [receiveAmount, setReceiveAmount] = useState<string>("");
   const [burnAmount, setBurnAmount] = useState<string>("");
   const [txHash, setTxHash] = useState<string>("");
-  const [emailCode, setEmailCode] = useState<string>("");
-  const [sentCode, setSentCode] = useState<string>("");
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
-  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod>("ETH");
+  const [showQuickBuy, setShowQuickBuy] = useState(false);
+  const [quickBuyAmount, setQuickBuyAmount] = useState<number>(100);
 
   const {
     connectWallet,
@@ -47,6 +46,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
 
   const MINIMUM_QSE_AMOUNT = 50;
   const QSE_TOKEN_PRICE_USD = 0.6; // QSE price in USD (e.g., $0.60 per QSE)
+
+  // Quick buy preset amounts
+  const quickBuyOptions = [100, 250, 500, 1000, 2500];
 
   useEffect(() => {
     if (isConnected) {
@@ -119,6 +121,14 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     setBurnAmount(burnTokens.toFixed(2));
   };
 
+  const handleQuickBuySelect = (amount: number) => {
+    setQuickBuyAmount(amount);
+    setQseAmount(amount.toString());
+    const payment = calculatePaymentFromQSE(amount, selectedPaymentMethod);
+    setPaymentAmount(payment);
+    calculateTokensAfterBurn(amount);
+  };
+
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setSelectedPaymentMethod(method);
 
@@ -133,47 +143,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       const tokens = getQSEAmountFromPayment(paymentAmount, method);
       setQseAmount(tokens.toFixed(2));
       calculateTokensAfterBurn(tokens);
-    }
-  };
-
-  const handleSendVerificationCode = () => {
-    if (!email || !email.includes("@")) {
-      setErrorMessage("Please enter a valid email address");
-      return;
-    }
-    setIsVerifyingEmail(true);
-
-    // Generate a 6-digit code for testing
-    const mockCode = Math.floor(100000 + Math.random() * 900000).toString();
-    setSentCode(mockCode);
-
-    // Automatically fill the verification code input for testing
-    setEmailCode(mockCode);
-
-    // Show a message in the error area to indicate the code was "sent"
-    setErrorMessage(`Code sent to your email: ${mockCode}`);
-
-    // Clear the error message after 3 seconds
-    setTimeout(() => {
-      if (errorMessage.includes("Code sent to your email")) {
-        setErrorMessage("");
-      }
-    }, 3000);
-  };
-
-  const handleVerifyEmail = () => {
-    if (emailCode === sentCode) {
-      setIsEmailVerified(true);
-      setErrorMessage("Email verified successfully!");
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        if (errorMessage === "Email verified successfully!") {
-          setErrorMessage("");
-        }
-      }, 3000);
-    } else {
-      setErrorMessage("Invalid verification code");
     }
   };
 
@@ -200,29 +169,21 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       return false;
     }
 
-    if (!email || !email.includes("@")) {
-      setErrorMessage("Please enter a valid email address");
-      return false;
-    }
-
-    if (!isEmailVerified) {
-      setErrorMessage("Please verify your email before purchasing");
-      return false;
-    }
-
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!validatePurchase()) return;
 
     setIsSubmitting(true);
     setErrorMessage("");
     try {
+      // Using a dummy email as it's no longer required for user input
+      const dummyEmail = `user-${Date.now()}@quantumsec.org`;
       const result = await buyTokens(
         paymentAmount,
-        email,
+        dummyEmail,
         selectedPaymentMethod
       );
       if (result.success) {
@@ -243,283 +204,361 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     }
   };
 
-  const handleButtonAction = async () => {
+  const handleQuickBuy = async () => {
+    if (!isConnected) {
+      await connectWallet();
+      return;
+    }
+
+    setQseAmount(quickBuyAmount.toString());
+    const payment = calculatePaymentFromQSE(
+      quickBuyAmount,
+      selectedPaymentMethod
+    );
+    setPaymentAmount(payment);
+    calculateTokensAfterBurn(quickBuyAmount);
+
+    // Execute purchase with minimal delay
+    setTimeout(() => {
+      handleSubmit();
+    }, 300);
+  };
+
+  const handleConnectOrBuy = async () => {
     if (!isConnected) {
       await connectWallet();
     } else {
-      // If connected, the button will be a submit button handled by the form
+      handleSubmit();
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[2000] px-4">
-      <div className="bg-[#0a0a4a] text-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[2000] px-4 backdrop-blur-sm">
+      <div className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white rounded-3xl shadow-2xl w-full max-w-4xl p-8 relative border border-blue-400/20">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-white"
+          className="absolute top-6 right-6 text-gray-300 hover:text-white bg-blue-800/50 p-2 rounded-lg hover:bg-blue-700/70 transition-all z-[3000]"
           aria-label="Close modal"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-bold mb-4 text-center">Buy QSE Tokens</h2>
-
-        {isConnected && (
-          <div className="mb-4 flex justify-between items-center p-3 bg-[#151575] rounded-lg text-sm">
-            <div>
-              <span className="text-gray-400">Your QSE Balance:</span>
-              <span className="ml-2 font-medium">
-                {parseFloat(qseBalance).toFixed(2)} QSE
-              </span>
-            </div>
-            <div
-              className="text-xs text-gray-400 truncate max-w-[150px]"
-              title={account || ""}
-            >
-              {account
-                ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-                : ""}
-            </div>
-          </div>
-        )}
-
-        {purchaseCompleted ? (
-          <div className="text-center py-6">
-            <div className="text-green-400 text-5xl mb-4">✓</div>
-            <h3 className="text-xl font-medium mb-2">Purchase Successful!</h3>
-            <p className="mb-2">You will receive {receiveAmount} QSE tokens</p>
-            <p className="text-sm text-gray-400 mb-4">
-              {burnAmount} QSE tokens were burned in this transaction
-            </p>
-            {txHash && (
-              <div className="mt-2 p-3 bg-[#151575] rounded-lg text-xs break-all">
-                <p className="font-medium mb-1">Transaction Hash:</p>
-                <p>{txHash}</p>
+        <div className="flex flex-col md:flex-row">
+          {/* Left Side - Main Content */}
+          <div
+            className={`${purchaseCompleted ? "w-full" : "w-full md:w-3/5"} pr-0 md:pr-6`}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg">
+                <Wallet size={28} className="text-white" />
               </div>
-            )}
-            <button
-              onClick={onClose}
-              className="mt-4 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-            >
-              Close
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Payment Method
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {supportedPaymentMethods.map((method) => (
-                  <button
-                    key={method}
-                    type="button"
-                    className={`py-2 rounded-lg text-sm font-medium transition duration-200 ${
-                      selectedPaymentMethod === method
-                        ? "bg-gradient-to-r from-[#a42e9a] to-[#5951f6] text-white"
-                        : "bg-[#1a1a6a] text-gray-300 hover:bg-[#252580]"
-                    }`}
-                    onClick={() => handlePaymentMethodChange(method)}
-                    disabled={!isConnected}
-                  >
-                    {method}
-                  </button>
-                ))}
-              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-200 to-indigo-100 bg-clip-text text-transparent">
+                Buy QSE Tokens
+              </h2>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                {selectedPaymentMethod} Amount
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  step="0.000001"
-                  min="0.000001"
-                  value={paymentAmount}
-                  onChange={handlePaymentInputChange}
-                  className="w-full bg-[#1a1a6a] rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="0.00"
-                  required
-                  disabled={!isConnected}
-                />
-                <div className="absolute right-3 top-3 text-gray-300">
-                  {selectedPaymentMethod}
-                </div>
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                Rate: 1 {selectedPaymentMethod} ={" "}
-                {getQSEAmountFromPayment("1", selectedPaymentMethod).toFixed(2)}{" "}
-                QSE
-              </div>
-              {/* <div className="text-xs text-gray-400 mt-1">
-                Rate: 1 USDT = {getQSEAmountFromPayment("1", "USDT")} QSE
-              </div> */}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                QSE Token Amount{" "}
-                <span className="text-xs text-gray-400">
-                  (min. {MINIMUM_QSE_AMOUNT} QSE)
-                </span>
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  min={MINIMUM_QSE_AMOUNT}
-                  value={qseAmount}
-                  onChange={handleQseInputChange}
-                  className="w-full bg-[#1a1a6a] rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="0"
-                  required
-                  disabled={!isConnected}
-                />
-                <div className="absolute right-3 top-3 text-gray-300">QSE</div>
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                Standard Rate: 1 USDT = {getQSEAmountFromPayment("1", "USDT")}{" "}
-                QSE
-              </div>
-            </div>
-
-            {receiveAmount && burnAmount && (
-              <div className="mb-4 p-3 bg-[#151575] rounded-lg">
-                <h4 className="font-medium mb-2">Transaction Details:</h4>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Gross Amount:</span>
-                  <span>{parseFloat(qseAmount).toFixed(2)} QSE</span>
-                </div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Burn Amount ({burnRate}%):</span>
-                  <span className="text-red-400">{burnAmount} QSE</span>
-                </div>
-                <div className="flex justify-between text-sm font-medium">
-                  <span>You Receive:</span>
-                  <span className="text-green-400">{receiveAmount} QSE</span>
-                </div>
-              </div>
-            )}
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Email (for purchase confirmation)
-              </label>
-              <div className="relative flex items-center">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#1a1a6a] rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="your@email.com"
-                  required
-                  disabled={isEmailVerified || !isConnected}
-                />
-                {!isEmailVerified && (
-                  <button
-                    type="button"
-                    onClick={handleSendVerificationCode}
-                    className="absolute right-3 text-sm text-blue-400 hover:text-blue-300 px-2 py-1"
-                    disabled={
-                      isVerifyingEmail ||
-                      !isConnected ||
-                      !email ||
-                      !email.includes("@")
-                    }
-                  >
-                    {isVerifyingEmail ? "Sent" : "Verify"}
-                  </button>
-                )}
-              </div>
-              {isVerifyingEmail && !isEmailVerified && (
-                <div className="mt-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Enter Verification Code
-                  </label>
-                  <div className="relative flex items-center">
-                    <input
-                      type="text"
-                      value={emailCode}
-                      onChange={(e) => setEmailCode(e.target.value)}
-                      className="w-full bg-[#1a1a6a] rounded-lg py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter 6-digit code"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleVerifyEmail}
-                      className="absolute right-3 text-sm text-blue-400 hover:text-blue-300 px-2 py-1"
-                    >
-                      Confirm
-                    </button>
+            {isConnected && (
+              <div className="mb-6 flex justify-between items-center p-4 bg-blue-800/40 rounded-xl text-sm border border-blue-500/30 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-700 p-2 rounded-lg">
+                    <Wallet size={18} />
+                  </div>
+                  <div>
+                    <div className="text-gray-300 text-xs">
+                      Your QSE Balance
+                    </div>
+                    <div className="font-semibold text-lg">
+                      {parseFloat(qseBalance).toFixed(2)}{" "}
+                      <span className="text-blue-300">QSE</span>
+                    </div>
                   </div>
                 </div>
-              )}
-              {isEmailVerified && (
-                <p className="text-sm text-green-400 mt-1">Email Verified ✓</p>
-              )}
-            </div>
-
-            {errorMessage && (
-              <div
-                className={`mb-4 p-3 rounded-lg text-sm ${
-                  errorMessage === "Email verified successfully!"
-                    ? "bg-green-900 bg-opacity-40 text-green-200"
-                    : errorMessage.includes("Code sent to your email")
-                      ? "bg-blue-900 bg-opacity-40 text-blue-200"
-                      : "bg-red-900 bg-opacity-40 text-red-200"
-                }`}
-              >
-                {errorMessage}
+                <div className="bg-blue-950/70 px-3 py-1.5 rounded-lg text-sm text-blue-300 font-mono truncate max-w-[200px]">
+                  {account
+                    ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
+                    : ""}
+                </div>
               </div>
             )}
 
-            {isConnected ? (
-              <button
-                type="submit"
-                disabled={isSubmitting || !isEmailVerified}
-                className={`w-full py-3 rounded-lg font-medium text-white bg-gradient-to-r from-[#a42e9a] to-[#5951f6] hover:opacity-90 transition duration-300 ${
-                  isSubmitting || !isEmailVerified ? "opacity-70" : ""
-                }`}
-              >
-                {isSubmitting ? "Processing..." : "Buy QSE Tokens"}
-              </button>
+            {purchaseCompleted ? (
+              <div className="text-center py-10 animate-fadeIn">
+                <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-green-400 to-green-600">
+                  <CheckCircle size={48} className="text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">
+                  Purchase Successful!
+                </h3>
+                <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-6 mb-8 max-w-md mx-auto">
+                  <div className="flex justify-between items-center mb-3 pb-3 border-b border-blue-700/50">
+                    <span className="text-gray-300">Tokens Purchased:</span>
+                    <span className="text-xl font-bold text-white">
+                      {qseAmount} QSE
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mb-3 pb-3 border-b border-blue-700/50">
+                    <span className="text-gray-300">Tokens Burned:</span>
+                    <span className="text-red-400">{burnAmount} QSE</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-gray-300">You Will Receive:</span>
+                    <span className="text-xl font-bold text-green-400">
+                      {receiveAmount} QSE
+                    </span>
+                  </div>
+                </div>
+                {txHash && (
+                  <div className="mb-6 p-4 bg-blue-900/60 rounded-xl text-xs break-all max-w-md mx-auto border border-blue-700/50">
+                    <p className="font-medium mb-1 text-blue-300">
+                      Transaction Hash:
+                    </p>
+                    <p className="font-mono text-gray-300 select-all">
+                      {txHash}
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={onClose}
+                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30"
+                >
+                  Close
+                </button>
+              </div>
             ) : (
-              <button
-                type="button"
-                onClick={handleButtonAction}
-                disabled={isConnecting}
-                className={`w-full py-3 rounded-lg font-medium text-white bg-gradient-to-r from-[#a42e9a] to-[#5951f6] hover:opacity-90 transition duration-300 ${
-                  isConnecting ? "opacity-70" : ""
-                }`}
-              >
-                {isConnecting ? "Connecting..." : "Connect Wallet"}
-              </button>
-            )}
-          </form>
-        )}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-blue-200">
+                    Payment Method
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {supportedPaymentMethods.map((method) => (
+                      <button
+                        key={method}
+                        type="button"
+                        className={`py-3 rounded-xl text-sm font-medium transition-all ${
+                          selectedPaymentMethod === method
+                            ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
+                            : "bg-blue-800/60 text-gray-300 hover:bg-blue-700/70 border border-blue-700/30"
+                        }`}
+                        onClick={() => handlePaymentMethodChange(method)}
+                        disabled={!isConnected}
+                      >
+                        {method}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-        <div className="mt-4 text-center text-xs text-gray-400">
-          <p>All transactions are processed on the blockchain.</p>
-          <p>
-            QSE price is fixed at $0.60 per token, regardless of payment method!
-          </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-blue-200">
+                      {selectedPaymentMethod} Amount
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.000001"
+                        min="0.000001"
+                        value={paymentAmount}
+                        onChange={handlePaymentInputChange}
+                        className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                        placeholder="0.00"
+                        required
+                        disabled={!isConnected}
+                      />
+                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300 font-medium">
+                        {selectedPaymentMethod}
+                      </div>
+                    </div>
+                    <div className="text-xs text-blue-300 mt-1.5 flex items-center gap-1">
+                      <span>Rate:</span>
+                      <span className="font-medium">
+                        1 {selectedPaymentMethod} ={" "}
+                        {getQSEAmountFromPayment(
+                          "1",
+                          selectedPaymentMethod
+                        ).toFixed(2)}{" "}
+                        QSE
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-blue-200">
+                      QSE Token Amount{" "}
+                      <span className="text-xs text-blue-300">
+                        (min. {MINIMUM_QSE_AMOUNT} QSE)
+                      </span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min={MINIMUM_QSE_AMOUNT}
+                        value={qseAmount}
+                        onChange={handleQseInputChange}
+                        className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3.5 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                        placeholder="0"
+                        required
+                        disabled={!isConnected}
+                      />
+                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300 font-medium">
+                        QSE
+                      </div>
+                    </div>
+                    <div className="text-xs text-blue-300 mt-1.5">
+                      Price: 1 QSE = ${QSE_TOKEN_PRICE_USD.toFixed(2)} USD
+                    </div>
+                  </div>
+                </div>
+
+                {(receiveAmount || showQuickBuy) && (
+                  <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-6 backdrop-blur-sm">
+                    <h4 className="font-medium mb-3 text-blue-100">
+                      Transaction Details:
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-300">Gross Amount:</span>
+                        <span className="text-white font-medium">
+                          {parseFloat(qseAmount || "0").toFixed(2)} QSE
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-300">
+                          Burn Amount ({burnRate}%):
+                        </span>
+                        <span className="text-red-400">
+                          {burnAmount || "0.00"} QSE
+                        </span>
+                      </div>
+                      <div className="h-px bg-blue-700/50 my-2"></div>
+                      <div className="flex justify-between text-sm font-medium">
+                        <span className="text-blue-100">You Receive:</span>
+                        <span className="text-green-400 font-bold">
+                          {receiveAmount || "0.00"} QSE
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {errorMessage && (
+                  <div
+                    className={`p-4 rounded-xl text-sm flex items-start gap-3 ${
+                      errorMessage.includes("success")
+                        ? "bg-green-900/40 text-green-200 border border-green-500/30"
+                        : "bg-red-900/40 text-red-200 border border-red-500/30"
+                    }`}
+                  >
+                    {errorMessage.includes("success") ? (
+                      <CheckCircle
+                        size={18}
+                        className="text-green-400 mt-0.5"
+                      />
+                    ) : (
+                      <AlertCircle size={18} className="text-red-400 mt-0.5" />
+                    )}
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                <div className="!mt-8">
+                  <button
+                    type={isConnected ? "submit" : "button"}
+                    onClick={isConnected ? undefined : handleConnectOrBuy}
+                    disabled={isSubmitting}
+                    className={`w-full py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-blue-500/30 relative overflow-hidden group ${
+                      isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {isSubmitting ? (
+                        "Processing..."
+                      ) : isConnected ? (
+                        <>
+                          Buy QSE Tokens
+                          <ArrowRight
+                            size={18}
+                            className="transition-transform group-hover:translate-x-1"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          Connect Wallet
+                          <Wallet size={18} />
+                        </>
+                      )}
+                    </span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+
+          {/* Right Side - Quick Buy Panel */}
+          {!purchaseCompleted && (
+            <div className="w-full md:w-2/5 mt-8 md:mt-0 md:border-l border-blue-700/40 md:pl-6">
+              <div className="bg-blue-800/30 border border-blue-600/20 rounded-xl p-5 backdrop-blur-sm">
+                <h3 className="text-xl font-medium mb-4 text-blue-100">
+                  Quick Buy
+                </h3>
+                <p className="text-gray-300 text-sm mb-6">
+                  Select a preset amount below for faster checkout with the
+                  current payment method.
+                </p>
+
+                <div className="space-y-3">
+                  {quickBuyOptions.map((amount) => (
+                    <button
+                      key={amount}
+                      type="button"
+                      onClick={() => handleQuickBuySelect(amount)}
+                      disabled={!isConnected}
+                      className={`w-full flex justify-between items-center p-4 rounded-lg border transition-all ${
+                        quickBuyAmount === amount
+                          ? "bg-blue-700/70 border-blue-500 text-white"
+                          : "bg-blue-900/40 border-blue-700/40 text-gray-300 hover:bg-blue-800/60"
+                      }`}
+                    >
+                      <span className="font-medium">{amount} QSE</span>
+                      <span className="text-sm">
+                        ≈{" "}
+                        {calculatePaymentFromQSE(amount, selectedPaymentMethod)}{" "}
+                        {selectedPaymentMethod}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    onClick={handleQuickBuy}
+                    disabled={isSubmitting || !isConnected}
+                    className={`w-full py-3.5 rounded-xl font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 flex items-center justify-center gap-2 transition-all ${
+                      isSubmitting || !isConnected ? "opacity-60" : ""
+                    }`}
+                  >
+                    {isConnected ? "Buy Now" : "Connect to Buy"}
+                    <ArrowRight size={18} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-4 text-center">
+                <p className="text-xs text-blue-300">
+                  Transactions processed securely on the blockchain.
+                </p>
+                <p className="text-xs text-blue-300 mt-1">
+                  QSE price fixed at ${QSE_TOKEN_PRICE_USD.toFixed(2)} per token
+                  for all payment methods
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
