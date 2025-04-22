@@ -1,11 +1,47 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FileText, Lightbulb, PieChart, Navigation } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 const QSEEcosystem = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+      },
+    },
+    hover: {
+      y: -8,
+      boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+
   // Function to handle PDF viewing with browser check
   const handleWhitepaperPDFView = () => {
     if (typeof window !== "undefined") {
@@ -117,159 +153,194 @@ const QSEEcosystem = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Whitepaper Card */}
-          <div className="bg-white backdrop-filter backdrop-blur-lg bg-opacity-95 p-8 rounded-2xl shadow-xl text-left transform transition-all duration-300 hover:translate-y-(-1) border border-blue-100 group hover:shadow-2xl">
-            <div className="flex items-center mb-6">
-              <div className="bg-blue-600 p-3 rounded-lg mr-4 text-white group-hover:bg-blue-700 transition-colors duration-300">
-                <FileText size={28} />
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10"
+          initial="hidden"
+          animate={isLoaded ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
+          {/* Token Theory Card (Now First) */}
+          <motion.div
+            className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <div className="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-indigo-50 p-4 rounded-xl mr-5 text-indigo-600">
+                  <Lightbulb size={28} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  Token Theory
+                </h3>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Whitepaper</h3>
-            </div>
-            <p className="text-gray-600 mb-6 text-lg">
-              Our comprehensive whitepaper outlines how QSE token transforms EV
-              charging with blockchain security, AI-enabled solutions, and
-              quantum-resistant cryptography—all designed with user privacy at
-              its core.
-            </p>
-            <div className="flex justify-start">
-              <button
-                onClick={handleWhitepaperPDFView}
-                className="group inline-flex items-center text-blue-600 font-medium text-lg bg-blue-50 px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300"
-              >
-                Learn more
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <p className="text-gray-600 mb-8 text-lg">
+                The QuantumSEC Token represents a paradigm shift in digital
+                trust and governance, built on three core principles: Security,
+                Intelligence, and Trust—with AI Security Agents providing 24/7
+                protection against emerging threats.
+              </p>
+              <div className="flex justify-start">
+                <button
+                  onClick={handleTokenTheoryView}
+                  className="group inline-flex items-center text-white font-medium text-lg bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-md hover:shadow-xl"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
-                </svg>
-              </button>
+                  Explore Theory
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Token Theory Card */}
-          <div className="bg-white backdrop-filter backdrop-blur-lg bg-opacity-95 p-8 rounded-2xl shadow-xl text-left transform transition-all duration-300 hover:translate-y-(-1) border border-blue-100 group hover:shadow-2xl">
-            <div className="flex items-center mb-6">
-              <div className="bg-blue-600 p-3 rounded-lg mr-4 text-white group-hover:bg-blue-700 transition-colors duration-300">
-                <Lightbulb size={28} />
+          {/* Whitepaper Card (Now Second) */}
+          <motion.div
+            className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <div className="h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-blue-50 p-4 rounded-xl mr-5 text-blue-600">
+                  <FileText size={28} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800">Whitepaper</h3>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Token Theory</h3>
-            </div>
-            <p className="text-gray-600 mb-6 text-lg">
-              The QuantumSEC Token represents a paradigm shift in digital trust
-              and governance, built on three core principles: Security,
-              Intelligence, and Trust—with AI Security Agents providing 24/7
-              protection against emerging threats.
-            </p>
-            <div className="flex justify-start">
-              <button
-                onClick={handleTokenTheoryView}
-                className="group inline-flex items-center text-blue-600 font-medium text-lg bg-blue-50 px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300"
-              >
-                Learn more
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <p className="text-gray-600 mb-8 text-lg">
+                Our comprehensive whitepaper outlines how QSE token transforms
+                EV charging with blockchain security, AI-enabled solutions, and
+                quantum-resistant cryptography—all designed with user privacy at
+                its core.
+              </p>
+              <div className="flex justify-start">
+                <button
+                  onClick={handleWhitepaperPDFView}
+                  className="group inline-flex items-center text-white font-medium text-lg bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-xl"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
-                </svg>
-              </button>
+                  Read Whitepaper
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Tokenomics Card */}
-          <div className="bg-white backdrop-filter backdrop-blur-lg bg-opacity-95 p-8 rounded-2xl shadow-xl text-left transform transition-all duration-300 hover:translate-y-(-1) border border-blue-100 group hover:shadow-2xl">
-            <div className="flex items-center mb-6">
-              <div className="bg-blue-600 p-3 rounded-lg mr-4 text-white group-hover:bg-blue-700 transition-colors duration-300">
-                <PieChart size={28} />
+          <motion.div
+            className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <div className="h-2 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-purple-50 p-4 rounded-xl mr-5 text-purple-600">
+                  <PieChart size={28} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800">Tokenomics</h3>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Tokenomics</h3>
-            </div>
-            <p className="text-gray-600 mb-6 text-lg">
-              QSE features a total supply of 1 billion tokens with strategic
-              allocation: 40% for development, 20% for community incentives, 20%
-              for R&D, 15% for partnerships, and 5% reserve—with a 2% monthly
-              burn rate from transaction fees.
-            </p>
-            <div className="flex justify-start">
-              <button
-                onClick={() => scrollToSection("tokenomics")}
-                className="group inline-flex items-center text-blue-600 font-medium text-lg bg-blue-50 px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300"
-              >
-                Learn more
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <p className="text-gray-600 mb-8 text-lg">
+                QSE features a total supply of 1 billion tokens with strategic
+                allocation: 40% for development, 20% for community incentives,
+                20% for R&D, 15% for partnerships, and 5% reserve—with a 2%
+                monthly burn rate from transaction fees.
+              </p>
+              <div className="flex justify-start">
+                <button
+                  onClick={() => scrollToSection("tokenomics")}
+                  className="group inline-flex items-center text-white font-medium text-lg bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-xl"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
-                </svg>
-              </button>
+                  View Tokenomics
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Roadmap Card */}
-          <div className="bg-white backdrop-filter backdrop-blur-lg bg-opacity-95 p-8 rounded-2xl shadow-xl text-left transform transition-all duration-300 hover:translate-y-(-1) border border-blue-100 group hover:shadow-2xl">
-            <div className="flex items-center mb-6">
-              <div className="bg-blue-600 p-3 rounded-lg mr-4 text-white group-hover:bg-blue-700 transition-colors duration-300">
-                <Navigation size={28} />
+          <motion.div
+            className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
+            variants={cardVariants}
+            whileHover="hover"
+          >
+            <div className="h-2 bg-gradient-to-r from-blue-400 to-cyan-500"></div>
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-cyan-50 p-4 rounded-xl mr-5 text-cyan-600">
+                  <Navigation size={28} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800">Roadmap</h3>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Roadmap</h3>
-            </div>
-            <p className="text-gray-600 mb-6 text-lg">
-              Our 2025 roadmap outlines a methodical approach: Q1 foundation
-              building and pilot launch, Q2 careful expansion, Q3 security
-              enhancements with AI and quantum testing, and Q4 wider adoption
-              with full-scale deployment.
-            </p>
-            <div className="flex justify-start">
-              <button
-                onClick={() => scrollToSection("roadmap")}
-                className="group inline-flex items-center text-blue-600 font-medium text-lg bg-blue-50 px-5 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all duration-300"
-              >
-                Learn more
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <p className="text-gray-600 mb-8 text-lg">
+                Our 2025 roadmap outlines a methodical approach: Q1 foundation
+                building and pilot launch, Q2 careful expansion, Q3 security
+                enhancements with AI and quantum testing, and Q4 wider adoption
+                with full-scale deployment.
+              </p>
+              <div className="flex justify-start">
+                <button
+                  onClick={() => scrollToSection("roadmap")}
+                  className="group inline-flex items-center text-white font-medium text-lg bg-gradient-to-r from-cyan-600 to-cyan-700 px-6 py-3 rounded-xl hover:from-cyan-700 hover:to-cyan-800 transition-all duration-300 shadow-md hover:shadow-xl"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  />
-                </svg>
-              </button>
+                  See Roadmap
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Subtle animated wave at bottom */}

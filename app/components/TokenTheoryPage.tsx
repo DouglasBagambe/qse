@@ -339,9 +339,6 @@ financial future.`,
       <div className="bg-white min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-          <h2 className="mt-4 text-2xl text-blue-700 font-bold">
-            Loading QuantumSEC
-          </h2>
         </div>
       </div>
     );
