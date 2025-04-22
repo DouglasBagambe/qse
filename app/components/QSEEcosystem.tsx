@@ -70,7 +70,9 @@ const QSEEcosystem = () => {
   const router = useRouter();
 
   const handleTokenTheoryView = () => {
-    window.open("/token-theory", "_blank");
+    if (typeof window !== "undefined") {
+      window.open("/token-theory", "_blank");
+    }
   };
 
   // Function to scroll to section
