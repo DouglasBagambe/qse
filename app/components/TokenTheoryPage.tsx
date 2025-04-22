@@ -1,7 +1,7 @@
 // TokenTheoryPage.tsx
 
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,6 +12,8 @@ import {
   Globe,
   Cpu,
   BarChart3,
+  X,
+  Menu,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,12 +22,38 @@ const TokenTheoryPage = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000); // This creates a 1-second artificial delay
-    return () => clearTimeout(timer);
+    }, 1000); // 1-second artificial delay
+
+    // Close sidebar when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    // Close sidebar on escape key
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const sections = [
@@ -279,6 +307,33 @@ financial future.`,
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
+  const sidebarVariants = {
+    hidden: { x: "-100%", opacity: 0 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    exit: {
+      x: "-100%",
+      opacity: 0,
+      transition: {
+        ease: "easeInOut",
+        duration: 0.3,
+      },
+    },
+  };
+
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, transition: { duration: 0.3 } },
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center">
@@ -318,153 +373,142 @@ financial future.`,
         </button>
       </motion.div>
 
-      {/* Mobile sidebar toggle */}
-      <motion.div
-        className="fixed top-6 left-6 z-50 block lg:hidden"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.5, type: "spring" }}
-      >
-        <button
-          onClick={toggleSidebar}
-          className="bg-white text-blue-600 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-          aria-label="Toggle sidebar"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+      {/* Mobile sidebar toggle - Only show when sidebar is closed */}
+      <AnimatePresence mode="wait">
+        {!isSidebarOpen && (
+          <motion.div
+            className="fixed top-6 left-6 z-50 block lg:hidden"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{ duration: 0.3, type: "spring" }}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h7"
-            />
-          </svg>
-        </button>
-      </motion.div>
+            <button
+              onClick={toggleSidebar}
+              className="bg-white text-blue-600 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+              aria-label="Open sidebar"
+            >
+              <Menu size={24} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-20">
         <div className="flex flex-col lg:flex-row gap-8 relative">
-          {/* Sidebar - hidden on mobile unless toggled */}
-          <motion.div
-            className={`fixed lg:relative top-0 left-0 h-full lg:h-auto w-3/4 lg:w-1/4 z-40 lg:z-0 bg-white lg:bg-transparent transform lg:transform-none transition-transform duration-300 ease-in-out ${
-              isSidebarOpen
-                ? "translate-x-0"
-                : "-translate-x-full lg:translate-x-0"
-            }`}
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 h-full lg:h-auto overflow-auto">
-              {/* Close button for mobile */}
-              <button
+          {/* Sidebar for Mobile with AnimatePresence */}
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <motion.div
+                key="sidebar-overlay"
+                className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+                variants={overlayVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
                 onClick={toggleSidebar}
-                className="absolute top-4 right-4 lg:hidden text-gray-500 hover:text-gray-800"
+              />
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {(isSidebarOpen || window.innerWidth >= 1024) && (
+              <motion.div
+                ref={sidebarRef}
+                className="fixed lg:relative top-0 left-0 h-full lg:h-auto w-4/5 lg:w-1/4 z-40 lg:z-0 bg-white lg:bg-transparent"
+                variants={sidebarVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-
-              <h2 className="text-xl font-bold mb-6 flex items-center text-blue-800">
-                <div className="bg-blue-100 p-2 rounded-lg mr-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-blue-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 h-full lg:h-auto overflow-auto">
+                  {/* Close button for mobile - only visible on mobile */}
+                  <motion.button
+                    onClick={toggleSidebar}
+                    className="absolute top-4 right-4 lg:hidden text-gray-500 hover:text-gray-800 p-1 bg-gray-100 rounded-full"
+                    whileHover={{ scale: 1.1, backgroundColor: "#f3f4f6" }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h7"
-                    />
-                  </svg>
-                </div>
-                Contents
-              </h2>
+                    <X size={20} />
+                  </motion.button>
 
-              <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                <ul className="space-y-1">
-                  {sections.map((section, index) => (
-                    <motion.li
-                      key={section.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      <button
-                        onClick={() => goToSection(index)}
-                        className={`text-left w-full py-3 px-4 rounded-xl transition-all duration-300 flex items-center ${
-                          index === currentSection
-                            ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md"
-                            : "hover:bg-gray-50 text-gray-700"
-                        }`}
+                  <h2 className="text-xl font-bold mb-6 flex items-center text-blue-800">
+                    <div className="bg-blue-100 p-2 rounded-lg mr-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-blue-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        <div
-                          className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 ${
-                            index === currentSection
-                              ? "bg-blue-600 text-white"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 6h16M4 12h16M4 18h7"
+                        />
+                      </svg>
+                    </div>
+                    Contents
+                  </h2>
+
+                  <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <ul className="space-y-1">
+                      {sections.map((section, index) => (
+                        <motion.li
+                          key={section.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
                         >
-                          {section.id}
-                        </div>
-                        <span className="line-clamp-1 font-medium">
-                          {section.title}
-                        </span>
-                      </button>
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
+                          <button
+                            onClick={() => goToSection(index)}
+                            className={`text-left w-full py-3 px-4 rounded-xl transition-all duration-300 flex items-center ${
+                              index === currentSection
+                                ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md"
+                                : "hover:bg-gray-50 text-gray-700"
+                            }`}
+                          >
+                            <div
+                              className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 ${
+                                index === currentSection
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
+                            >
+                              {section.id}
+                            </div>
+                            <span className="line-clamp-1 font-medium">
+                              {section.title}
+                            </span>
+                          </button>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </div>
 
-              {/* Progress indicator */}
-              <div className="mt-8">
-                <div className="text-sm text-gray-600 mb-2 font-medium">
-                  Progress
+                  {/* Progress indicator */}
+                  <div className="mt-8">
+                    <div className="text-sm text-gray-600 mb-2 font-medium">
+                      Progress
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
+                        style={{
+                          width: `${(currentSection / (sections.length - 1)) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      Section {currentSection + 1} of {sections.length}
+                    </div>
+                  </div>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
-                    style={{
-                      width: `${(currentSection / (sections.length - 1)) * 100}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="text-xs text-gray-500 mt-2">
-                  Section {currentSection + 1} of {sections.length}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Overlay for mobile sidebar */}
-          {isSidebarOpen && (
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-              onClick={toggleSidebar}
-            ></div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Main Content Area with elevated card effect */}
           <motion.div
@@ -498,15 +542,15 @@ financial future.`,
                       variants={itemVariants}
                       className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-2xl mr-4 text-blue-600 shadow-md transform transition-transform hover:scale-105 border border-blue-200"
                     >
-                      {sections[currentSection].icon}
+                      {sections[currentSection]?.icon}
                     </motion.div>
 
                     <motion.div variants={itemVariants}>
                       <div className="text-sm font-mono text-blue-500 mb-1">
-                        Section {sections[currentSection].id}
+                        Section {sections[currentSection]?.id}
                       </div>
                       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800">
-                        {sections[currentSection].title}
+                        {sections[currentSection]?.title}
                       </h2>
                     </motion.div>
                   </motion.div>
@@ -515,7 +559,7 @@ financial future.`,
                   <motion.div
                     className="prose prose-lg max-w-none prose-headings:text-blue-700 prose-strong:text-blue-700 prose-strong:font-bold"
                     dangerouslySetInnerHTML={{
-                      __html: sections[currentSection].content,
+                      __html: sections[currentSection]?.content,
                     }}
                     variants={contentVariants}
                     initial="hidden"
@@ -610,7 +654,12 @@ financial future.`,
 
       {/* Section indicators on mobile (bottom of screen) */}
       <div className="fixed bottom-6 left-0 right-0 flex justify-center lg:hidden z-30">
-        <div className="bg-white rounded-full shadow-lg px-4 py-2 flex space-x-1">
+        <motion.div
+          className="bg-white rounded-full shadow-lg px-4 py-2 flex space-x-1"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5, type: "spring" }}
+        >
           {Array.from({ length: Math.min(7, sections.length) }).map(
             (_, idx) => {
               const dotIndex =
@@ -638,7 +687,7 @@ financial future.`,
               return null;
             }
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Add global styles */}
@@ -686,6 +735,11 @@ financial future.`,
           .prose {
             font-size: 16px;
           }
+        }
+
+        /* Prevent body scrolling when sidebar is open on mobile */
+        body.sidebar-open {
+          overflow: hidden;
         }
       `}</style>
     </motion.div>
