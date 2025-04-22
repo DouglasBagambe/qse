@@ -1,69 +1,73 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { FileText, Lightbulb, PieChart, Navigation } from "lucide-react";
-import { useRouter } from "next/navigation"; // Changed from 'next/router' to 'next/navigation'
+import { useRouter } from "next/navigation";
 
 const QSEEcosystem = () => {
-  // Function to handle PDF viewing
+  // Function to handle PDF viewing with browser check
   const handleWhitepaperPDFView = () => {
-    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
-    const newWindow = window.open("", "_blank");
-    if (newWindow) {
-      newWindow.document.write(`
-      <html>
-        <head>
-          <title>QSE-Token EVCI Whitepaper</title>
-          <style>
-            body, html {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-              overflow: hidden;
-            }
-            iframe {
-              width: 100%;
-              height: 100%;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
-        </body>
-      </html>
-      `);
+    if (typeof window !== "undefined") {
+      const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
+      const newWindow = window.open("", "_blank");
+      if (newWindow) {
+        newWindow.document.write(`
+        <html>
+          <head>
+            <title>QSE-Token EVCI Whitepaper</title>
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+              }
+              iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+              }
+            </style>
+          </head>
+          <body>
+            <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+          </body>
+        </html>
+        `);
+      }
     }
   };
 
   const handleTokenTheoryPDFView = () => {
-    const pdfPath = `${window.location.origin}/assets/token-theory/HCISS - QSE Token Theory.pdf`;
-    const newWindow = window.open("", "_blank");
-    if (newWindow) {
-      newWindow.document.write(`
-      <html>
-        <head>
-          <title>QSE Token Theory</title>
-          <style>
-            body, html {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-              overflow: hidden;
-            }
-            iframe {
-              width: 100%;
-              height: 100%;
-              border: none;
-            }
-          </style>
-        </head>
-        <body>
-          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
-        </body>
-      </html>
-      `);
+    if (typeof window !== "undefined") {
+      const pdfPath = `${window.location.origin}/assets/token-theory/HCISS - QSE Token Theory.pdf`;
+      const newWindow = window.open("", "_blank");
+      if (newWindow) {
+        newWindow.document.write(`
+        <html>
+          <head>
+            <title>QSE Token Theory</title>
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+              }
+              iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+              }
+            </style>
+          </head>
+          <body>
+            <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+          </body>
+        </html>
+        `);
+      }
     }
   };
 
@@ -77,9 +81,11 @@ const QSEEcosystem = () => {
 
   // Function to scroll to section
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    if (typeof window !== "undefined" && typeof document !== "undefined") {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 

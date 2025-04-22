@@ -14,6 +14,12 @@ const Header = () => {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname(); // Get current path for active link highlighting
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true once component mounts on client
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -21,9 +27,11 @@ const Header = () => {
       setScrolled(window.scrollY > 10);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (isClient) {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, [isClient]);
 
   // Handle clicking outside mobile menu to close it
   useEffect(() => {
@@ -39,9 +47,12 @@ const Header = () => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [mobileMenuOpen]);
+    if (isClient) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [mobileMenuOpen, isClient]);
 
   const toggleMobileMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -59,6 +70,8 @@ const Header = () => {
   };
 
   const handlePDFView = () => {
+    if (!isClient) return;
+
     const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
@@ -80,6 +93,8 @@ const Header = () => {
   };
 
   const handleTokenTheoryPDFView = () => {
+    if (!isClient) return;
+
     const pdfPath = `${window.location.origin}/assets/token-theory/HCISS - QSE Token Theory.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
@@ -102,6 +117,8 @@ const Header = () => {
 
   // Function to navigate to a section on the home page
   const navigateToHomeSection = (sectionId: string) => {
+    if (!isClient) return;
+
     // If we're already on the home page, just scroll to the section
     if (pathname === "/" || pathname === "") {
       const element = document.getElementById(sectionId);
@@ -122,11 +139,12 @@ const Header = () => {
       setIsAtTop(window.scrollY < 50);
     };
 
-    window.addEventListener("scroll", checkIfTop);
-    checkIfTop(); // Check on initial load
-
-    return () => window.removeEventListener("scroll", checkIfTop);
-  }, []);
+    if (isClient) {
+      window.addEventListener("scroll", checkIfTop);
+      checkIfTop(); // Check on initial load
+      return () => window.removeEventListener("scroll", checkIfTop);
+    }
+  }, [isClient]);
 
   const navLinks = [
     { id: "home", href: "/", label: "Home", isHomePage: true },
@@ -147,6 +165,8 @@ const Header = () => {
 
   // Function to determine if a link is active
   const isLinkActive = (link: any): boolean => {
+    if (!isClient) return false;
+
     // For the home link
     if (link.isHomePage && pathname === "/" && isAtTop) {
       return true;
@@ -187,7 +207,9 @@ const Header = () => {
                 className="flex items-center group"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = "/";
+                  if (isClient) {
+                    window.location.href = "/";
+                  }
                 }}
               >
                 <div className="w-10 h-10 relative -mt-4 mr-2">
@@ -211,6 +233,8 @@ const Header = () => {
                   href={link.href}
                   onClick={(e) => {
                     e.preventDefault();
+
+                    if (!isClient) return;
 
                     if (link.isHomePage) {
                       window.location.href = "/";
@@ -328,6 +352,8 @@ const Header = () => {
                 href={link.href}
                 onClick={(e) => {
                   e.preventDefault();
+
+                  if (!isClient) return;
 
                   if (link.isHomePage) {
                     window.location.href = "/";
