@@ -74,9 +74,28 @@ const TokenTheoryPage = () => {
       id: "02",
       title: "QuantumSEC AI Security Agentic Bots – Transformative Features",
       icon: <Cpu className="h-8 w-8" />,
-      content:
-        "<strong>Predictive Threat Neutralization:</strong><br/> Unlike traditional systems that react to breaches, AI Security Agentic (BSECA.ai) bots anticipate and eliminate risks before they strike. In decentralized finance (DeFi), they prevent flash loan attacks and smart contract exploits. For energy grids, they detect abnormal consumption patterns, stopping fraud or cyber-physical sabotage.<br/><br/> <strong>Self-Healing Automation:</strong><br/> These bots don't just find problems, they fix them instantly. In logistics, if a GPS tracker is hacked, it's quickly shut off, repaired, and brought back online without delay. For storage, if data is tampered with, it automatically restores itself. No waiting, no downtime, just smart, fast protection.<br/><br/> <strong>Regulatory Intelligence:</strong><br/> BSECA.ai bots auto-enforce compliance, slashing costs. In DeFi, they validate Know-Your-Customers-Know-Your-Transactions-Anti-Money-Laundering - KYC/KYT/AML rules across chains. For energy traders, they certify carbon credits and audit transactions against global standards—no manual oversight needed.<br/><br/> <strong>Advanced Security Features:</strong><br/> HCISS AI Security Agent Bots integrates several advanced features that set it apart in the competitive landscape: -<br/> Autonomous Threat Intervention: Unlike many bots that simply detect threats, HCISS AI Security Agents can act autonomously—blocking, isolating, or mitigating risks in real time without waiting for manual approval.<br/> Behavioral Biometrics for Access Control: The agents can analyze user behavior patterns (mouse movements, keystroke dynamics, transaction timing) to detect impersonation or insider threats—an edge most traditional systems don't offer.<br/> Cross-Chain Threat Intelligence: With multi-chain interoperability, the agents aggregate threat data across multiple blockchain networks, allowing for a more comprehensive security net—critical for decentralized finance systems operating across platforms.<br/> Sentiment-Based Attack Prediction: Using natural language processing (NLP), the bots scrape social media, forums, and dark web chatter to detect early signs of coordinated attacks or market manipulation—a proactive shield rather than reactive patchwork.<br/> Quantum-Resilient Cryptography Readiness: Futureproofing is baked in. The bots are designed to upgrade to quantum-safe encryption standards, making them ready for post-quantum threats as quantum computing becomes more accessible.",
+      content: `
+  <strong>Predictive Threat Neutralization:</strong><br/>
+  Unlike traditional systems that react to breaches, AI Security Agentic (BSECA.ai) bots anticipate and eliminate risks before they strike. In decentralized finance (DeFi), they prevent flash loan attacks and smart contract exploits. For energy grids, they detect abnormal consumption patterns, stopping fraud or cyber-physical sabotage.<br/><br/>
+
+  <strong>Self-Healing Automation:</strong><br/>
+  These bots don't just find problems, they fix them instantly. In logistics, if a GPS tracker is hacked, it's quickly shut off, repaired, and brought back online without delay. For storage, if data is tampered with, it automatically restores itself. No waiting, no downtime—just smart, fast protection.<br/><br/>
+
+  <strong>Regulatory Intelligence:</strong><br/>
+  BSECA.ai bots auto-enforce compliance, slashing costs. In DeFi, they validate Know-Your-Customers-Know-Your-Transactions-Anti-Money-Laundering (KYC/KYT/AML) rules across chains. For energy traders, they certify carbon credits and audit transactions against global standards—no manual oversight needed.<br/><br/>
+
+  <strong>Advanced Security Features:</strong><br/>
+  HCISS AI Security Agent Bots offer a suite of cutting-edge capabilities that elevate security beyond standard protocols:
+  <ul class="list-disc pl-6 mt-2 space-y-2 text-gray-800 font-medium">
+    <li><span class="font-semibold">Autonomous Threat Intervention:</span> Acts immediately—blocking, isolating, or mitigating risks in real time without human input.</li>
+    <li><span class="font-semibold">Behavioral Biometrics for Access Control:</span> Monitors keystrokes, mouse movements, and timing patterns to detect impersonation or insider threats.</li>
+    <li><span class="font-semibold">Cross-Chain Threat Intelligence:</span> Aggregates threat data across multiple blockchains to provide a unified, proactive defense strategy.</li>
+    <li><span class="font-semibold">Sentiment-Based Attack Prediction:</span> Uses NLP to monitor social media, forums, and dark web chatter to anticipate coordinated attacks or manipulations.</li>
+    <li><span class="font-semibold">Quantum-Resilient Cryptography Readiness:</span> Built with future-proof architecture to adapt to quantum-safe encryption standards.</li>
+  </ul>
+`,
     },
+
     {
       id: "03",
       title: "(QSE) Token Theory Introduction",
