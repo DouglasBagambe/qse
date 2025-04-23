@@ -131,35 +131,37 @@ const Header = () => {
     }
   };
 
-  // Check if we're at the top of the page (for highlighting home link)
-  const [isAtTop, setIsAtTop] = useState(true);
-
-  useEffect(() => {
-    const checkIfTop = () => {
-      setIsAtTop(window.scrollY < 50);
-    };
-
-    if (isClient) {
-      window.addEventListener("scroll", checkIfTop);
-      checkIfTop(); // Check on initial load
-      return () => window.removeEventListener("scroll", checkIfTop);
-    }
-  }, [isClient]);
-
+  // Updated navigation links based on boss's feedback
   const navLinks = [
-    { id: "home", href: "/", label: "Home", isHomePage: true },
+    {
+      id: "whitepaper",
+      href: "#",
+      label: "Whitepaper",
+      isWhitepaper: true,
+    },
+    {
+      id: "tokenomics",
+      href: "/tokenomics",
+      label: "Tokenomics",
+      isTokenomics: true,
+    },
+    {
+      id: "token-theory",
+      href: "/token-theory",
+      label: "Token Theory",
+      isTokenTheory: true,
+    },
     {
       id: "ecosystem",
       href: "#ecosystem",
       label: "Ecosystem",
       isSection: true,
     },
-    { id: "whitepaper", href: "#", label: "Whitepaper", isWhitepaper: true },
     {
-      id: "token-theory",
-      href: "/token-theory",
-      label: "Token Theory",
-      isTokenTheory: true,
+      id: "roadmap",
+      href: "#roadmap",
+      label: "RoadMap",
+      isRoadmap: true,
     },
   ];
 
@@ -167,22 +169,28 @@ const Header = () => {
   const isLinkActive = (link: any): boolean => {
     if (!isClient) return false;
 
-    // For the home link
-    if (link.isHomePage && pathname === "/" && isAtTop) {
-      return true;
-    }
-
     // For section links on the home page
     if (link.isSection && pathname === "/") {
       const hash = window.location.hash;
-      return (
-        hash === link.href ||
-        (hash === "" && link.id === "ecosystem" && !isAtTop)
-      );
+      return hash === link.href;
     }
 
     // For the token theory page
     if (link.isTokenTheory && pathname === "/token-theory") {
+      return true;
+    }
+
+    // For the tokenomics page
+    if (link.isTokenomics && pathname === "/tokenomics") {
+      return true;
+    }
+
+    // For the roadmap section
+    if (
+      link.isRoadmap &&
+      pathname === "/" &&
+      window.location.hash === "#roadmap"
+    ) {
       return true;
     }
 
@@ -225,7 +233,7 @@ const Header = () => {
               </a>
             </div>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - New hover effect without persistent underline */}
             <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
               {navLinks.map((link) => (
                 <a
@@ -236,27 +244,30 @@ const Header = () => {
 
                     if (!isClient) return;
 
-                    if (link.isHomePage) {
-                      window.location.href = "/";
-                    } else if (link.isWhitepaper) {
+                    if (link.isWhitepaper) {
                       handlePDFView();
                     } else if (link.isTokenTheory) {
                       window.open("/token-theory", "_blank");
+                    } else if (link.isTokenomics) {
+                      window.open("/tokenomics", "_blank");
                     } else if (link.isSection) {
+                      navigateToHomeSection(link.id);
+                    } else if (link.isRoadmap) {
                       navigateToHomeSection(link.id);
                     }
                   }}
                   className={`relative px-4 py-2 text-white font-medium text-sm lg:text-base transition-all duration-300
-                    after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 
-                    after:bg-blue-300 after:transition-all after:duration-300
-                    hover:text-blue-200 hover:after:w-full ${isLinkActive(link) ? "text-blue-200 after:w-full" : ""}`}
+                    group ${isLinkActive(link) ? "text-blue-200" : ""}`}
                 >
-                  {link.label}
+                  <span className="relative inline-block">
+                    {link.label}
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                  </span>
                 </a>
               ))}
             </nav>
 
-            {/* Buy Token Button - Desktop */}
+            {/* Buy $QSE Button - Desktop */}
             <div className="hidden md:block">
               <button
                 onClick={openPurchaseModal}
@@ -264,7 +275,7 @@ const Header = () => {
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
                 <div className="relative flex items-center">
-                  <span>Buy Token</span>
+                  <span>Buy $QSE</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"
@@ -289,7 +300,7 @@ const Header = () => {
                 onClick={openPurchaseModal}
                 className="mr-4 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-400 text-white text-sm font-bold rounded-lg shadow-md hover:shadow-cyan-500/30 transition-all duration-200"
               >
-                Buy
+                Buy $QSE
               </button>
 
               <button
@@ -334,7 +345,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu - Epic Design */}
+        {/* Mobile Navigation Menu - Updated items and hover effect */}
         <div
           ref={mobileMenuRef}
           className={`md:hidden fixed right-0 top-16 w-3/4 max-h-[50vh] overflow-y-auto 
@@ -355,13 +366,15 @@ const Header = () => {
 
                   if (!isClient) return;
 
-                  if (link.isHomePage) {
-                    window.location.href = "/";
-                  } else if (link.isWhitepaper) {
+                  if (link.isWhitepaper) {
                     handlePDFView();
                   } else if (link.isTokenTheory) {
                     window.open("/token-theory", "_blank");
+                  } else if (link.isTokenomics) {
+                    window.open("/tokenomics", "_blank");
                   } else if (link.isSection) {
+                    navigateToHomeSection(link.id);
+                  } else if (link.isRoadmap) {
                     navigateToHomeSection(link.id);
                   }
 
@@ -373,9 +386,7 @@ const Header = () => {
               >
                 <span className="relative overflow-hidden group">
                   {link.label}
-                  <span
-                    className={`absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform transition-transform duration-300 ${isLinkActive(link) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
-                  ></span>
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                 </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -402,7 +413,7 @@ const Header = () => {
                 <span className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSI1MDAiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjAuMTUiLz48L3N2Zz4=')] opacity-20"></span>
                 <div className="relative flex items-center justify-center">
                   <span className="inline-flex items-center mr-2 transform group-hover:translate-x-0 group-hover:scale-105 transition-all duration-300">
-                    Buy Token
+                    Buy $QSE
                   </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
