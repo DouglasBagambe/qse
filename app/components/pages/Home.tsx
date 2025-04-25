@@ -247,10 +247,10 @@ const Home = () => {
       </section>
       <hr className="border-t border-gray-300" />
 
-      <section id="team" className="">
+      {/* <section id="team" className="">
         <TeamSection />
       </section>
-      <hr className="border-t border-gray-300" />
+      <hr className="border-t border-gray-300" /> */}
 
       <section id="faq" className="">
         <FAQSection />
