@@ -12,25 +12,11 @@ import {
 } from "lucide-react";
 
 const Footer = () => {
-  const handleDownloadWhitepaper = () => {
-    const fileUrl = "/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf";
-
+  const handleDownload = (fileUrl: string, fileName: string) => {
     // Create a temporary link element
     const link = document.createElement("a");
     link.href = fileUrl;
-    link.setAttribute("download", "QSE_TokenEVCI_Use Case.pdf"); // Set the download attribute
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleDownloadTokenTheory = () => {
-    const fileUrl = "/assets/token-theory/HCISS - QSE Token Theory.pdf";
-
-    // Create a temporary link element
-    const link = document.createElement("a");
-    link.href = fileUrl;
-    link.setAttribute("download", "HCISS - QSE Token Theory.pdf"); // Set the download attribute
+    link.setAttribute("download", fileName); // Set the download attribute
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -216,47 +202,19 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Social Media and Downloads Column */}
+          {/* Downloads Column */}
           <div className="md:col-span-3">
-            <h3 className="text-lg font-semibold mb-6 text-blue-700">
-              Follow Us
+            <h3 className="text-lg font-semibold mb-4 text-blue-700">
+              Documents
             </h3>
-            <div className="grid grid-cols-6 gap-2 mb-8">
-              <a href="#" className="mb-2">
-                <div className="border border-blue-500 hover:bg-white transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                  <Instagram className="text-blue-500 hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2">
-                <div className="border border-blue-500 hover:bg-white transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                  <Twitter className="text-blue-500 hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2">
-                <div className="border border-blue-500 hover:bg-white transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                  <Facebook className="text-blue-500 hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2">
-                <div className="border border-blue-500 hover:bg-white transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                  <MessageCircle className="text-blue-500 hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2">
-                <div className="border border-blue-500 hover:bg-white transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                  <Send className="text-blue-500 hover:text-white w-5 h-5" />
-                </div>
-              </a>
-              <a href="#" className="mb-2">
-                <div className="border border-blue-500 hover:bg-white transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                  <Linkedin className="text-blue-500 hover:text-white w-5 h-5" />
-                </div>
-              </a>
-            </div>
-
-            <div className="space-y-4">
+            <div className="space-y-3">
               <button
-                onClick={handleDownloadWhitepaper}
+                onClick={() =>
+                  handleDownload(
+                    "/assets/whitepaper/QSETokenWhitePaper.pdf",
+                    "QSETokenWhitePaper.pdf"
+                  )
+                }
                 className="text-white bg-blue-700 hover:bg-blue-500 rounded-full px-6 py-2 w-full transition-colors duration-300 flex items-center justify-center"
               >
                 <Download className="w-4 h-4 mr-2" />
@@ -264,18 +222,75 @@ const Footer = () => {
               </button>
 
               <button
-                onClick={handleDownloadTokenTheory}
+                onClick={() =>
+                  handleDownload(
+                    "/assets/token-theory/HCISS - QSE Token Theory.pdf",
+                    "HCISS - QSE Token Theory.pdf"
+                  )
+                }
                 className="text-white border border-blue-700 rounded-full px-6 py-2 w-full hover:bg-blue-700 hover:text-white transition-colors duration-300 flex items-center justify-center"
               >
                 <Download className="w-4 h-4 mr-2" />
                 QSE Token Theory
               </button>
+
+              <button
+                onClick={() =>
+                  handleDownload(
+                    "/assets/purchase-guide/QSETokenPurchaseGuide.pdf",
+                    "QSETokenPurchaseGuide.pdf"
+                  )
+                }
+                className="text-white border border-blue-700 rounded-full px-6 py-2 w-full hover:bg-blue-700 hover:text-white transition-colors duration-300 flex items-center justify-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                QSE Token Purchase Guide
+              </button>
             </div>
           </div>
         </div>
 
+        {/* Social Media Section - Moved below the main content and above copyright */}
+        <div className="mt-12 text-center">
+          <h3 className="text-lg font-semibold mb-6 text-blue-700">
+            Connect With Us
+          </h3>
+          <div className="flex justify-center space-x-4">
+            <a href="#">
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Instagram className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a href="#">
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Twitter className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a href="#">
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Facebook className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a href="#">
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <MessageCircle className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a href="#">
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Send className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a href="#">
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Linkedin className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+          </div>
+        </div>
+
         {/* Copyright */}
-        <div className="mt-16 pt-8 border-t border-[#2a305e] text-center text-gray-500 text-sm">
+        <div className="mt-8 pt-8 border-t border-[#2a305e] text-center text-gray-500 text-sm">
           &copy; 2025 QuantumSEC. All rights reserved.
         </div>
       </div>

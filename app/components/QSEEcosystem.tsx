@@ -45,7 +45,7 @@ const QSEEcosystem = () => {
   // Function to handle PDF viewing with browser check
   const handleWhitepaperPDFView = () => {
     if (typeof window !== "undefined") {
-      const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
+      const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
       const newWindow = window.open("", "_blank");
       if (newWindow) {
         newWindow.document.write(`

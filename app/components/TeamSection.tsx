@@ -58,28 +58,6 @@ const TeamSection = () => {
     },
     {
       id: 3,
-      name: "Arundhati Datta",
-      position: "CDO, PMO",
-      bio: "20+ years in tech and data analytics, founder of an AI company.",
-      image:
-        "https://i0.wp.com/hciss.io/wp-content/uploads/2020/02/ArDa.jpeg?fit=300%2C300&ssl=1",
-      social: [
-        {
-          platform: "facebook",
-          url: "https://www.facebook.com/arundhati.datta.5",
-        },
-        {
-          platform: "linkedin",
-          url: "https://www.linkedin.com/in/arundhati-datta/",
-        },
-        {
-          platform: "instagram",
-          url: "https://www.instagram.com/arundhati_datta1977/",
-        },
-      ],
-    },
-    {
-      id: 4,
       name: "Joel Odelson",
       position: "CISO",
       bio: "Leads global cybersecurity with expertise in NIST and GDPR frameworks.",
@@ -90,6 +68,34 @@ const TeamSection = () => {
           platform: "linkedin",
           url: "https://www.linkedin.com/in/joel-odelson/",
         },
+      ],
+    },
+    {
+      id: 4,
+      name: "Mark Santiago",
+      position: "",
+      bio: "",
+      image: "/assets/team/Mark-Santiago.png",
+      social: [
+        {
+          platform: "linkedin",
+          url: "https://www.linkedin.com/in/mark-santiago/",
+        },
+        { platform: "twitter", url: "https://twitter.com/mark_santiago" },
+      ],
+    },
+    {
+      id: 5,
+      name: "Douglas Bagambe",
+      position: "",
+      bio: "",
+      image: "/assets/team/Douglas-Bagambe.jpg",
+      social: [
+        {
+          platform: "linkedin",
+          url: "www.linkedin.com/in/ainamaani-douglas-bagambe-851480254",
+        },
+        { platform: "twitter", url: "https://twitter.com/realdyson_" },
       ],
     },
   ];
@@ -133,7 +139,7 @@ const TeamSection = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col rounded-xl overflow-hidden bg-gradient-to-b from-blue-800 to-blue-900 shadow-lg"
+        className="flex flex-col rounded-xl overflow-hidden bg-gradient-to-b from-blue-800 to-blue-900 shadow-lg w-full max-w-xs"
       >
         <div className="relative group">
           {/* Image with overlay */}
@@ -166,8 +172,8 @@ const TeamSection = () => {
   };
 
   return (
-    <section className="bg-blue-700 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section className="bg-blue-700 py-16 overflow-hidden">
+      <div className="container mx-auto px-4 max-w-7xl">
         <div className="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-700 text-white p-8 md:p-12 overflow-hidden relative">
           {/* Background design elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-700 rounded-full opacity-20 -mr-20 -mt-20"></div>
@@ -180,7 +186,7 @@ const TeamSection = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="text-center mb-12"
+              className="text-center mb-16"
             >
               <h2 className="text-5xl md:text-5xl font-bold mb-4 bg-clip-text text-white">
                 THE TEAM
@@ -192,11 +198,20 @@ const TeamSection = () => {
               </p>
             </motion.div>
 
-            {/* Team members grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-              {teamMembers.map((member) => (
+            {/* Top row - 3 team members */}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-12">
+              {teamMembers.slice(0, 3).map((member) => (
                 <TeamMemberCard key={member.id} member={member} />
               ))}
+            </div>
+
+            {/* Bottom row - 2 team members, centered */}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 mx-auto">
+              <div className="flex gap-8 justify-center">
+                {teamMembers.slice(3, 5).map((member) => (
+                  <TeamMemberCard key={member.id} member={member} />
+                ))}
+              </div>
             </div>
           </div>
         </div>

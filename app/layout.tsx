@@ -15,18 +15,22 @@ export default function RootLayout({
   const pathname = usePathname();
 
   // Define routes where Header and Footer should not be displayed
-  const hideHeaderFooter = ["/token-theory"];
+  const hideHeader = ["/token-theory", "/purchase-guide"];
 
-  const shouldHideHeaderFooter = hideHeaderFooter.includes(pathname);
+  const shouldHideHeader = hideHeader.includes(pathname);
+
+  const hideFooter = [""];
+
+  const shouldHideFooter = hideFooter.includes(pathname);
 
   return (
     <html lang="en">
       <body>
         <Web3Provider>
           <div className="App">
-            {!shouldHideHeaderFooter && <Header />}
+            {!shouldHideHeader && <Header />}
             {children}
-            {!shouldHideHeaderFooter && <Footer />}
+            {!shouldHideFooter && <Footer />}
           </div>
         </Web3Provider>
       </body>

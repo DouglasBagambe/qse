@@ -346,7 +346,7 @@ const TokenTheoryPage = () => {
                             : "text-gray-500 hover:bg-gray-50"
                         }`}
                       >
-                        <span className="font-lato text-sm">
+                        <span className="font-lato text-sm font-bold">
                           {section.id}. {section.title}
                         </span>
                       </button>

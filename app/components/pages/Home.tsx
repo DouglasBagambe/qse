@@ -31,7 +31,7 @@ const Home = () => {
   const closePurchaseModal = () => setShowPurchaseModal(false);
 
   const handlePDFView = () => {
-    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
       newWindow.document.write(`
@@ -247,10 +247,10 @@ const Home = () => {
       </section>
       <hr className="border-t border-gray-300" />
 
-      {/* <section id="team" className="">
+      <section id="team" className="">
         <TeamSection />
       </section>
-      <hr className="border-t border-gray-300" /> */}
+      <hr className="border-t border-gray-300" />
 
       <section id="faq" className="">
         <FAQSection />

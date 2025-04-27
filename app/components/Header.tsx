@@ -72,7 +72,7 @@ const Header = () => {
   const handlePDFView = () => {
     if (!isClient) return;
 
-    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use Case.pdf`;
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
       newWindow.document.write(`
@@ -163,6 +163,12 @@ const Header = () => {
       label: "RoadMap",
       isRoadmap: true,
     },
+    // {
+    //   id: "purchase-guide",
+    //   href: "/purchase-guide",
+    //   label: "Purchase Guide",
+    //   isPurchaseGuide: true,
+    // },
   ];
 
   // Function to determine if a link is active
@@ -191,6 +197,11 @@ const Header = () => {
       pathname === "/" &&
       window.location.hash === "#roadmap"
     ) {
+      return true;
+    }
+
+    // For the token theory page
+    if (link.isPurchaseGuide && pathname === "/purchase-guide") {
       return true;
     }
 
@@ -249,12 +260,14 @@ const Header = () => {
                     } else if (link.isTokenTheory) {
                       window.open("/token-theory", "_blank");
                     } else if (link.isTokenomics) {
-                      window.open("/tokenomics", "_blank");
+                      navigateToHomeSection(link.id);
                     } else if (link.isSection) {
                       navigateToHomeSection(link.id);
                     } else if (link.isRoadmap) {
                       navigateToHomeSection(link.id);
-                    }
+                    } // else if (link.isPurchaseGuide) {
+                    //   window.open("/purchase-guide", "_blank");
+                    // }
                   }}
                   className={`relative px-4 py-2 text-white font-medium text-sm lg:text-base transition-all duration-300
                     group ${isLinkActive(link) ? "text-blue-200" : ""}`}
@@ -371,12 +384,14 @@ const Header = () => {
                   } else if (link.isTokenTheory) {
                     window.open("/token-theory", "_blank");
                   } else if (link.isTokenomics) {
-                    window.open("/tokenomics", "_blank");
+                    navigateToHomeSection(link.id);
                   } else if (link.isSection) {
                     navigateToHomeSection(link.id);
                   } else if (link.isRoadmap) {
                     navigateToHomeSection(link.id);
-                  }
+                  } // else if (link.isPurchaseGuide) {
+                  //   window.open("/purchase-guide", "_blank");
+                  // }
 
                   closeMobileMenu();
                 }}
