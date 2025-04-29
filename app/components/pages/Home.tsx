@@ -97,12 +97,12 @@ const Home = () => {
           </div>
 
           {/* Updated stats bar with bg-blue-700 */}
-          <StatsBar
-            tokenPrice="$0.05"
-            raisedAmount="$3.2M"
-            targetAmount="$5M"
+          {/* <StatsBar
+            tokenPrice=" "
+            raisedAmount=" "
+            targetAmount=" "
             presaleEndDate={presaleEndDate}
-          />
+          /> */}
         </div>{" "}
       </section>
 
@@ -247,10 +247,10 @@ const Home = () => {
       </section>
       <hr className="border-t border-gray-300" />
 
-      <section id="team" className="">
+      {/* <section id="team" className="">
         <TeamSection />
       </section>
-      <hr className="border-t border-gray-300" />
+      <hr className="border-t border-gray-300" /> */}
 
       <section id="faq" className="">
         <FAQSection />
