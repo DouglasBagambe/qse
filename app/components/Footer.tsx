@@ -234,7 +234,7 @@ const Footer = () => {
                 QSE Token Theory
               </button>
 
-              {/* <button
+              <button
                 onClick={() =>
                   handleDownload(
                     "/assets/purchase-guide/QSETokenPurchaseGuide.pdf",
@@ -245,7 +245,7 @@ const Footer = () => {
               >
                 <Download className="w-4 h-4 mr-2" />
                 QSE Token Purchase Guide
-              </button> */}
+              </button>
             </div>
           </div>
         </div>

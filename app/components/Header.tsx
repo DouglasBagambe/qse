@@ -163,12 +163,12 @@ const Header = () => {
       label: "RoadMap",
       isRoadmap: true,
     },
-    // {
-    //   id: "purchase-guide",
-    //   href: "/purchase-guide",
-    //   label: "Purchase Guide",
-    //   isPurchaseGuide: true,
-    // },
+    {
+      id: "purchase-guide",
+      href: "/purchase-guide",
+      label: "Token Purchase Guide",
+      isPurchaseGuide: true,
+    },
   ];
 
   // Function to determine if a link is active
@@ -265,9 +265,9 @@ const Header = () => {
                       navigateToHomeSection(link.id);
                     } else if (link.isRoadmap) {
                       navigateToHomeSection(link.id);
-                    } // else if (link.isPurchaseGuide) {
-                    //   window.open("/purchase-guide", "_blank");
-                    // }
+                    } else if (link.isPurchaseGuide) {
+                      window.open("/purchase-guide", "_blank");
+                    }
                   }}
                   className={`relative px-4 py-2 text-white font-medium text-sm lg:text-base transition-all duration-300
                     group ${isLinkActive(link) ? "text-blue-200" : ""}`}
@@ -389,9 +389,9 @@ const Header = () => {
                     navigateToHomeSection(link.id);
                   } else if (link.isRoadmap) {
                     navigateToHomeSection(link.id);
-                  } // else if (link.isPurchaseGuide) {
-                  //   window.open("/purchase-guide", "_blank");
-                  // }
+                  } else if (link.isPurchaseGuide) {
+                    window.open("/purchase-guide", "_blank");
+                  }
 
                   closeMobileMenu();
                 }}

@@ -113,7 +113,7 @@ const TokenomicsChart = () => {
                   fontSize="14"
                   className="font-bold"
                 >
-                  100,000,000
+                  1,000,000,000
                 </text>
                 <text
                   x="0"
@@ -182,20 +182,20 @@ const TokenomicsChart = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Total Supply</p>
-                  <p className="font-medium">100,000,000 QSE</p>
+                  <p className="font-medium">1,000,000,000 QSE</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Token Type</p>
                   <p className="font-medium">ERC-20</p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-sm text-gray-500">Initial Price</p>
                   <p className="font-medium">$0.05 USD</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Vesting Period</p>
                   <p className="font-medium">12 Months</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

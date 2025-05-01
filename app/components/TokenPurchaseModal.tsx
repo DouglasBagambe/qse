@@ -178,7 +178,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     setIsSubmitting(true);
     setErrorMessage("");
     try {
-      // Using a dummy email as it's no longer required for user input
       const dummyEmail = `user-${Date.now()}@quantumsec.org`;
       const result = await buyTokens(
         paymentAmount,
