@@ -51,6 +51,27 @@ const Home = () => {
     }
   };
 
+  const handleUseCasePDFView = () => {
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use_Case.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE-Token EVCI Use Case</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
   return (
     <>
       <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-8 md:pt-12 bg-gradient-to-b from-[#1E3A8A] to-[#0A1733]">
@@ -146,6 +167,7 @@ const Home = () => {
                 title: "Real-World Use Cases",
                 description:
                   "From secure energy grids to safe electric vehicle charging and cloud-based data protection, QSE Token fuels practical solutions.",
+                onClick: handleUseCasePDFView,
               },
               {
                 icon: <Users size={36} />,
@@ -174,7 +196,10 @@ const Home = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <h3 className="text-xl text-blue-600 font-semibold mb-3">
+                  <h3
+                    className="text-xl text-blue-600 font-semibold mb-3 cursor-pointer hover:underline"
+                    onClick={feature.onClick}
+                  >
                     {feature.title}
                   </h3>
                   <p className="text-gray-600">{feature.description}</p>
