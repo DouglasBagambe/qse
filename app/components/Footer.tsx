@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React from "react";
@@ -256,34 +257,49 @@ const Footer = () => {
             Connect With Us
           </h3>
           <div className="flex justify-center space-x-4">
-            <a href="#">
-              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                <Instagram className="text-blue-500 hover:text-white w-5 h-5" />
-              </div>
-            </a>
-            <a href="#">
-              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                <Twitter className="text-blue-500 hover:text-white w-5 h-5" />
-              </div>
-            </a>
-            <a href="#">
+            <a
+              href="https://www.facebook.com/Health-Blockchain-Security-Services-HCISS-LLC-756609304405798/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
                 <Facebook className="text-blue-500 hover:text-white w-5 h-5" />
               </div>
             </a>
-            <a href="#">
+            <a
+              href="https://twitter.com/HCISS_LLC"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                <MessageCircle className="text-blue-500 hover:text-white w-5 h-5" />
+                <Twitter className="text-blue-500 hover:text-white w-5 h-5" />
               </div>
             </a>
-            <a href="#">
-              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
-                <Send className="text-blue-500 hover:text-white w-5 h-5" />
-              </div>
-            </a>
-            <a href="#">
+            <a
+              href="https://www.linkedin.com/company/health-blockchain-security-services-hciss/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
                 <Linkedin className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a
+              href="https://www.instagram.com/hciss_/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Instagram className="text-blue-500 hover:text-white w-5 h-5" />
+              </div>
+            </a>
+            <a
+              href="https://discord.gg/QS74yWsqQ5"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="border border-blue-500 hover:bg-blue-500 transition-colors duration-300 rounded-full w-10 h-10 flex items-center justify-center">
+                <Send className="text-blue-500 hover:text-white w-5 h-5" />
               </div>
             </a>
           </div>
