@@ -30,8 +30,8 @@ const NewsletterSection = () => {
                 Stay Charged. Stay Informed.
               </h2>
               <p className="text-lg max-w-2xl mx-auto">
-                Subscribe to our newsletter for the latest updates on Quantum
-                SEC, token sales, and partnerships.
+                Subscribe to our newsletter for the latest updates on
+                QuantumSEC, token sales, and partnerships.
               </p>
             </div>
 
@@ -64,9 +64,9 @@ const NewsletterSection = () => {
               )}
 
               <p className="text-sm text-blue-300 text-center mt-4">
-                I agree to receive emails from HCISS Co. and acknowledge that my
-                information will be processed in accordance with HCISS Co.'s
-                Privacy Policy.
+                I agree to receive emails from HCISS LLC BSECAEnergy and
+                acknowledge that my information will be processed in accordance
+                with HCISS LLC BSECAEnergy's Privacy Policy.
               </p>
             </div>
           </div>
