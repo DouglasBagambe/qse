@@ -1,5 +1,6 @@
 // app/components/Web3Provider.tsx
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -12,11 +13,11 @@ import React, {
   ReactNode,
 } from "react";
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { arbitrumSepolia } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 import { ethers } from "ethers";
-import QSETokenArtifact from "../artifacts/contracts/QSE.sol/QSEToken.json";
-import QSECrowdsaleArtifact from "../artifacts/contracts/QSECrowdsale.sol/QSECrowdsale.json";
+import QSEArtifact from "../../contracts/QSE.json";
+import QSEPresaleArtifact from "../../contracts/QSEPresale.json";
 
 declare global {
   interface Window {
@@ -24,31 +25,38 @@ declare global {
   }
 }
 
-const QSE_TOKEN_ADDRESS =
-  process.env.NEXT_PUBLIC_QSE_TOKEN_ADDRESS ||
-  "0x47cdE6190AE3718088Ca2305D97d0C622599b2F4";
-const QSE_CROWDSALE_ADDRESS =
-  process.env.NEXT_PUBLIC_QSE_CROWDSALE_ADDRESS ||
-  "0xCe849ef42298587D7eA9761BF4d34F45395aE0F7";
+const QSE_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_QSE_TOKEN_ADDRESS;
+const QSE_PRESALE_ADDRESS = process.env.NEXT_PUBLIC_QSE_PRESALE_ADDRESS;
 
-// Define the supported payment methods
-export type PaymentMethod = "ETH" | "USDT" | "USDC" | "USD";
-
-// Define rates against USD (these would come from an API in production)
-const PAYMENT_RATES = {
-  ETH: { usdRate: 3000, tokenSymbol: "ETH" }, // 1 ETH = $3000 USD
-  USDT: { usdRate: 1, tokenSymbol: "USDT" }, // 1 USDT = $1 USD
-  USDC: { usdRate: 1, tokenSymbol: "USDC" }, // 1 USDC = $1 USD
-  USD: { usdRate: 1, tokenSymbol: "$" }, // 1 USD = $1 USD (of course)
+const STABLECOINS = {
+  USDT: {
+    mainnet: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+    sepolia: "0x70C19cAE7F2e0298c64cB219e6408ef7b0726CE8",
+  },
+  USDC: {
+    mainnet: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+    sepolia: "0x0e6538E2888c56247211C116390EE43DBAc0f6b4",
+  },
+  DAI: {
+    mainnet: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+    sepolia: "0x8682F1d14E9C5A38f25BF849d0013123B5Db699C",
+  },
 };
 
-const QSE_TOKEN_PRICE_USD = 0.6; // QSE price in USD (e.g., $0.60 per QSE)
+export type PaymentMethod = "ETH" | "USDT" | "USDC" | "DAI";
+
+const PAYMENT_RATES = {
+  ETH: { usdRate: 3000, tokenSymbol: "ETH" },
+  USDT: { usdRate: 1, tokenSymbol: "USDT" },
+  USDC: { usdRate: 1, tokenSymbol: "USDC" },
+  DAI: { usdRate: 1, tokenSymbol: "DAI" },
+};
 
 const config = createConfig({
-  chains: [sepolia],
+  chains: [arbitrumSepolia],
   transports: {
-    [sepolia.id]: http(
-      "https://sepolia.infura.io/v3/201fb4feef8441f5ace3a42c8b4501df"
+    [arbitrumSepolia.id]: http(
+      "https://arbitrum-sepolia.infura.io/v3/201fb4feef8441f5ace3a42c8b4501df"
     ),
   },
   connectors: [injected()],
@@ -60,24 +68,43 @@ type Web3ContextType = {
   account: string | null;
   chainId: number | null;
   qseToken: ethers.Contract | null;
-  qseCrowdsale: ethers.Contract | null;
+  qsePresale: ethers.Contract | null;
   connectWallet: () => Promise<boolean>;
   buyTokens: (
     amount: string,
-    email: string,
-    paymentMethod: PaymentMethod
+    paymentMethod: PaymentMethod,
+    roundId: number
   ) => Promise<{ success: boolean; message: string }>;
+  claimTokens: () => Promise<{ success: boolean; message: string }>;
+  getClaimableAmount: (
+    roundId: number
+  ) => Promise<{ claimable: string; periodsPassed: number }>;
+  getRounds: () => Promise<any[]>;
   isConnecting: boolean;
   isConnected: boolean;
-  tokenRate: number;
+  tokenPrice: number;
   burnRate: number;
   networkError: string | null;
-  switchToSepolia: () => Promise<boolean>;
+  switchToArbitrumSepolia: () => Promise<boolean>;
   qseBalance: string;
   loadQSEBalance: () => Promise<void>;
   supportedPaymentMethods: PaymentMethod[];
-  getQSEAmountFromPayment: (amount: string, method: PaymentMethod) => number;
+  getQSEAmountFromPayment: (
+    amount: string,
+    method: PaymentMethod,
+    roundId: number
+  ) => Promise<number>;
   getPaymentRateForMethod: (method: PaymentMethod) => number;
+  currentRound: {
+    roundId: number;
+    tokenPrice: number;
+    tokenAmount: number;
+    startTime: number;
+    endTime: number;
+    soldAmount: number;
+  } | null;
+  tgeTime: number;
+  isTgeSet: boolean;
 };
 
 const Web3Context = createContext<Web3ContextType>({
@@ -86,20 +113,26 @@ const Web3Context = createContext<Web3ContextType>({
   account: null,
   chainId: null,
   qseToken: null,
-  qseCrowdsale: null,
+  qsePresale: null,
   connectWallet: async () => false,
   buyTokens: async () => ({ success: false, message: "" }),
+  claimTokens: async () => ({ success: false, message: "" }),
+  getClaimableAmount: async () => ({ claimable: "0", periodsPassed: 0 }),
+  getRounds: async () => [],
   isConnecting: false,
   isConnected: false,
-  tokenRate: 5000,
+  tokenPrice: 0,
   burnRate: 2,
   networkError: null,
-  switchToSepolia: async () => false,
+  switchToArbitrumSepolia: async () => false,
   qseBalance: "0",
   loadQSEBalance: async () => {},
-  supportedPaymentMethods: ["ETH", "USDT", "USDC", "USD"],
-  getQSEAmountFromPayment: () => 0,
+  supportedPaymentMethods: ["ETH", "USDT", "USDC", "DAI"],
+  getQSEAmountFromPayment: async () => 0,
   getPaymentRateForMethod: () => 0,
+  currentRound: null,
+  tgeTime: 0,
+  isTgeSet: false,
 });
 
 export const useWeb3 = () => useContext(Web3Context);
@@ -114,36 +147,102 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
   const [account, setAccount] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
   const [qseToken, setQseToken] = useState<ethers.Contract | null>(null);
-  const [qseCrowdsale, setQseCrowdsale] = useState<ethers.Contract | null>(
-    null
-  );
-  const [tokenRate, setTokenRate] = useState(5000);
+  const [qsePresale, setQsePresale] = useState<ethers.Contract | null>(null);
+  const [tokenPrice, setTokenPrice] = useState(0);
   const [burnRate, setBurnRate] = useState(2);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [networkError, setNetworkError] = useState<string | null>(null);
   const [qseBalance, setQseBalance] = useState<string>("0");
+  const [currentRound, setCurrentRound] = useState<{
+    roundId: number;
+    tokenPrice: number;
+    tokenAmount: number;
+    startTime: number;
+    endTime: number;
+    soldAmount: number;
+  } | null>(null);
+  const [tgeTime, setTgeTime] = useState(0);
+  const [isTgeSet, setIsTgeSet] = useState(false);
   const supportedPaymentMethods: PaymentMethod[] = [
     "ETH",
     "USDT",
     "USDC",
-    "USD",
+    "DAI",
   ];
 
-  // Function to get payment rate for a specific method
-  const getPaymentRateForMethod = (method: PaymentMethod): number => {
-    return PAYMENT_RATES[method].usdRate;
+  const getPaymentRateForMethod = (method: PaymentMethod): number =>
+    PAYMENT_RATES[method].usdRate;
+
+  const getQSEAmountFromPayment = async (
+    amount: string,
+    method: PaymentMethod,
+    roundId: number
+  ): Promise<number> => {
+    if (!amount || isNaN(parseFloat(amount)) || !qsePresale) return 0;
+
+    let coinAddress = "";
+    if (method === "USDT")
+      coinAddress =
+        chainId === 42161 ? STABLECOINS.USDT.mainnet : STABLECOINS.USDT.sepolia;
+    if (method === "USDC")
+      coinAddress =
+        chainId === 42161 ? STABLECOINS.USDC.mainnet : STABLECOINS.USDC.sepolia;
+    if (method === "DAI")
+      coinAddress =
+        chainId === 42161 ? STABLECOINS.DAI.mainnet : STABLECOINS.DAI.sepolia;
+
+    if (method === "ETH") {
+      const ethAmount = ethers.parseEther(amount);
+      const tokenAmount = await qsePresale.estimatedTokenAmountAvailableWithETH(
+        ethAmount,
+        roundId
+      );
+      return Number(ethers.formatUnits(tokenAmount, 18));
+    }
+
+    if (coinAddress) {
+      const coinContract = new ethers.Contract(
+        coinAddress,
+        ["function decimals() view returns (uint8)"],
+        provider
+      );
+      const decimals = await coinContract.decimals();
+      const coinAmount = ethers.parseUnits(amount, decimals);
+      const tokenAmount =
+        await qsePresale.estimatedTokenAmountAvailableWithCoin(
+          coinAmount,
+          coinAddress,
+          roundId
+        );
+      return Number(ethers.formatUnits(tokenAmount, 18));
+    }
+
+    return 0;
   };
 
-  // Function to calculate QSE amount from payment amount and method
-  const getQSEAmountFromPayment = (
-    amount: string,
-    method: PaymentMethod
-  ): number => {
-    if (!amount || isNaN(parseFloat(amount))) return 0;
-
-    const paymentValue = parseFloat(amount) * PAYMENT_RATES[method].usdRate;
-    return paymentValue / QSE_TOKEN_PRICE_USD;
+  const getRounds = async () => {
+    if (!qsePresale) return [];
+    const rounds = [];
+    for (let i = 1; i <= 10; i++) {
+      // Adjust max rounds as needed
+      try {
+        const round = await qsePresale.getRound(i);
+        if (round.startTime > 0) {
+          rounds.push({
+            roundId: Number(round.roundId),
+            tokenPrice: Number(round.tokenPrice) / 1e6,
+            tokenAmount: Number(round.tokenAmount) / 1e18,
+            startTime: Number(round.startTime),
+            endTime: Number(round.endTime),
+            soldAmount: Number(round.soldAmount) / 1e18,
+          });
+        }
+      } catch {
+        break; // Stop if round doesn't exist
+      }
+    }
+    return rounds;
   };
 
   useEffect(() => {
@@ -177,74 +276,61 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
     }
   }, []);
 
-  // Function to load QSE token balance
   const loadQSEBalance = async () => {
     if (!qseToken || !account) {
       setQseBalance("0");
       return;
     }
-
     try {
       const balance = await qseToken.balanceOf(account);
       setQseBalance(ethers.formatUnits(balance, 18));
-      console.log("QSE Balance:", ethers.formatUnits(balance, 18));
     } catch (error) {
       console.error("Error loading QSE balance:", error);
       setQseBalance("0");
     }
   };
 
-  const switchToSepolia = async () => {
+  const switchToArbitrumSepolia = async () => {
     if (!window.ethereum) {
       setNetworkError("MetaMask or compatible wallet not detected");
       return false;
     }
-
     setNetworkError(null);
     try {
-      // Try to switch to Sepolia
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0xaa36a7" }], // 0xaa36a7 is hex for 11155111 (Sepolia chainId)
+        params: [{ chainId: "0x66eee" }],
       });
       return true;
     } catch (switchError: any) {
-      // If the network doesn't exist in the wallet, add it
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
             params: [
               {
-                chainId: "0xaa36a7",
-                chainName: "Sepolia Test Network",
+                chainId: "0x66eee",
+                chainName: "Arbitrum Sepolia",
                 nativeCurrency: {
-                  name: "Sepolia ETH",
+                  name: "Arbitrum ETH",
                   symbol: "ETH",
                   decimals: 18,
                 },
-                rpcUrls: [
-                  "https://sepolia.infura.io/v3/201fb4feef8441f5ace3a42c8b4501df",
-                ],
-                blockExplorerUrls: ["https://sepolia.etherscan.io"],
+                rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
+                blockExplorerUrls: ["https://sepolia.arbiscan.io"],
               },
             ],
           });
           return true;
         } catch (addError) {
-          console.error("Error adding Sepolia network:", addError);
-          setNetworkError("Failed to add Sepolia network to your wallet");
+          setNetworkError("Failed to add Arbitrum Sepolia network");
           return false;
         }
       } else if (switchError.code === 4001) {
-        // User rejected the request
-        setNetworkError(
-          "Please switch to Sepolia network to use this application"
-        );
+        setNetworkError("Please switch to Arbitrum Sepolia network");
         return false;
       }
-      console.error("Error switching to Sepolia network:", switchError);
-      setNetworkError("Failed to switch to Sepolia network");
+      setNetworkError("Failed to switch to Arbitrum Sepolia network");
       return false;
     }
   };
@@ -259,109 +345,67 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       setSigner(signer);
       setChainId(Number(network.chainId));
 
-      if (network.chainId !== BigInt(sepolia.id)) {
-        setNetworkError(
-          "Please switch to Sepolia network to use this application"
-        );
-        const switched = await switchToSepolia();
-        if (!switched) {
-          throw new Error(
-            `Please switch to Sepolia network (chainId: ${sepolia.id})`
-          );
-        } else {
-          // Recheck network after switching
-          const updatedNetwork = await ethProvider.getNetwork();
-          if (updatedNetwork.chainId !== BigInt(sepolia.id)) {
-            setNetworkError(
-              "Network switch failed. Please manually switch to Sepolia network"
-            );
-            throw new Error(
-              `Network switch failed. Please manually switch to Sepolia network (chainId: ${sepolia.id})`
-            );
-          }
-          // Clear error if switch was successful
-          setNetworkError(null);
+      if (network.chainId !== BigInt(arbitrumSepolia.id)) {
+        setNetworkError("Please switch to Arbitrum Sepolia network");
+        const switched = await switchToArbitrumSepolia();
+        if (!switched) throw new Error("Network switch failed");
+        const updatedNetwork = await ethProvider.getNetwork();
+        if (updatedNetwork.chainId !== BigInt(arbitrumSepolia.id)) {
+          setNetworkError("Please manually switch to Arbitrum Sepolia");
+          throw new Error("Network switch failed");
         }
+        setNetworkError(null);
       }
 
       if (QSE_TOKEN_ADDRESS) {
         const token = new ethers.Contract(
           QSE_TOKEN_ADDRESS,
-          QSETokenArtifact.abi,
+          (QSEArtifact as any).abi,
           signer
         );
         setQseToken(token);
-        // Since the new QSEToken has a name() function, we can call it
-        const tokenName = await token.name();
-        console.log("QSE Token contract initialized, name:", tokenName);
-
-        // Load QSE balance
         await loadQSEBalance();
+        const burnRate = await token.TRANSACTION_BURN_RATE();
+        setBurnRate(Number(burnRate));
       }
 
-      if (QSE_CROWDSALE_ADDRESS) {
-        const crowdsale = new ethers.Contract(
-          QSE_CROWDSALE_ADDRESS,
-          QSECrowdsaleArtifact.abi,
+      if (QSE_PRESALE_ADDRESS) {
+        const presale = new ethers.Contract(
+          QSE_PRESALE_ADDRESS,
+          (QSEPresaleArtifact as any).abi,
           signer
         );
-        setQseCrowdsale(crowdsale);
-        await loadContractData(crowdsale);
+        setQsePresale(presale);
+        await loadContractData(presale);
       }
     } catch (error: any) {
-      console.error("Error initializing provider and contracts:", error);
-      if (!networkError) {
-        setNetworkError(
-          error.message || "Failed to initialize blockchain connection"
-        );
-      }
+      console.error("Error initializing provider:", error);
+      if (!networkError)
+        setNetworkError("Failed to initialize blockchain connection");
     }
   };
 
-  const loadContractData = async (crowdsale: ethers.Contract) => {
+  const loadContractData = async (presale: ethers.Contract) => {
     try {
-      const rate = await crowdsale.rate();
-      setTokenRate(Number(rate));
-      const burnRate = await crowdsale.BURN_RATE();
-      setBurnRate(Number(burnRate));
+      const roundId = 1; // Default to round 1; update based on active round in production
+      const round = await presale.rounds(roundId);
+      const tgeTime = await presale.tgeTime();
+      const isTgeSet = await presale.isTgeSet();
 
-      const saleStartTime = await crowdsale.saleStartTime();
-      const saleEndTime = await crowdsale.saleEndTime();
-      const tokenAddress = await crowdsale.token();
-
-      // Use the provider for read-only calls
-      const tokenContract = new ethers.Contract(
-        tokenAddress,
-        QSETokenArtifact.abi,
-        provider // Use provider instead of signer
-      );
-      const tokenBalance = await tokenContract.balanceOf(QSE_CROWDSALE_ADDRESS);
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      console.log("Contract State:");
-      console.log("Rate:", Number(rate));
-      console.log("Burn Rate:", Number(burnRate));
-      console.log(
-        "Sale Start Time:",
-        Number(saleStartTime),
-        new Date(Number(saleStartTime) * 1000)
-      );
-      console.log(
-        "Sale End Time:",
-        Number(saleEndTime),
-        new Date(Number(saleEndTime) * 1000)
-      );
-      console.log("Current Time:", currentTime, new Date(currentTime * 1000));
-      console.log("Token Address:", tokenAddress);
-      console.log(
-        "Crowdsale Token Balance:",
-        ethers.formatUnits(tokenBalance, 18),
-        "QSE"
-      );
+      setCurrentRound({
+        roundId: Number(round.roundId),
+        tokenPrice: Number(round.tokenPrice) / 1e6,
+        tokenAmount: Number(round.tokenAmount) / 1e18,
+        startTime: Number(round.startTime),
+        endTime: Number(round.endTime),
+        soldAmount: Number(round.soldAmount) / 1e18,
+      });
+      setTokenPrice(Number(round.tokenPrice) / 1e6);
+      setTgeTime(Number(tgeTime));
+      setIsTgeSet(isTgeSet);
     } catch (error) {
       console.error("Error loading contract data:", error);
-      setNetworkError("Failed to load contract data. Please try again.");
-      throw error;
+      setNetworkError("Failed to load contract data");
     }
   };
 
@@ -370,40 +414,40 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       setAccount(null);
       setSigner(null);
       setQseToken(null);
-      setQseCrowdsale(null);
+      setQsePresale(null);
       setIsConnected(false);
       setQseBalance("0");
+      setCurrentRound(null);
+      setTgeTime(0);
+      setIsTgeSet(false);
     } else {
       setAccount(accounts[0]);
       setIsConnected(true);
       if (provider) {
-        // Check if we need to switch networks
         const network = await provider.getNetwork();
-        if (network.chainId !== BigInt(sepolia.id)) {
-          setNetworkError("Please switch to Sepolia network");
-          await switchToSepolia();
+        if (network.chainId !== BigInt(arbitrumSepolia.id)) {
+          setNetworkError("Please switch to Arbitrum Sepolia network");
+          await switchToArbitrumSepolia();
         }
-
         provider.getSigner().then((newSigner) => {
           setSigner(newSigner);
           if (QSE_TOKEN_ADDRESS) {
             const tokenContract = new ethers.Contract(
               QSE_TOKEN_ADDRESS,
-              QSETokenArtifact.abi,
+              (QSEArtifact as any).abi,
               newSigner
             );
             setQseToken(tokenContract);
-            // Load QSE balance
             loadQSEBalance();
           }
-          if (QSE_CROWDSALE_ADDRESS) {
-            const crowdsale = new ethers.Contract(
-              QSE_CROWDSALE_ADDRESS,
-              QSECrowdsaleArtifact.abi,
+          if (QSE_PRESALE_ADDRESS) {
+            const presale = new ethers.Contract(
+              QSE_PRESALE_ADDRESS,
+              (QSEPresaleArtifact as any).abi,
               newSigner
             );
-            setQseCrowdsale(crowdsale);
-            loadContractData(crowdsale).catch((err) => {
+            setQsePresale(presale);
+            loadContractData(presale).catch((err) => {
               setNetworkError(
                 "Failed to load contract data: " +
                   (err.message || "Unknown error")
@@ -424,32 +468,26 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       setNetworkError("MetaMask or compatible wallet not detected");
       return false;
     }
-
     setIsConnecting(true);
     setNetworkError(null);
     try {
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
-
-      // After connecting, check if we need to switch networks
       const network = await provider.getNetwork();
-      if (network.chainId !== BigInt(sepolia.id)) {
-        setNetworkError("Please switch to Sepolia network");
-        await switchToSepolia();
+      if (network.chainId !== BigInt(arbitrumSepolia.id)) {
+        setNetworkError("Please switch to Arbitrum Sepolia network");
+        await switchToArbitrumSepolia();
       }
-
       handleAccountsChanged(accounts);
       return accounts.length > 0;
     } catch (error: any) {
       console.error("Error connecting wallet:", error);
-      if (error.code === 4001) {
-        setNetworkError("Wallet connection rejected. Please try again.");
-      } else {
+      if (error.code === 4001) setNetworkError("Wallet connection rejected");
+      else
         setNetworkError(
           "Failed to connect wallet: " + (error.message || "Unknown error")
         );
-      }
       return false;
     } finally {
       setIsConnecting(false);
@@ -458,120 +496,116 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
 
   const buyTokens = async (
     amount: string,
-    email: string,
-    paymentMethod: PaymentMethod
+    paymentMethod: PaymentMethod,
+    roundId: number
   ) => {
-    if (!signer || !qseCrowdsale) {
+    if (!signer || !qsePresale || !account) {
       return {
         success: false,
         message: "Wallet not connected or contract not initialized",
       };
     }
-
     try {
-      if (chainId !== sepolia.id) {
-        setNetworkError("Please switch to Sepolia network");
-        const switched = await switchToSepolia();
-        if (!switched) {
+      if (chainId !== arbitrumSepolia.id) {
+        setNetworkError("Please switch to Arbitrum Sepolia network");
+        const switched = await switchToArbitrumSepolia();
+        if (!switched)
           return {
             success: false,
-            message: "Please switch to Sepolia network to purchase tokens",
+            message: "Please switch to Arbitrum Sepolia network",
           };
-        }
       }
 
-      // For now, we only support ETH payments on-chain
-      // In a production environment, you would integrate with payment processors for USD
-      // and with other token contracts for USDT/USDC
-      if (paymentMethod !== "ETH") {
-        // This is a mock implementation - in production you'd handle other payment methods
-        if (paymentMethod === "USD") {
-          return {
-            success: false,
-            message:
-              "USD payments are currently being processed off-chain. Our team will contact you via email.",
-          };
-        } else {
-          return {
-            success: false,
-            message: `${paymentMethod} payments are not yet implemented on this network.`,
-          };
-        }
-      }
-
-      const weiAmount = ethers.parseEther(amount);
-
-      // Calculate token amount based on USD value
-      const ethUsdValue = parseFloat(amount) * getPaymentRateForMethod("ETH");
-      const tokenAmount = BigInt(
-        Math.floor((ethUsdValue / QSE_TOKEN_PRICE_USD) * 10 ** 18)
-      );
-
-      const netTokenAmount =
-        (tokenAmount * BigInt(100 - burnRate)) / BigInt(100);
-
-      const saleStartTime = await qseCrowdsale.saleStartTime();
-      const saleEndTime = await qseCrowdsale.saleEndTime();
-      const tokenAddress = await qseCrowdsale.token();
-      const tokenContract = new ethers.Contract(
-        tokenAddress,
-        QSETokenArtifact.abi,
-        provider
-      );
-      const tokenBalance = await tokenContract.balanceOf(QSE_CROWDSALE_ADDRESS);
+      const round = await qsePresale.rounds(roundId);
       const currentTime = Math.floor(Date.now() / 1000);
+      const tokenAmount = await getQSEAmountFromPayment(
+        amount,
+        paymentMethod,
+        roundId
+      );
+      const tokenAmountWei = ethers.parseUnits(tokenAmount.toString(), 18);
+      const tokensAvailable = await qsePresale.tokensAvailable(roundId);
 
-      console.log("Pre-transaction checks:");
-      console.log("ETH Amount (wei):", weiAmount.toString());
-      console.log(
-        "Token Amount (gross):",
-        ethers.formatUnits(tokenAmount, 18),
-        "QSE"
-      );
-      console.log(
-        "Token Amount (net):",
-        ethers.formatUnits(netTokenAmount, 18),
-        "QSE"
-      );
-      console.log(
-        "Crowdsale Token Balance:",
-        ethers.formatUnits(tokenBalance, 18),
-        "QSE"
-      );
-      console.log("Current Time:", currentTime);
-      console.log("Sale Start Time:", Number(saleStartTime));
-      console.log("Sale End Time:", Number(saleEndTime));
-
-      if (currentTime < Number(saleStartTime)) {
+      if (currentTime < Number(round.startTime))
         return {
           success: false,
           message: "The token sale has not yet started",
         };
-      }
-      if (currentTime > Number(saleEndTime)) {
+      if (currentTime > Number(round.endTime))
         return { success: false, message: "The token sale has ended" };
-      }
-      if (tokenBalance < netTokenAmount) {
+      if (tokenAmountWei > tokensAvailable)
         return {
           success: false,
-          message: "Insufficient tokens in crowdsale contract",
+          message: "Insufficient tokens available in presale",
         };
+
+      let tx;
+      if (paymentMethod === "ETH") {
+        const ethAmount = ethers.parseEther(amount);
+        tx = await qsePresale.buyWithETH(roundId, {
+          value: ethAmount,
+          gasLimit: 500000,
+        });
+      } else {
+        let coinAddress = "";
+        let decimals = 6;
+        if (paymentMethod === "USDT")
+          coinAddress =
+            chainId === 42161
+              ? STABLECOINS.USDT.mainnet
+              : STABLECOINS.USDT.sepolia;
+        if (paymentMethod === "USDC")
+          coinAddress =
+            chainId === 42161
+              ? STABLECOINS.USDC.mainnet
+              : STABLECOINS.USDC.sepolia;
+        if (paymentMethod === "DAI")
+          coinAddress =
+            chainId === 42161
+              ? STABLECOINS.DAI.mainnet
+              : STABLECOINS.DAI.sepolia;
+
+        const coinContract = new ethers.Contract(
+          coinAddress,
+          [
+            "function decimals() view returns (uint8)",
+            "function allowance(address owner, address spender) view returns (uint256)",
+            "function approve(address spender, uint256 amount) returns (bool)",
+          ],
+          signer
+        );
+        decimals = await coinContract.decimals();
+        const coinAmount = ethers.parseUnits(amount, decimals);
+        const allowance = await coinContract.allowance(
+          account,
+          QSE_PRESALE_ADDRESS
+        );
+
+        if (allowance < coinAmount) {
+          const approveTx = await coinContract.approve(
+            QSE_PRESALE_ADDRESS,
+            coinAmount,
+            { gasLimit: 100000 }
+          );
+          await approveTx.wait();
+        }
+
+        if (paymentMethod === "USDT")
+          tx = await qsePresale.buyWithUSDT(tokenAmountWei, roundId, {
+            gasLimit: 300000,
+          });
+        else if (paymentMethod === "USDC")
+          tx = await qsePresale.buyWithUSDC(tokenAmountWei, roundId, {
+            gasLimit: 300000,
+          });
+        else if (paymentMethod === "DAI")
+          tx = await qsePresale.buyWithDAI(tokenAmountWei, roundId, {
+            gasLimit: 300000,
+          });
       }
 
-      console.log("Purchase email:", email);
-
-      const tx = await qseCrowdsale.buyTokens({
-        value: weiAmount,
-        gasLimit: 300000,
-      });
-
-      console.log("Transaction sent:", tx.hash);
       const receipt = await tx.wait();
-      console.log("Transaction confirmed:", receipt);
-
-      // After successful purchase, reload the user's QSE balance
       await loadQSEBalance();
-
       return { success: true, message: `Transaction: ${receipt.hash}` };
     } catch (error: any) {
       console.error("Buy Tokens Error:", error);
@@ -579,7 +613,62 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       if (error.code === 4001) errorMessage = "Transaction rejected by user";
       else if (error.message.includes("insufficient funds"))
         errorMessage = "Insufficient funds in your wallet";
+      else if (error.message.includes("Round is not active"))
+        errorMessage = "Selected round is not active";
+      else if (error.message.includes("Insufficient allowance"))
+        errorMessage = "Insufficient allowance for stablecoin";
       return { success: false, message: errorMessage };
+    }
+  };
+
+  const claimTokens = async () => {
+    if (!signer || !qsePresale || !account) {
+      return {
+        success: false,
+        message: "Wallet not connected or contract not initialized",
+      };
+    }
+    try {
+      const isTgeSet = await qsePresale.isTgeSet();
+      const tgeTime = await qsePresale.tgeTime();
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (!isTgeSet) return { success: false, message: "TGE time not set yet" };
+      if (currentTime < Number(tgeTime))
+        return { success: false, message: "TGE has not occurred yet" };
+
+      const userRounds = await qsePresale.getUserRounds(account);
+      if (userRounds.length === 0)
+        return { success: false, message: "No rounds to claim" };
+
+      const tx = await qsePresale.claimTokens({ gasLimit: 500000 });
+      const receipt = await tx.wait();
+      await loadQSEBalance();
+      return { success: true, message: `Claimed tokens: ${receipt.hash}` };
+    } catch (error: any) {
+      console.error("Claim Tokens Error:", error);
+      let errorMessage = "Claim failed";
+      if (error.code === 4001) errorMessage = "Transaction rejected by user";
+      else if (error.message.includes("No tokens available to claim"))
+        errorMessage = "No tokens available to claim";
+      return { success: false, message: errorMessage };
+    }
+  };
+
+  const getClaimableAmount = async (roundId: number) => {
+    if (!qsePresale || !account) return { claimable: "0", periodsPassed: 0 };
+    try {
+      const [claimable, periodsPassed] = await qsePresale.getClaimableAmount(
+        account,
+        roundId
+      );
+      return {
+        claimable: ethers.formatUnits(claimable, 18),
+        periodsPassed: Number(periodsPassed),
+      };
+    } catch (error) {
+      console.error("Error fetching claimable amount:", error);
+      return { claimable: "0", periodsPassed: 0 };
     }
   };
 
@@ -589,20 +678,26 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
     account,
     chainId,
     qseToken,
-    qseCrowdsale,
+    qsePresale,
     connectWallet,
     buyTokens,
+    claimTokens,
+    getClaimableAmount,
+    getRounds,
     isConnecting,
     isConnected,
-    tokenRate,
+    tokenPrice,
     burnRate,
     networkError,
-    switchToSepolia,
+    switchToArbitrumSepolia,
     qseBalance,
     loadQSEBalance,
     supportedPaymentMethods,
     getQSEAmountFromPayment,
     getPaymentRateForMethod,
+    currentRound,
+    tgeTime,
+    isTgeSet,
   };
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;

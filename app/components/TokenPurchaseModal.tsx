@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/components/TokenPurchaseModal.tsx
 
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -21,103 +22,154 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const [qseAmount, setQseAmount] = useState<string>("");
   const [purchaseCompleted, setPurchaseCompleted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [receiveAmount, setReceiveAmount] = useState<string>("");
-  const [burnAmount, setBurnAmount] = useState<string>("");
   const [txHash, setTxHash] = useState<string>("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod>("ETH");
   const [quickBuyAmount, setQuickBuyAmount] = useState<number>(100);
+  const [selectedRound, setSelectedRound] = useState<number>(1);
+  const [availableRounds, setAvailableRounds] = useState<any[]>([]);
+  const [claimableAmount, setClaimableAmount] = useState<string>("0");
+  const [vestingPeriodsPassed, setVestingPeriodsPassed] = useState<number>(0);
+  const [rate, setRate] = useState<string>("");
 
   const {
     connectWallet,
     buyTokens,
+    claimTokens,
+    getClaimableAmount,
+    getRounds,
     isConnected,
     isConnecting,
     account,
-    burnRate,
     qseBalance,
     loadQSEBalance,
     supportedPaymentMethods,
     getQSEAmountFromPayment,
     getPaymentRateForMethod,
+    currentRound,
+    tgeTime,
+    isTgeSet,
   } = useWeb3();
 
   const MINIMUM_QSE_AMOUNT = 50;
-  const QSE_TOKEN_PRICE_USD = 0.6; // QSE price in USD (e.g., $0.60 per QSE)
-
-  // Quick buy preset amounts
+  const QSE_TOKEN_PRICE_USD = 0.6;
   const quickBuyOptions = [100, 250, 500, 1000, 2500];
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && account) {
       loadQSEBalance();
+      fetchClaimableAmount();
+      fetchRounds();
     }
-  }, [isConnected, loadQSEBalance]);
+  }, [isConnected, account, selectedRound]);
 
   useEffect(() => {
     setErrorMessage("");
-  }, [paymentAmount, qseAmount]);
+  }, [paymentAmount, qseAmount, selectedPaymentMethod, selectedRound]);
 
-  // Calculate payment amount from QSE tokens based on selected payment method
+  useEffect(() => {
+    async function updateRate() {
+      try {
+        const tokens = await getQSEAmountFromPayment(
+          "1",
+          selectedPaymentMethod,
+          selectedRound
+        );
+        setRate(tokens.toFixed(2));
+      } catch (error) {
+        console.error("Error calculating rate:", error);
+        setRate("Error");
+      }
+    }
+
+    if (isConnected) {
+      updateRate();
+    }
+  }, [
+    selectedPaymentMethod,
+    selectedRound,
+    getQSEAmountFromPayment,
+    isConnected,
+  ]);
+
+  const fetchRounds = async () => {
+    try {
+      const rounds = await getRounds();
+      setAvailableRounds(rounds);
+      if (
+        rounds.length > 0 &&
+        !rounds.some((r) => r.roundId === selectedRound)
+      ) {
+        setSelectedRound(rounds[0].roundId);
+      }
+    } catch (error) {
+      console.error("Error fetching rounds:", error);
+    }
+  };
+
+  const fetchClaimableAmount = () => {
+    if (!account || !selectedRound) return;
+    getClaimableAmount(selectedRound)
+      .then(({ claimable, periodsPassed }) => {
+        setClaimableAmount(claimable);
+        setVestingPeriodsPassed(periodsPassed);
+      })
+      .catch((error) =>
+        console.error("Error fetching claimable amount:", error)
+      );
+  };
+
   const calculatePaymentFromQSE = (
     qseValue: number,
     method: PaymentMethod
   ): string => {
-    // QSE value in USD = QSE amount * price per token
     const usdValue = qseValue * QSE_TOKEN_PRICE_USD;
+    const paymentRate = getPaymentRateForMethod(method);
+    if (paymentRate <= 0) return "0";
 
-    // Convert USD value to the selected payment method
-    const paymentValue = usdValue / getPaymentRateForMethod(method);
-
-    // Format with appropriate decimal places based on payment method
-    const decimals = method === "ETH" ? 6 : method === "USDC" ? 6 : 2;
-
+    const paymentValue = usdValue / paymentRate;
+    const decimals = method === "ETH" ? 6 : 6;
     return paymentValue.toFixed(decimals);
   };
 
-  // Convert payment amount to QSE tokens
+  const calculateTokens = async (
+    value: string,
+    method: PaymentMethod,
+    round: number
+  ) => {
+    if (value && !isNaN(parseFloat(value))) {
+      try {
+        const tokens = await getQSEAmountFromPayment(value, method, round);
+        setQseAmount(tokens.toFixed(2));
+      } catch (error) {
+        console.error("Error calculating tokens:", error);
+        setQseAmount("");
+      }
+    } else {
+      setQseAmount("");
+    }
+  };
+
   const handlePaymentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPaymentAmount(value);
-
-    if (value && !isNaN(parseFloat(value))) {
-      const tokens = getQSEAmountFromPayment(value, selectedPaymentMethod);
-      setQseAmount(tokens.toFixed(2));
-      calculateTokensAfterBurn(tokens);
-    } else {
-      setQseAmount("");
-      setReceiveAmount("");
-      setBurnAmount("");
+    if (isConnected) {
+      calculateTokens(value, selectedPaymentMethod, selectedRound);
     }
   };
 
-  // Convert QSE tokens to payment amount based on selected payment method
   const handleQseInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQseAmount(value);
-
     if (value && !isNaN(parseFloat(value))) {
       const tokens = parseFloat(value);
-
-      // Calculate and set the corresponding payment amount
       const payment = calculatePaymentFromQSE(tokens, selectedPaymentMethod);
       setPaymentAmount(payment);
-
-      // Calculate tokens after burn
-      calculateTokensAfterBurn(tokens);
     } else {
       setPaymentAmount("");
-      setReceiveAmount("");
-      setBurnAmount("");
     }
-  };
-
-  const calculateTokensAfterBurn = (totalTokens: number) => {
-    const burnTokens = (totalTokens * burnRate) / 100;
-    const netTokens = totalTokens - burnTokens;
-    setReceiveAmount(netTokens.toFixed(2));
-    setBurnAmount(burnTokens.toFixed(2));
   };
 
   const handleQuickBuySelect = (amount: number) => {
@@ -125,23 +177,20 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     setQseAmount(amount.toString());
     const payment = calculatePaymentFromQSE(amount, selectedPaymentMethod);
     setPaymentAmount(payment);
-    calculateTokensAfterBurn(amount);
   };
 
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setSelectedPaymentMethod(method);
 
-    // When payment method changes, recalculate based on QSE amount if it exists
+    // Update payment amount based on current QSE amount
     if (qseAmount && !isNaN(parseFloat(qseAmount))) {
       const tokens = parseFloat(qseAmount);
       const payment = calculatePaymentFromQSE(tokens, method);
       setPaymentAmount(payment);
     }
-    // Otherwise recalculate based on payment amount
+    // Or recalculate QSE amount if we have a payment amount
     else if (paymentAmount && !isNaN(parseFloat(paymentAmount))) {
-      const tokens = getQSEAmountFromPayment(paymentAmount, method);
-      setQseAmount(tokens.toFixed(2));
-      calculateTokensAfterBurn(tokens);
+      calculateTokens(paymentAmount, method, selectedRound);
     }
   };
 
@@ -150,39 +199,47 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       setErrorMessage("Please connect your wallet first");
       return false;
     }
-
+    if (!currentRound) {
+      setErrorMessage("No active presale round available");
+      return false;
+    }
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (currentTime < currentRound.startTime) {
+      setErrorMessage("The presale round has not yet started");
+      return false;
+    }
+    if (currentTime > currentRound.endTime) {
+      setErrorMessage("The presale round has ended");
+      return false;
+    }
     if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
       setErrorMessage(`Please enter a valid ${selectedPaymentMethod} amount`);
       return false;
     }
-
     if (!qseAmount || parseFloat(qseAmount) <= 0) {
       setErrorMessage("Please enter a valid QSE amount");
       return false;
     }
-
     if (parseFloat(qseAmount) < MINIMUM_QSE_AMOUNT) {
       setErrorMessage(
         `Minimum purchase amount is ${MINIMUM_QSE_AMOUNT} QSE tokens`
       );
       return false;
     }
-
     return true;
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const executePurchase = async () => {
     if (!validatePurchase()) return;
 
     setIsSubmitting(true);
+    setIsApproving(selectedPaymentMethod !== "ETH");
     setErrorMessage("");
     try {
-      const dummyEmail = `user-${Date.now()}@quantumsec.org`;
       const result = await buyTokens(
         paymentAmount,
-        dummyEmail,
-        selectedPaymentMethod
+        selectedPaymentMethod,
+        selectedRound
       );
       if (result.success) {
         setPurchaseCompleted(true);
@@ -190,8 +247,8 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
           /Transaction: (0x[a-fA-F0-9]{64})/
         );
         if (hashMatch && hashMatch[1]) setTxHash(hashMatch[1]);
-        // Reload QSE balance after successful purchase
         loadQSEBalance();
+        fetchClaimableAmount();
       } else {
         setErrorMessage(result.message);
       }
@@ -199,38 +256,86 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       setErrorMessage(error.message || "An error occurred during purchase");
     } finally {
       setIsSubmitting(false);
+      setIsApproving(false);
     }
   };
 
-  const handleQuickBuy = async () => {
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    executePurchase();
+  };
+
+  const handleQuickBuy = () => {
     if (!isConnected) {
-      await connectWallet();
+      connectWallet()
+        .then(() => {
+          setQseAmount(quickBuyAmount.toString());
+          const payment = calculatePaymentFromQSE(
+            quickBuyAmount,
+            selectedPaymentMethod
+          );
+          setPaymentAmount(payment);
+          setTimeout(() => executePurchase(), 300);
+        })
+        .catch((error) => {
+          console.error("Error connecting wallet:", error);
+          setErrorMessage("Failed to connect wallet");
+        });
       return;
     }
-
     setQseAmount(quickBuyAmount.toString());
     const payment = calculatePaymentFromQSE(
       quickBuyAmount,
       selectedPaymentMethod
     );
     setPaymentAmount(payment);
-    calculateTokensAfterBurn(quickBuyAmount);
-
-    // Execute purchase with minimal delay
-    setTimeout(() => {
-      handleSubmit();
-    }, 300);
+    setTimeout(() => executePurchase(), 300);
   };
 
-  const handleConnectOrBuy = async () => {
+  const executeClaimTokens = () => {
+    setIsSubmitting(true);
+    setErrorMessage("");
+    claimTokens()
+      .then((result) => {
+        if (result.success) {
+          setErrorMessage("Tokens claimed successfully!");
+          const hashMatch = result.message.match(
+            /Claimed tokens: (0x[a-fA-F0-9]{64})/
+          );
+          if (hashMatch && hashMatch[1]) setTxHash(hashMatch[1]);
+          loadQSEBalance();
+          fetchClaimableAmount();
+        } else {
+          setErrorMessage(result.message);
+        }
+      })
+      .catch((error: any) => {
+        setErrorMessage(error.message || "An error occurred during claiming");
+      })
+      .finally(() => setIsSubmitting(false));
+  };
+
+  const handleClaimTokens = () => {
+    executeClaimTokens();
+  };
+
+  const handleConnectOrBuy = () => {
     if (!isConnected) {
-      await connectWallet();
+      connectWallet()
+        .then(() => executePurchase())
+        .catch((error) => {
+          console.error("Error connecting wallet:", error);
+          setErrorMessage("Failed to connect wallet");
+        });
     } else {
-      handleSubmit();
+      executePurchase();
     }
   };
 
   if (!isOpen) return null;
+
+  const formatDate = (timestamp: number) =>
+    new Date(timestamp * 1000).toLocaleString();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-start justify-center z-[2000] p-4 backdrop-blur-sm overflow-y-auto">
@@ -243,7 +348,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
           <X size={20} />
         </button>
 
-        {/* Modal Content */}
         <div className="p-5 md:p-8 overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
             <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 md:p-3 rounded-xl shadow-lg">
@@ -271,9 +375,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
               </div>
               <div className="bg-blue-950/70 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm text-blue-300 font-mono truncate max-w-[100px] md:max-w-[200px]">
                 {account
-                  ? `${account.substring(0, 6)}...${account.substring(
-                      account.length - 4
-                    )}`
+                  ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
                   : ""}
               </div>
             </div>
@@ -295,14 +397,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     {qseAmount} QSE
                   </span>
                 </div>
-                <div className="flex justify-between items-center mb-3 pb-3 border-b border-blue-700/50">
-                  <span className="text-gray-300">Tokens Burned:</span>
-                  <span className="text-red-400">{burnAmount} QSE</span>
-                </div>
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-gray-300">You Will Receive:</span>
-                  <span className="text-lg md:text-xl font-bold text-green-400">
-                    {receiveAmount} QSE
+                  <span className="text-gray-300">Vesting Schedule:</span>
+                  <span className="text-blue-300">
+                    20% at TGE, 80% over 12 months
                   </span>
                 </div>
               </div>
@@ -323,21 +421,74 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
             </div>
           ) : (
             <div className="flex flex-col lg:flex-row lg:space-x-6">
-              {/* Main Form Section */}
               <div className="w-full lg:w-3/5">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
                     <label className="block text-sm font-medium mb-2 text-blue-200">
+                      Presale Round
+                    </label>
+                    <select
+                      value={selectedRound}
+                      onChange={(e) => setSelectedRound(Number(e.target.value))}
+                      className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      disabled={!isConnected || availableRounds.length === 0}
+                    >
+                      {availableRounds.length === 0 ? (
+                        <option value="1">Loading rounds...</option>
+                      ) : (
+                        availableRounds.map((round) => (
+                          <option key={round.roundId} value={round.roundId}>
+                            Round {round.roundId}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+
+                  {currentRound && (
+                    <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 mb-4 text-sm">
+                      <div className="flex justify-between mb-2">
+                        <span className="text-gray-300">Token Price:</span>
+                        <span className="text-white">
+                          ${currentRound.tokenPrice.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-gray-300">Tokens Available:</span>
+                        <span className="text-white">
+                          {(
+                            currentRound.tokenAmount - currentRound.soldAmount
+                          ).toFixed(2)}{" "}
+                          QSE
+                        </span>
+                      </div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-gray-300">Start Time:</span>
+                        <span className="text-white">
+                          {formatDate(currentRound.startTime)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-300">End Time:</span>
+                        <span className="text-white">
+                          {formatDate(currentRound.endTime)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-blue-200">
                       Payment Method
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-4 gap-1">
                       {supportedPaymentMethods.map((method) => (
                         <button
                           key={method}
                           type="button"
-                          className={`py-2.5 md:py-3 rounded-xl text-sm font-medium transition-all ${
+                          className={`py-2 rounded-lg text-xs font-medium transition-all ${
                             selectedPaymentMethod === method
-                              ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
+                              ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30"
                               : "bg-blue-800/60 text-gray-300 hover:bg-blue-700/70 border border-blue-700/30"
                           }`}
                           onClick={() => handlePaymentMethodChange(method)}
@@ -373,11 +524,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       <div className="text-xs text-blue-300 mt-1.5 flex items-center gap-1">
                         <span>Rate:</span>
                         <span className="font-medium">
-                          1 {selectedPaymentMethod} ={" "}
-                          {getQSEAmountFromPayment(
-                            "1",
-                            selectedPaymentMethod
-                          ).toFixed(2)}{" "}
+                          1 {selectedPaymentMethod} = {rate || "Calculating..."}{" "}
                           QSE
                         </span>
                       </div>
@@ -411,34 +558,61 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     </div>
                   </div>
 
-                  {receiveAmount && (
+                  {isTgeSet && tgeTime > 0 && (
                     <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 md:p-6 backdrop-blur-sm">
                       <h4 className="font-medium mb-3 text-blue-100">
-                        Transaction Details:
+                        TGE Details:
                       </h4>
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-300">Gross Amount:</span>
-                          <span className="text-white font-medium">
-                            {parseFloat(qseAmount || "0").toFixed(2)} QSE
+                          <span className="text-gray-300">TGE Time:</span>
+                          <span className="text-white">
+                            {formatDate(tgeTime)}
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-300">
-                            Burn Amount ({burnRate}%):
+                            Vesting Schedule:
                           </span>
-                          <span className="text-red-400">
-                            {burnAmount || "0.00"} QSE
-                          </span>
-                        </div>
-                        <div className="h-px bg-blue-700/50 my-2"></div>
-                        <div className="flex justify-between text-sm font-medium">
-                          <span className="text-blue-100">You Receive:</span>
-                          <span className="text-green-400 font-bold">
-                            {receiveAmount || "0.00"} QSE
+                          <span className="text-white">
+                            20% at TGE, 80% over 12 months
                           </span>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {parseFloat(claimableAmount) > 0 && (
+                    <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 md:p-6 backdrop-blur-sm">
+                      <h4 className="font-medium mb-3 text-blue-100">
+                        Claimable Tokens:
+                      </h4>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-gray-300">
+                          Available to Claim:
+                        </span>
+                        <span className="text-green-400 font-bold">
+                          {claimableAmount} QSE
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleClaimTokens}
+                        disabled={
+                          isSubmitting ||
+                          !isConnected ||
+                          parseFloat(claimableAmount) === 0
+                        }
+                        className={`w-full py-3 rounded-xl font-medium text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all ${
+                          isSubmitting ||
+                          !isConnected ||
+                          parseFloat(claimableAmount) === 0
+                            ? "opacity-60 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        Claim Tokens
+                      </button>
                     </div>
                   )}
 
@@ -469,14 +643,20 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     <button
                       type={isConnected ? "submit" : "button"}
                       onClick={isConnected ? undefined : handleConnectOrBuy}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !currentRound}
                       className={`w-full py-3.5 md:py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-blue-500/30 relative overflow-hidden group ${
-                        isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                        isSubmitting || !currentRound
+                          ? "opacity-70 cursor-not-allowed"
+                          : ""
                       }`}
                     >
                       <span className="relative z-10 flex items-center justify-center gap-2">
                         {isSubmitting ? (
-                          "Processing..."
+                          isApproving ? (
+                            `Approving ${selectedPaymentMethod}...`
+                          ) : (
+                            "Processing..."
+                          )
                         ) : isConnected ? (
                           <>
                             Buy QSE Tokens
@@ -497,7 +677,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                   </div>
                 </form>
 
-                {/* Mobile Quick Buy Section - Only visible on small screens */}
                 <div className="lg:hidden mt-6 pt-6 border-t border-blue-700/40">
                   <h3 className="text-lg font-medium mb-3 text-blue-100">
                     Quick Buy Options
@@ -543,7 +722,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                 </div>
               </div>
 
-              {/* Desktop Quick Buy Panel - Only visible on large screens */}
               <div className="hidden lg:block w-2/5 border-l border-blue-700/40 pl-6">
                 <div className="bg-blue-800/30 border border-blue-600/20 rounded-xl p-5 backdrop-blur-sm">
                   <h3 className="text-xl font-medium mb-4 text-blue-100">
@@ -553,7 +731,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     Select a preset amount below for faster checkout with the
                     current payment method.
                   </p>
-
                   <div className="space-y-3">
                     {quickBuyOptions.map((amount) => (
                       <button
@@ -579,7 +756,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       </button>
                     ))}
                   </div>
-
                   <div className="mt-8">
                     <button
                       type="button"
@@ -594,23 +770,21 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     </button>
                   </div>
                 </div>
-
                 <div className="mt-4 text-center">
                   <p className="text-xs text-blue-300">
-                    Transactions processed securely on the blockchain.
+                    Transactions processed securely on Arbitrum Sepolia.
                   </p>
                   <p className="text-xs text-blue-300 mt-1">
                     QSE price fixed at ${QSE_TOKEN_PRICE_USD.toFixed(2)} per
-                    token for all payment methods
+                    token
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Footer info - only shown on mobile */}
           <div className="mt-6 text-center text-xs text-blue-300 lg:hidden">
-            <p>Transactions processed securely on the blockchain.</p>
+            <p>Transactions processed securely on Arbitrum Sepolia.</p>
             <p className="mt-1">
               QSE price fixed at ${QSE_TOKEN_PRICE_USD.toFixed(2)} per token
             </p>

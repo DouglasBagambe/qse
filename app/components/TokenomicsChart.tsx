@@ -185,8 +185,8 @@ const TokenomicsChart = () => {
                   <p className="font-medium">1,000,000,000 QSE</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Token Type</p>
-                  <p className="font-medium">ERC-20</p>
+                  <p className="text-sm text-gray-500">Monthly Burn Rate</p>
+                  <p className="font-medium">2%</p>
                 </div>
                 {/* <div>
                   <p className="text-sm text-gray-500">Initial Price</p>
