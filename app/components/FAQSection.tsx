@@ -58,7 +58,7 @@ const FAQSection = () => {
           Frequently Asked Questions
         </h2>
         <p className="text-center mb-12 max-w-2xl mx-auto">
-          Find answers to common questions about QuantumCoin, our ICO, and our
+          Find answers to common questions about QuantumSEC, our ICO, and our
           vision for the future.
         </p>
 
