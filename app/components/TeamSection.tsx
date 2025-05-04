@@ -193,7 +193,7 @@ const TeamSection = () => {
               </h2>
               <div className="w-20 h-1 bg-blue-300 mx-auto mb-6"></div>
               <p className="text-lg md:text-xl max-w-2xl mx-auto text-blue-100">
-                Meet the experts behind Quantum SEC who are revolutionizing how
+                Meet the experts behind QuantumSEC who are revolutionizing how
                 we pay for charging electric vehicles.
               </p>
             </motion.div>

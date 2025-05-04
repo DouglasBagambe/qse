@@ -10,9 +10,9 @@ const FAQSection = () => {
 
   const faqs = [
     {
-      question: "What is Quantum SEC and how does it work?",
+      question: "What is QuantumSEC and how does it work?",
       answer:
-        "Quantum SEC is a blockchain-based token designed specifically for electric vehicle charging infrastructure. It uses quantum-resistant cryptography and AI to create a secure payment ecosystem for EV charging stations worldwide.",
+        "QuantumSEC is a blockchain-based token designed specifically for electric vehicle charging infrastructure. It uses quantum-resistant cryptography and AI to create a secure payment ecosystem for EV charging stations worldwide.",
     },
     {
       question: "How can I participate in the ICO?",
@@ -25,9 +25,9 @@ const FAQSection = () => {
         "Token distribution will begin immediately after the ICO ends. You will receive your tokens directly in the wallet you used for the purchase. We'll send email notifications when the distribution process begins.",
     },
     {
-      question: "What makes Quantum SEC different from other crypto projects?",
+      question: "What makes QuantumSEC different from other crypto projects?",
       answer:
-        "Quantum SEC is unique in its specialized focus on EV charging infrastructure, quantum-resistant security features, AI integration for fraud detection, and partnerships with major charging networks to ensure real-world utility and adoption.",
+        "QuantumSEC is unique in its specialized focus on EV charging infrastructure, quantum-resistant security features, AI integration for fraud detection, and partnerships with major charging networks to ensure real-world utility and adoption.",
     },
     {
       question: "Is there a vesting period for team tokens?",
@@ -35,12 +35,12 @@ const FAQSection = () => {
         "Yes, team tokens are subject to a vesting period of 24 months with a 6-month cliff. This ensures long-term commitment from our team and prevents market flooding of tokens.",
     },
     {
-      question: "Which blockchain does Quantum SEC use?",
+      question: "Which blockchain does QuantumSEC use?",
       answer:
-        "Quantum SEC is built on the Ethereum blockchain as an ERC-20 token, utilizing smart contracts for security and transaction transparency. We're also developing cross-chain compatibility for future expansion.",
+        "QuantumSEC is built on the Ethereum blockchain as an ERC-20 token, utilizing smart contracts for security and transaction transparency. We're also developing cross-chain compatibility for future expansion.",
     },
     {
-      question: "How will Quantum SEC ensure security and prevent fraud?",
+      question: "How will QuantumSEC ensure security and prevent fraud?",
       answer:
         "We employ quantum-resistant cryptography, real-time AI monitoring systems, multi-signature wallets for fund management, and regular security audits by third-party firms to ensure the highest level of security and prevent fraud.",
     },

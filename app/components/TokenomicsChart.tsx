@@ -70,7 +70,7 @@ const TokenomicsChart = () => {
         <div className="w-20 h-1 bg-blue-300 mx-auto mb-6"></div>
         <p className="text-center text-gray-600 text-lg max-w-3xl mx-auto">
           Our token distribution is designed to ensure sustainable growth and
-          development of the Quantum SEC ecosystem.
+          development of the QuantumSEC ecosystem.
         </p>
       </div>
 
@@ -174,7 +174,7 @@ const TokenomicsChart = () => {
               <div className="grid grid-cols-2 gap-y-4">
                 <div>
                   <p className="text-sm text-gray-500">Token Name</p>
-                  <p className="font-medium">Quantum SEC</p>
+                  <p className="font-medium">QuantumSEC</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Symbol</p>
