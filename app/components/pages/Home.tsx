@@ -131,7 +131,7 @@ const Home = () => {
       <section className="py-12 md:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 md:mb-16 text-blue-900">
-            About Quantum SEC
+            About QuantumSEC
           </h2>
 
           <div className="max-w-3xl mx-auto text-center mb-10 md:mb-16 px-2">
@@ -217,10 +217,10 @@ const Home = () => {
             {/* Content Side */}
             <div className="p-6 md:p-8 lg:w-2/3">
               <h2 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4">
-                The Future of Quantum SEC
+                The Future of QuantumSEC
               </h2>
               <p className="mb-4 md:mb-6 text-blue-50 text-sm md:text-base">
-                Quantum SEC is more than just a cryptocurrency - it's a complete
+                QSE is more than just a cryptocurrency - it's a complete
                 ecosystem designed to accelerate the adoption of sustainable
                 energy and services.
               </p>
