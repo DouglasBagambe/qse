@@ -260,7 +260,7 @@ const Header = () => {
                     } else if (link.isTokenTheory) {
                       window.open("/token-theory", "_blank");
                     } else if (link.isTokenomics) {
-                      navigateToHomeSection(link.id);
+                      window.open("/tokenomics", "_blank");
                     } else if (link.isSection) {
                       navigateToHomeSection(link.id);
                     } else if (link.isRoadmap) {
@@ -384,7 +384,7 @@ const Header = () => {
                   } else if (link.isTokenTheory) {
                     window.open("/token-theory", "_blank");
                   } else if (link.isTokenomics) {
-                    navigateToHomeSection(link.id);
+                    window.open("/tokenomics", "_blank");
                   } else if (link.isSection) {
                     navigateToHomeSection(link.id);
                   } else if (link.isRoadmap) {

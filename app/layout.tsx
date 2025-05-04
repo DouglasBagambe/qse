@@ -15,7 +15,7 @@ export default function RootLayout({
   const pathname = usePathname();
 
   // Define routes where Header and Footer should not be displayed
-  const hideHeader = ["/token-theory", "/purchase-guide"];
+  const hideHeader = ["/token-theory", "/purchase-guide", "/tokenomics"];
 
   const shouldHideHeader = hideHeader.includes(pathname);
 

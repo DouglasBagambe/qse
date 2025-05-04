@@ -115,6 +115,12 @@ const QSEEcosystem = () => {
     }
   };
 
+  const handleTokenomicsView = () => {
+    if (typeof window !== "undefined") {
+      window.open("/tokenomics", "_blank");
+    }
+  };
+
   // Function to scroll to section
   const scrollToSection = (id: string) => {
     if (typeof window !== "undefined" && typeof document !== "undefined") {
@@ -273,7 +279,7 @@ const QSEEcosystem = () => {
               </p>
               <div className="flex justify-start">
                 <button
-                  onClick={() => scrollToSection("tokenomics")}
+                  onClick={handleTokenomicsView}
                   className="group inline-flex items-center text-white font-medium text-lg bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-xl"
                 >
                   View Tokenomics
