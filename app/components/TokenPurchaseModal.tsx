@@ -51,6 +51,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     currentRound,
     tgeTime,
     isTgeSet,
+    networkError,
   } = useWeb3();
 
   const MINIMUM_QSE_AMOUNT = 50;
@@ -66,8 +67,8 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   }, [isConnected, account, selectedRound]);
 
   useEffect(() => {
-    setErrorMessage("");
-  }, [paymentAmount, qseAmount, selectedPaymentMethod, selectedRound]);
+    setErrorMessage(networkError || "");
+  }, [networkError]);
 
   useEffect(() => {
     async function updateRate() {
@@ -80,11 +81,11 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
         setRate(tokens.toFixed(2));
       } catch (error) {
         console.error("Error calculating rate:", error);
-        setRate("Error");
+        setRate("N/A");
       }
     }
 
-    if (isConnected) {
+    if (isConnected && currentRound) {
       updateRate();
     }
   }, [
@@ -92,6 +93,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     selectedRound,
     getQSEAmountFromPayment,
     isConnected,
+    currentRound,
   ]);
 
   const fetchRounds = async () => {
@@ -106,6 +108,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       }
     } catch (error) {
       console.error("Error fetching rounds:", error);
+      setErrorMessage("Failed to load presale rounds");
     }
   };
 
@@ -182,14 +185,11 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setSelectedPaymentMethod(method);
 
-    // Update payment amount based on current QSE amount
     if (qseAmount && !isNaN(parseFloat(qseAmount))) {
       const tokens = parseFloat(qseAmount);
       const payment = calculatePaymentFromQSE(tokens, method);
       setPaymentAmount(payment);
-    }
-    // Or recalculate QSE amount if we have a payment amount
-    else if (paymentAmount && !isNaN(parseFloat(paymentAmount))) {
+    } else if (paymentAmount && !isNaN(parseFloat(paymentAmount))) {
       calculateTokens(paymentAmount, method, selectedRound);
     }
   };
@@ -265,31 +265,29 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     executePurchase();
   };
 
-  const handleQuickBuy = () => {
-    if (!isConnected) {
-      connectWallet()
-        .then(() => {
-          setQseAmount(quickBuyAmount.toString());
-          const payment = calculatePaymentFromQSE(
-            quickBuyAmount,
-            selectedPaymentMethod
-          );
-          setPaymentAmount(payment);
-          setTimeout(() => executePurchase(), 300);
-        })
-        .catch((error) => {
-          console.error("Error connecting wallet:", error);
-          setErrorMessage("Failed to connect wallet");
-        });
-      return;
-    }
+  const handleQuickBuy = async () => {
+    // Update the QSE amount and payment amount regardless of connection status
     setQseAmount(quickBuyAmount.toString());
     const payment = calculatePaymentFromQSE(
       quickBuyAmount,
       selectedPaymentMethod
     );
     setPaymentAmount(payment);
-    setTimeout(() => executePurchase(), 300);
+
+    if (!isConnected) {
+      try {
+        await connectWallet();
+        // Give time for connection state to update before proceeding
+        setTimeout(() => {
+          executePurchase();
+        }, 500);
+      } catch (error) {
+        console.error("Error connecting wallet:", error);
+        setErrorMessage("Failed to connect wallet");
+      }
+    } else {
+      executePurchase();
+    }
   };
 
   const executeClaimTokens = () => {
@@ -319,14 +317,20 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     executeClaimTokens();
   };
 
-  const handleConnectOrBuy = () => {
+  const handleConnectOrBuy = async () => {
     if (!isConnected) {
-      connectWallet()
-        .then(() => executePurchase())
-        .catch((error) => {
-          console.error("Error connecting wallet:", error);
-          setErrorMessage("Failed to connect wallet");
-        });
+      try {
+        await connectWallet();
+        // After successful connection, we need to wait for state to update
+        setTimeout(() => {
+          if (validatePurchase()) {
+            executePurchase();
+          }
+        }, 500);
+      } catch (error) {
+        console.error("Error connecting wallet:", error);
+        setErrorMessage("Failed to connect wallet");
+      }
     } else {
       executePurchase();
     }
@@ -434,7 +438,11 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       disabled={!isConnected || availableRounds.length === 0}
                     >
                       {availableRounds.length === 0 ? (
-                        <option value="1">Loading rounds...</option>
+                        <option value="0">
+                          {isConnected
+                            ? "No active rounds"
+                            : "Connect wallet to load rounds"}
+                        </option>
                       ) : (
                         availableRounds.map((round) => (
                           <option key={round.roundId} value={round.roundId}>
@@ -492,7 +500,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                               : "bg-blue-800/60 text-gray-300 hover:bg-blue-700/70 border border-blue-700/30"
                           }`}
                           onClick={() => handlePaymentMethodChange(method)}
-                          disabled={!isConnected}
                         >
                           {method}
                         </button>
@@ -515,7 +522,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
                           placeholder="0.00"
                           required
-                          disabled={!isConnected}
                         />
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300 font-medium">
                           {selectedPaymentMethod}
@@ -524,8 +530,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       <div className="text-xs text-blue-300 mt-1.5 flex items-center gap-1">
                         <span>Rate:</span>
                         <span className="font-medium">
-                          1 {selectedPaymentMethod} = {rate || "Calculating..."}{" "}
-                          QSE
+                          1 {selectedPaymentMethod} = {rate || "N/A"} QSE
                         </span>
                       </div>
                     </div>
@@ -546,7 +551,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
                           placeholder="0"
                           required
-                          disabled={!isConnected}
                         />
                         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300 font-medium">
                           QSE
@@ -639,42 +643,42 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     </div>
                   )}
 
-                  <div className="!mt-6">
-                    <button
-                      type={isConnected ? "submit" : "button"}
-                      onClick={isConnected ? undefined : handleConnectOrBuy}
-                      disabled={isSubmitting || !currentRound}
-                      className={`w-full py-3.5 md:py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-blue-500/30 relative overflow-hidden group ${
-                        isSubmitting || !currentRound
-                          ? "opacity-70 cursor-not-allowed"
-                          : ""
-                      }`}
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {isSubmitting ? (
-                          isApproving ? (
-                            `Approving ${selectedPaymentMethod}...`
-                          ) : (
-                            "Processing..."
-                          )
-                        ) : isConnected ? (
-                          <>
-                            Buy QSE Tokens
-                            <ArrowRight
-                              size={18}
-                              className="transition-transform group-hover:translate-x-1"
-                            />
-                          </>
+                  <button
+                    type="button" // Changed from "submit" to "button" to prevent form submission
+                    onClick={handleConnectOrBuy}
+                    disabled={isSubmitting || isConnecting || !currentRound}
+                    className={`w-full py-3.5 md:py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-blue-500/30 relative overflow-hidden group ${
+                      isSubmitting || isConnecting || !currentRound
+                        ? "opacity-70 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      {isSubmitting ? (
+                        isApproving ? (
+                          `Approving ${selectedPaymentMethod}...`
                         ) : (
-                          <>
-                            Connect Wallet
-                            <Wallet size={18} />
-                          </>
-                        )}
-                      </span>
-                      <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    </button>
-                  </div>
+                          "Processing..."
+                        )
+                      ) : isConnecting ? (
+                        "Connecting..."
+                      ) : isConnected ? (
+                        <>
+                          Buy QSE Tokens
+                          <ArrowRight
+                            size={18}
+                            className="transition-transform group-hover:translate-x-1"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          Connect Wallet
+                          <Wallet size={18} />
+                        </>
+                      )}
+                    </span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  </button>
                 </form>
 
                 <div className="lg:hidden mt-6 pt-6 border-t border-blue-700/40">
@@ -687,7 +691,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                         key={amount}
                         type="button"
                         onClick={() => handleQuickBuySelect(amount)}
-                        disabled={!isConnected}
                         className={`flex flex-col justify-between p-3 rounded-lg border transition-all ${
                           quickBuyAmount === amount
                             ? "bg-blue-700/70 border-blue-500 text-white"
@@ -711,9 +714,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                   <button
                     type="button"
                     onClick={handleQuickBuy}
-                    disabled={isSubmitting || !isConnected}
+                    disabled={isSubmitting || isConnecting}
                     className={`w-full mt-4 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 flex items-center justify-center gap-2 transition-all ${
-                      isSubmitting || !isConnected ? "opacity-60" : ""
+                      isSubmitting || isConnecting ? "opacity-60" : ""
                     }`}
                   >
                     {isConnected ? "Quick Buy Now" : "Connect to Quick Buy"}
@@ -737,7 +740,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                         key={amount}
                         type="button"
                         onClick={() => handleQuickBuySelect(amount)}
-                        disabled={!isConnected}
                         className={`w-full flex justify-between items-center p-4 rounded-lg border transition-all ${
                           quickBuyAmount === amount
                             ? "bg-blue-700/70 border-blue-500 text-white"
@@ -760,9 +762,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                     <button
                       type="button"
                       onClick={handleQuickBuy}
-                      disabled={isSubmitting || !isConnected}
+                      disabled={isSubmitting || isConnecting}
                       className={`w-full py-3.5 rounded-xl font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 flex items-center justify-center gap-2 transition-all ${
-                        isSubmitting || !isConnected ? "opacity-60" : ""
+                        isSubmitting || isConnecting ? "opacity-60" : ""
                       }`}
                     >
                       {isConnected ? "Buy Now" : "Connect to Buy"}

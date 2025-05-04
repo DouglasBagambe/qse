@@ -25,21 +25,37 @@ declare global {
   }
 }
 
-const QSE_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_QSE_TOKEN_ADDRESS;
-const QSE_PRESALE_ADDRESS = process.env.NEXT_PUBLIC_QSE_PRESALE_ADDRESS;
+const QSE_TOKEN_ADDRESS =
+  process.env.NEXT_PUBLIC_QSE_TOKEN_ADDRESS ||
+  "0xeCBBF174A4502A033B24582eC54df39A71b0A74C";
+const QSE_PRESALE_ADDRESS =
+  process.env.NEXT_PUBLIC_QSE_PRESALE_ADDRESS ||
+  "0xCe849ef42298587D7eA9761BF4d34F45395aE0F7";
 
 const STABLECOINS = {
   USDT: {
-    mainnet: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-    sepolia: "0x70C19cAE7F2e0298c64cB219e6408ef7b0726CE8",
+    mainnet:
+      process.env.NEXT_PUBLIC_USDT_ADDRESS ||
+      "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+    sepolia:
+      process.env.NEXT_PUBLIC_USDT_ADDRESS ||
+      "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0",
   },
   USDC: {
-    mainnet: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-    sepolia: "0x0e6538E2888c56247211C116390EE43DBAc0f6b4",
+    mainnet:
+      process.env.NEXT_PUBLIC_USDC_ADDRESS ||
+      "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+    sepolia:
+      process.env.NEXT_PUBLIC_USDC_ADDRESS ||
+      "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
   },
   DAI: {
-    mainnet: "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-    sepolia: "0x8682F1d14E9C5A38f25BF849d0013123B5Db699C",
+    mainnet:
+      process.env.NEXT_PUBLIC_DAI_ADDRESS ||
+      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+    sepolia:
+      process.env.NEXT_PUBLIC_DAI_ADDRESS ||
+      "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357",
   },
 };
 
@@ -80,6 +96,7 @@ type Web3ContextType = {
     roundId: number
   ) => Promise<{ claimable: string; periodsPassed: number }>;
   getRounds: () => Promise<any[]>;
+  getTokensAvailable: (roundId: number) => Promise<string>;
   isConnecting: boolean;
   isConnected: boolean;
   tokenPrice: number;
@@ -119,6 +136,7 @@ const Web3Context = createContext<Web3ContextType>({
   claimTokens: async () => ({ success: false, message: "" }),
   getClaimableAmount: async () => ({ claimable: "0", periodsPassed: 0 }),
   getRounds: async () => [],
+  getTokensAvailable: async () => "0",
   isConnecting: false,
   isConnected: false,
   tokenPrice: 0,
@@ -179,55 +197,70 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
     method: PaymentMethod,
     roundId: number
   ): Promise<number> => {
-    if (!amount || isNaN(parseFloat(amount)) || !qsePresale) return 0;
-
-    let coinAddress = "";
-    if (method === "USDT")
-      coinAddress =
-        chainId === 42161 ? STABLECOINS.USDT.mainnet : STABLECOINS.USDT.sepolia;
-    if (method === "USDC")
-      coinAddress =
-        chainId === 42161 ? STABLECOINS.USDC.mainnet : STABLECOINS.USDC.sepolia;
-    if (method === "DAI")
-      coinAddress =
-        chainId === 42161 ? STABLECOINS.DAI.mainnet : STABLECOINS.DAI.sepolia;
-
-    if (method === "ETH") {
-      const ethAmount = ethers.parseEther(amount);
-      const tokenAmount = await qsePresale.estimatedTokenAmountAvailableWithETH(
-        ethAmount,
-        roundId
-      );
-      return Number(ethers.formatUnits(tokenAmount, 18));
+    if (!amount || isNaN(parseFloat(amount)) || !qsePresale) {
+      console.error("Invalid amount or qsePresale not initialized");
+      return 0;
     }
 
-    if (coinAddress) {
-      const coinContract = new ethers.Contract(
-        coinAddress,
-        ["function decimals() view returns (uint8)"],
-        provider
-      );
-      const decimals = await coinContract.decimals();
-      const coinAmount = ethers.parseUnits(amount, decimals);
-      const tokenAmount =
-        await qsePresale.estimatedTokenAmountAvailableWithCoin(
-          coinAmount,
+    try {
+      let coinAddress = "";
+      if (method === "USDT")
+        coinAddress =
+          chainId === 42161
+            ? STABLECOINS.USDT.mainnet
+            : STABLECOINS.USDT.sepolia;
+      if (method === "USDC")
+        coinAddress =
+          chainId === 42161
+            ? STABLECOINS.USDC.mainnet
+            : STABLECOINS.USDC.sepolia;
+      if (method === "DAI")
+        coinAddress =
+          chainId === 42161 ? STABLECOINS.DAI.mainnet : STABLECOINS.DAI.sepolia;
+
+      if (method === "ETH") {
+        const ethAmount = ethers.parseEther(amount);
+        const tokenAmount =
+          await qsePresale.estimatedTokenAmountAvailableWithETH(
+            ethAmount,
+            roundId
+          );
+        return Number(ethers.formatUnits(tokenAmount, 18));
+      }
+
+      if (coinAddress) {
+        const coinContract = new ethers.Contract(
           coinAddress,
-          roundId
+          ["function decimals() view returns (uint8)"],
+          provider
         );
-      return Number(ethers.formatUnits(tokenAmount, 18));
-    }
+        const decimals = await coinContract.decimals();
+        const coinAmount = ethers.parseUnits(amount, decimals);
+        const tokenAmount =
+          await qsePresale.estimatedTokenAmountAvailableWithCoin(
+            coinAmount,
+            coinAddress,
+            roundId
+          );
+        return Number(ethers.formatUnits(tokenAmount, 18));
+      }
 
-    return 0;
+      return 0;
+    } catch (error) {
+      console.error("Error in getQSEAmountFromPayment:", error);
+      return 0;
+    }
   };
 
   const getRounds = async () => {
-    if (!qsePresale) return [];
+    if (!qsePresale) {
+      console.error("qsePresale not initialized");
+      return [];
+    }
     const rounds = [];
-    for (let i = 1; i <= 10; i++) {
-      // Adjust max rounds as needed
-      try {
-        const round = await qsePresale.getRound(i);
+    try {
+      for (let i = 1; i <= 10; i++) {
+        const round = await qsePresale.getRound(BigInt(i));
         if (round.startTime > 0) {
           rounds.push({
             roundId: Number(round.roundId),
@@ -237,12 +270,26 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
             endTime: Number(round.endTime),
             soldAmount: Number(round.soldAmount) / 1e18,
           });
+        } else {
+          break;
         }
-      } catch {
-        break; // Stop if round doesn't exist
       }
+    } catch (error) {
+      console.error("Error fetching rounds:", error);
+      setNetworkError("Failed to fetch presale rounds");
     }
     return rounds;
+  };
+
+  const getTokensAvailable = async (roundId: number): Promise<string> => {
+    if (!qsePresale) return "0";
+    try {
+      const tokens = await qsePresale.getTokensAvailable(roundId);
+      return ethers.formatUnits(tokens, 18);
+    } catch (error) {
+      console.error("Error fetching tokens available:", error);
+      return "0";
+    }
   };
 
   useEffect(() => {
@@ -259,7 +306,10 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
             initializeProviderAndContracts(ethProvider);
           }
         })
-        .catch(console.error);
+        .catch((error) => {
+          console.error("Error listing accounts:", error);
+          setNetworkError("Failed to connect to wallet");
+        });
 
       window.ethereum.on("accountsChanged", handleAccountsChanged);
       window.ethereum.on("chainChanged", handleChainChanged);
@@ -273,6 +323,8 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
           window.ethereum.removeListener("chainChanged", handleChainChanged);
         }
       };
+    } else {
+      setNetworkError("No Ethereum wallet detected. Please install MetaMask.");
     }
   }, []);
 
@@ -282,6 +334,11 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       return;
     }
     try {
+      if (!qseToken || !account) {
+        console.warn("qseToken or account is not initialized");
+        setQseBalance("0");
+        return;
+      }
       const balance = await qseToken.balanceOf(account);
       setQseBalance(ethers.formatUnits(balance, 18));
     } catch (error) {
@@ -360,19 +417,23 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       if (QSE_TOKEN_ADDRESS) {
         const token = new ethers.Contract(
           QSE_TOKEN_ADDRESS,
-          (QSEArtifact as any).abi,
+          QSEArtifact.abi,
           signer
         );
         setQseToken(token);
         await loadQSEBalance();
-        const burnRate = await token.TRANSACTION_BURN_RATE();
-        setBurnRate(Number(burnRate));
+        try {
+          const burnRate = await token.TRANSACTION_BURN_RATE();
+          setBurnRate(Number(burnRate));
+        } catch {
+          console.warn("TRANSACTION_BURN_RATE not available on token contract");
+        }
       }
 
       if (QSE_PRESALE_ADDRESS) {
         const presale = new ethers.Contract(
           QSE_PRESALE_ADDRESS,
-          (QSEPresaleArtifact as any).abi,
+          QSEPresaleArtifact.abi,
           signer
         );
         setQsePresale(presale);
@@ -380,14 +441,19 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       }
     } catch (error: any) {
       console.error("Error initializing provider:", error);
-      if (!networkError)
-        setNetworkError("Failed to initialize blockchain connection");
+      setNetworkError(
+        error.message || "Failed to initialize blockchain connection"
+      );
     }
   };
 
   const loadContractData = async (presale: ethers.Contract) => {
     try {
       const roundId = 1; // Default to round 1; update based on active round in production
+      const roundExists = await presale.roundExists(roundId); // Ensure the contract has a method to check if a round exists
+      if (!roundExists) {
+        throw new Error(`Round with ID ${roundId} does not exist`);
+      }
       const round = await presale.rounds(roundId);
       const tgeTime = await presale.tgeTime();
       const isTgeSet = await presale.isTgeSet();
@@ -429,32 +495,38 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
           setNetworkError("Please switch to Arbitrum Sepolia network");
           await switchToArbitrumSepolia();
         }
-        provider.getSigner().then((newSigner) => {
-          setSigner(newSigner);
-          if (QSE_TOKEN_ADDRESS) {
-            const tokenContract = new ethers.Contract(
-              QSE_TOKEN_ADDRESS,
-              (QSEArtifact as any).abi,
-              newSigner
-            );
-            setQseToken(tokenContract);
-            loadQSEBalance();
-          }
-          if (QSE_PRESALE_ADDRESS) {
-            const presale = new ethers.Contract(
-              QSE_PRESALE_ADDRESS,
-              (QSEPresaleArtifact as any).abi,
-              newSigner
-            );
-            setQsePresale(presale);
-            loadContractData(presale).catch((err) => {
-              setNetworkError(
-                "Failed to load contract data: " +
-                  (err.message || "Unknown error")
+        provider
+          .getSigner()
+          .then((newSigner) => {
+            setSigner(newSigner);
+            if (QSE_TOKEN_ADDRESS) {
+              const tokenContract = new ethers.Contract(
+                QSE_TOKEN_ADDRESS,
+                QSEArtifact.abi,
+                newSigner
               );
-            });
-          }
-        });
+              setQseToken(tokenContract);
+              loadQSEBalance();
+            }
+            if (QSE_PRESALE_ADDRESS) {
+              const presale = new ethers.Contract(
+                QSE_PRESALE_ADDRESS,
+                QSEPresaleArtifact.abi,
+                newSigner
+              );
+              setQsePresale(presale);
+              loadContractData(presale).catch((err) => {
+                setNetworkError(
+                  "Failed to load contract data: " +
+                    (err.message || "Unknown error")
+                );
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting signer:", error);
+            setNetworkError("Failed to initialize signer");
+          });
       }
     }
   };
@@ -464,7 +536,7 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
   };
 
   const connectWallet = async () => {
-    if (!provider) {
+    if (!provider || !window.ethereum) {
       setNetworkError("MetaMask or compatible wallet not detected");
       return false;
     }
@@ -476,10 +548,13 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
       });
       const network = await provider.getNetwork();
       if (network.chainId !== BigInt(arbitrumSepolia.id)) {
-        setNetworkError("Please switch to Arbitrum Sepolia network");
-        await switchToArbitrumSepolia();
+        const switched = await switchToArbitrumSepolia();
+        if (!switched) {
+          setNetworkError("Please switch to Arbitrum Sepolia network");
+          return false;
+        }
       }
-      handleAccountsChanged(accounts);
+      await handleAccountsChanged(accounts);
       return accounts.length > 0;
     } catch (error: any) {
       console.error("Error connecting wallet:", error);
@@ -524,7 +599,7 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
         roundId
       );
       const tokenAmountWei = ethers.parseUnits(tokenAmount.toString(), 18);
-      const tokensAvailable = await qsePresale.tokensAvailable(roundId);
+      const tokensAvailable = await qsePresale.getTokensAvailable(roundId);
 
       if (currentTime < Number(round.startTime))
         return {
@@ -658,10 +733,12 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
   const getClaimableAmount = async (roundId: number) => {
     if (!qsePresale || !account) return { claimable: "0", periodsPassed: 0 };
     try {
-      const [claimable, periodsPassed] = await qsePresale.getClaimableAmount(
+      const result = await qsePresale.getClaimableAmount(
         account,
-        roundId
+        BigInt(roundId)
       );
+      const claimable = result[0];
+      const periodsPassed = result[1];
       return {
         claimable: ethers.formatUnits(claimable, 18),
         periodsPassed: Number(periodsPassed),
@@ -684,6 +761,7 @@ const Web3ContextProvider: React.FC<Web3ProviderProps> = ({ children }) => {
     claimTokens,
     getClaimableAmount,
     getRounds,
+    getTokensAvailable,
     isConnecting,
     isConnected,
     tokenPrice,
