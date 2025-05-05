@@ -21,7 +21,7 @@ const NewsletterSection = () => {
   return (
     <section className="py-8 bg-white">
       <div className="container mx-auto px-4">
-        <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 text-white p-8 overflow-hidden">
+        <div className="rounded-2xl from-blue-600 to-blue-500 text-white p-8 overflow-hidden">
           {/* Main Content Container */}
           <div className="flex flex-col max-w-5xl mx-auto">
             {/* Header Section */}
