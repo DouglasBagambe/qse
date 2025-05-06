@@ -23,6 +23,27 @@ const Footer = () => {
     document.body.removeChild(link);
   };
 
+  const handlePDFView = () => {
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE Token Whitepaper</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
   return (
     <footer className="bg-gradient-to-b from-[#10152b] to-[#080c1a] py-16 text-white">
       <div className="container mx-auto px-6">
@@ -82,18 +103,10 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="#tokenomics"
+                  href="#ecosystem"
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
-                  Tokenomics
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#roadmap"
-                  className="text-gray-400 hover:text-[#952dc0] transition"
-                >
-                  Roadmap
+                  Ecosystem
                 </a>
               </li>
               <li>
@@ -122,12 +135,12 @@ const Footer = () => {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  href="#whitepaper"
+                <button
+                  onClick={handlePDFView}
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
                   Whitepaper
-                </a>
+                </button>
               </li>
               <li>
                 <a

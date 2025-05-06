@@ -80,7 +80,7 @@ const Header = () => {
       newWindow.document.write(`
       <html>
         <head>
-          <title>QSE-Token EVCI Whitepaper</title>
+          <title>QSE Token Whitepaper</title>
           <style>
             body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
             iframe { width: 100%; height: 100%; border: none; }
@@ -159,20 +159,20 @@ const Header = () => {
       label: "Token Theory",
       isTokenTheory: true,
     },
-    {
-      id: "ecosystem",
-      href: "#ecosystem",
-      label: "Ecosystem",
-      isSection: true,
-      sectionId: "ecosystem",
-    },
-    {
-      id: "roadmap",
-      href: "#roadmap",
-      label: "RoadMap",
-      isRoadmap: true,
-      sectionId: "roadmap",
-    },
+    // {
+    //   id: "ecosystem",
+    //   href: "#ecosystem",
+    //   label: "Ecosystem",
+    //   isSection: true,
+    //   sectionId: "ecosystem",
+    // },
+    // {
+    //   id: "roadmap",
+    //   href: "#roadmap",
+    //   label: "RoadMap",
+    //   isRoadmap: true,
+    //   sectionId: "roadmap",
+    // },
     {
       id: "purchase-guide",
       href: "/purchase-guide",
@@ -280,10 +280,10 @@ const Header = () => {
                         window.location.href = "/token-theory";
                       } else if (link.isTokenomics) {
                         window.location.href = "/tokenomics";
-                      } else if (link.isSection && link.sectionId) {
-                        navigateToHomeSection(link.sectionId);
-                      } else if (link.isRoadmap && link.sectionId) {
-                        navigateToHomeSection(link.sectionId);
+                        // } else if (link.isSection && link.sectionId) {
+                        //   navigateToHomeSection(link.sectionId);
+                        // } else if (link.isRoadmap && link.sectionId) {
+                        //   navigateToHomeSection(link.sectionId);
                       } else if (link.isPurchaseGuide) {
                         window.location.href = "/purchase-guide";
                       }
@@ -476,10 +476,10 @@ const Header = () => {
                         window.location.href = "/token-theory";
                       } else if (link.isTokenomics) {
                         window.location.href = "/tokenomics";
-                      } else if (link.isSection && link.sectionId) {
-                        navigateToHomeSection(link.sectionId);
-                      } else if (link.isRoadmap && link.sectionId) {
-                        navigateToHomeSection(link.sectionId);
+                        // } else if (link.isSection && link.sectionId) {
+                        //   navigateToHomeSection(link.sectionId);
+                        // } else if (link.isRoadmap && link.sectionId) {
+                        //   navigateToHomeSection(link.sectionId);
                       } else if (link.isPurchaseGuide) {
                         window.location.href = "/purchase-guide";
                       }
