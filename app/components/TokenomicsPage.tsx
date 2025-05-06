@@ -169,7 +169,7 @@ const TokenomicsPage = () => {
       variants={containerVariants}
     >
       {/* Top Navigation Bar for Mobile */}
-      <div className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm lg:hidden">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm lg:hidden mt-20">
         <div className="flex items-center justify-between py-3 px-4">
           <motion.button
             onClick={toggleSidebar}
@@ -240,7 +240,7 @@ const TokenomicsPage = () => {
           {(isSidebarOpen || window.innerWidth >= 1024) && (
             <motion.div
               ref={sidebarRef}
-              className="fixed lg:sticky top-0 left-0 h-full w-3/4 lg:w-1/4 z-40 lg:z-0 bg-white lg:bg-white border-r border-gray-200 shadow-lg lg:shadow-none overflow-hidden"
+              className="fixed lg:sticky top-0 left-0 h-full w-3/4 lg:w-1/4 z-40 lg:z-0 bg-white lg:bg-white border-r border-gray-200 shadow-lg lg:shadow-none overflow-hidden mt-20"
               variants={sidebarVariants}
               initial="hidden"
               animate="visible"
