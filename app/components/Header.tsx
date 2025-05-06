@@ -291,8 +291,8 @@ const Header = () => {
                     className={`relative px-4 py-2 text-sm lg:text-base transition-all duration-300 
                       group ${
                         active
-                          ? "text-blue-200 font-semibold"
-                          : "text-white font-medium hover:text-blue-100"
+                          ? "text-white font-bold"
+                          : "text-white font-medium"
                       }`}
                   >
                     <span className="relative inline-block">
