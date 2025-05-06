@@ -19,6 +19,7 @@ import TokenPurchaseModal from "../TokenPurchaseModal";
 import StatsBar from "../StatsBar";
 import { Compass, Shield, Puzzle, Users, FileText, Coins } from "lucide-react";
 import TunnelWithSpinningLogos from "../Grid-Hero";
+import PageHead from "../../PageHead";
 
 const Home = () => {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
@@ -74,6 +75,10 @@ const Home = () => {
 
   return (
     <>
+      <PageHead
+        title="QSE | Quantum Security Ecosystem"
+        description="The future of secure cryptocurrency infrastructure built on quantum-resistant technologies."
+      />
       <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-8 md:pt-12 bg-gradient-to-b from-[#1E3A8A] to-[#0A1733]">
         {/* Background with Tunnel SVG */}
         <div className="absolute inset-0 w-full h-full">

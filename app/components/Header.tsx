@@ -133,8 +133,14 @@ const Header = () => {
     }
   };
 
-  // Updated navigation links based on boss's feedback
+  // Updated navigation links with Home added
   const navLinks = [
+    {
+      id: "home",
+      href: "/",
+      label: "Home",
+      isHome: true,
+    },
     {
       id: "whitepaper",
       href: "#",
@@ -158,12 +164,14 @@ const Header = () => {
       href: "#ecosystem",
       label: "Ecosystem",
       isSection: true,
+      sectionId: "ecosystem",
     },
     {
       id: "roadmap",
       href: "#roadmap",
       label: "RoadMap",
       isRoadmap: true,
+      sectionId: "roadmap",
     },
     {
       id: "purchase-guide",
@@ -173,14 +181,19 @@ const Header = () => {
     },
   ];
 
-  // Function to determine if a link is active
+  // Enhanced function to determine if a link is active
   const isLinkActive = (link: any): boolean => {
     if (!isClient) return false;
 
+    // For the home page
+    if (link.isHome && (pathname === "/" || pathname === "")) {
+      // Active if we're on the home page with no hash
+      return !window.location.hash;
+    }
+
     // For section links on the home page
-    if (link.isSection && pathname === "/") {
-      const hash = window.location.hash;
-      return hash === link.href;
+    if (link.isSection && pathname === "/" && link.sectionId) {
+      return window.location.hash === `#${link.sectionId}`;
     }
 
     // For the token theory page
@@ -202,7 +215,7 @@ const Header = () => {
       return true;
     }
 
-    // For the token theory page
+    // For the purchase guide page
     if (link.isPurchaseGuide && pathname === "/purchase-guide") {
       return true;
     }
@@ -213,7 +226,7 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-500 mb-8 ${
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
           scrolled
             ? "bg-gradient-to-r from-blue-900 to-blue-800 shadow-lg py-2"
             : "bg-gradient-to-r from-blue-800 to-blue-700 py-3"
@@ -246,43 +259,57 @@ const Header = () => {
               </a>
             </div>
 
-            {/* Desktop Navigation - New hover effect without persistent underline */}
+            {/* Desktop Navigation - Enhanced active state styling */}
             <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
+              {navLinks.map((link) => {
+                const active = isLinkActive(link);
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
 
-                    if (!isClient) return;
+                      if (!isClient) return;
 
-                    if (link.isWhitepaper) {
-                      handlePDFView();
-                    } else if (link.isTokenTheory) {
-                      window.open("/token-theory", "_blank");
-                    } else if (link.isTokenomics) {
-                      window.open("/tokenomics", "_blank");
-                    } else if (link.isSection) {
-                      navigateToHomeSection(link.id);
-                    } else if (link.isRoadmap) {
-                      navigateToHomeSection(link.id);
-                    } else if (link.isPurchaseGuide) {
-                      window.open("/purchase-guide", "_blank");
-                    }
-                  }}
-                  className={`relative px-4 py-2 text-white font-medium text-sm lg:text-base transition-all duration-300
-                    group ${isLinkActive(link) ? "text-blue-200" : ""}`}
-                >
-                  <span className="relative inline-block">
-                    {link.label}
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-                  </span>
-                </a>
-              ))}
+                      if (link.isHome) {
+                        window.location.href = "/";
+                      } else if (link.isWhitepaper) {
+                        handlePDFView();
+                      } else if (link.isTokenTheory) {
+                        window.location.href = "/token-theory";
+                      } else if (link.isTokenomics) {
+                        window.location.href = "/tokenomics";
+                      } else if (link.isSection && link.sectionId) {
+                        navigateToHomeSection(link.sectionId);
+                      } else if (link.isRoadmap && link.sectionId) {
+                        navigateToHomeSection(link.sectionId);
+                      } else if (link.isPurchaseGuide) {
+                        window.location.href = "/purchase-guide";
+                      }
+                    }}
+                    className={`relative px-4 py-2 text-sm lg:text-base transition-all duration-300 
+                      group ${
+                        active
+                          ? "text-blue-200 font-semibold"
+                          : "text-white font-medium hover:text-blue-100"
+                      }`}
+                  >
+                    <span className="relative inline-block">
+                      {link.label}
+                      {active && (
+                        <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-300"></span>
+                      )}
+                      {!active && (
+                        <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                      )}
+                    </span>
+                  </a>
+                );
+              })}
             </nav>
 
-            {/* Buy $QSE Button - Desktop */}
+            {/* Buy $QSE Button - Desktop Only */}
             <div className="hidden md:block">
               <button
                 onClick={openPurchaseModal}
@@ -309,18 +336,11 @@ const Header = () => {
               </button>
             </div>
 
-            {/* Mobile Menu Controls */}
-            <div className="flex items-center md:hidden">
-              <button
-                onClick={openPurchaseModal}
-                className="mr-4 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-400 text-white text-sm font-bold rounded-lg shadow-md hover:shadow-cyan-500/30 transition-all duration-200"
-              >
-                Buy $QSE
-              </button>
-
+            {/* Mobile Menu Controls - Improved */}
+            <div className="md:hidden">
               <button
                 ref={menuButtonRef}
-                className="text-white p-2 rounded-md bg-blue-700 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200"
+                className="text-white p-2 rounded-md bg-blue-700 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors duration-200 flex items-center justify-center"
                 onClick={toggleMobileMenu}
                 aria-label="Toggle menu"
               >
@@ -360,54 +380,43 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu - Updated items and hover effect */}
+        {/* Redesigned Mobile Navigation Menu */}
         <div
           ref={mobileMenuRef}
-          className={`md:hidden fixed right-0 top-16 w-3/4 max-h-[50vh] overflow-y-auto 
-                  bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 
-                  backdrop-blur-lg rounded-bl-2xl shadow-2xl 
-                  border-l border-t-0 border-blue-600/30
-                  transition-all duration-300 ease-in-out transform origin-top-right
-                  ${mobileMenuOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}`}
+          className={`md:hidden fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out ${
+            mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         >
-          <div className="absolute inset-0 bg-blue-500/5 bg-opacity-10 backdrop-filter backdrop-blur-sm"></div>
-          <nav className="relative z-10">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  if (!isClient) return;
-
-                  if (link.isWhitepaper) {
-                    handlePDFView();
-                  } else if (link.isTokenTheory) {
-                    window.open("/token-theory", "_blank");
-                  } else if (link.isTokenomics) {
-                    window.open("/tokenomics", "_blank");
-                  } else if (link.isSection) {
-                    navigateToHomeSection(link.id);
-                  } else if (link.isRoadmap) {
-                    navigateToHomeSection(link.id);
-                  } else if (link.isPurchaseGuide) {
-                    window.open("/purchase-guide", "_blank");
-                  }
-
-                  closeMobileMenu();
-                }}
-                className={`block py-4 px-6 text-white border-b border-blue-700/50 
-                    hover:bg-blue-700/30 transition-all duration-200 font-medium
-                    flex items-center ${isLinkActive(link) ? "text-blue-300" : ""}`}
-              >
-                <span className="relative overflow-hidden group">
-                  {link.label}
-                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+          <div
+            className={`absolute right-0 top-0 h-full w-4/5 max-w-sm bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 
+            shadow-2xl transform transition-transform duration-300 ease-in-out ${
+              mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+            {/* Mobile Menu Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-blue-700/50">
+              <div className="flex items-center">
+                <div className="w-8 h-8 relative -mt-6 mr-2">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-6 h-6">
+                      <div className="spin"></div>
+                    </div>
+                  </div>
+                </div>
+                <span className="ml-4 text-white text-lg font-bold tracking-wider">
+                  QuantumSEC
                 </span>
+                {/* <span className="ml-3 text-white text-xl md:text-2xl font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">
+                  QuantumSEC
+                </span> */}
+              </div>
+              <button
+                onClick={closeMobileMenu}
+                className="text-white p-1 rounded-full hover:bg-blue-700/50 transition-colors"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 ml-auto text-blue-400"
+                  className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -416,41 +425,106 @@ const Header = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 5l7 7-7 7"
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
-              </a>
-            ))}
-            <div className="mt-6 mb-4 px-4">
-              <button
-                onClick={openPurchaseModal}
-                className="w-full py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 text-white font-bold rounded-lg relative overflow-hidden shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 group"
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-300 opacity-0 group-hover:opacity-100 transition-all duration-300"></span>
-                <span className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjUwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuNjUiIG51bU9jdGF2ZXM9IjMiIHN0aXRjaFRpbGVzPSJzdGl0Y2giLz48ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjUwMCIgaGVpZ2h0PSI1MDAiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjAuMTUiLz48L3N2Zz4=')] opacity-20"></span>
-                <div className="relative flex items-center justify-center">
-                  <span className="inline-flex items-center mr-2 transform group-hover:translate-x-0 group-hover:scale-105 transition-all duration-300">
-                    Buy $QSE
-                  </span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 transform group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </div>
-                <span className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-cyan-300 to-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></span>
               </button>
             </div>
-          </nav>
+
+            {/* Buy $QSE Button in Mobile Menu Top Section */}
+            <div className="px-6 py-4 border-b border-blue-700/50">
+              <button
+                onClick={openPurchaseModal}
+                className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold rounded-lg shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 flex items-center justify-center"
+              >
+                <span className="mr-2">Buy $QSE</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Mobile Menu Navigation Links */}
+            <div className="overflow-y-auto max-h-[calc(100vh-150px)]">
+              {navLinks.map((link) => {
+                const active = isLinkActive(link);
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (!isClient) return;
+
+                      if (link.isHome) {
+                        window.location.href = "/";
+                      } else if (link.isWhitepaper) {
+                        handlePDFView();
+                      } else if (link.isTokenTheory) {
+                        window.location.href = "/token-theory";
+                      } else if (link.isTokenomics) {
+                        window.location.href = "/tokenomics";
+                      } else if (link.isSection && link.sectionId) {
+                        navigateToHomeSection(link.sectionId);
+                      } else if (link.isRoadmap && link.sectionId) {
+                        navigateToHomeSection(link.sectionId);
+                      } else if (link.isPurchaseGuide) {
+                        window.location.href = "/purchase-guide";
+                      }
+
+                      closeMobileMenu();
+                    }}
+                    className={`flex items-center justify-between px-6 py-4 border-b border-blue-700/30
+                      ${
+                        active
+                          ? "bg-blue-700/40 border-l-4 border-l-blue-300"
+                          : "hover:bg-blue-700/20"
+                      }`}
+                  >
+                    <span
+                      className={`${active ? "text-blue-200 font-semibold" : "text-white"}`}
+                    >
+                      {link.label}
+                    </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-4 w-4 ${active ? "text-blue-300" : "text-blue-400"}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Mobile Menu Footer */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-700/30 bg-blue-900/80 backdrop-blur-sm">
+              <div className="text-xs text-blue-300 text-center">
+                &copy; {new Date().getFullYear()} QuantumSEC. All rights
+                reserved.
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Token Purchase Modal */}

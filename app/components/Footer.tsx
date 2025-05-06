@@ -137,7 +137,7 @@ const Footer = () => {
                   Smart Contract
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a
                   href="#token-audit"
                   className="text-gray-400 hover:text-[#952dc0] transition"
@@ -160,7 +160,7 @@ const Footer = () => {
                 >
                   Press Kit
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -168,14 +168,14 @@ const Footer = () => {
           <div className="md:col-span-2">
             <h3 className="text-lg font-semibold mb-6 text-blue-700">Legal</h3>
             <ul className="space-y-3">
-              <li>
+              {/* <li>
                 <a
                   href="#terms"
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
                   Terms of Service
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a
                   href="#privacy"

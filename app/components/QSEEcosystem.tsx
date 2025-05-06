@@ -111,13 +111,13 @@ const QSEEcosystem = () => {
 
   const handleTokenTheoryView = () => {
     if (typeof window !== "undefined") {
-      window.open("/token-theory", "_blank");
+      window.location.href = "/token-theory";
     }
   };
 
   const handleTokenomicsView = () => {
     if (typeof window !== "undefined") {
-      window.open("/tokenomics", "_blank");
+      window.location.href = "/tokenomics";
     }
   };
 

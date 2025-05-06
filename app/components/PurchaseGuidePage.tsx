@@ -229,7 +229,7 @@ const PurchaseGuidePage = () => {
             </h1>
           </div>
 
-          <motion.button
+          {/* <motion.button
             onClick={goToHome}
             className="text-blue-600 p-2 rounded-full hover:bg-blue-50 transition-all duration-300"
             whileHover={{ scale: 1.1 }}
@@ -237,12 +237,12 @@ const PurchaseGuidePage = () => {
             aria-label="Go to home page"
           >
             <Home size={24} />
-          </motion.button>
+          </motion.button> */}
         </div>
       </div>
 
       {/* Home Button (Desktop only) */}
-      <motion.div
+      {/* <motion.div
         className="fixed top-6 right-6 z-50 hidden lg:block"
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -258,7 +258,7 @@ const PurchaseGuidePage = () => {
             className="group-hover:text-blue-800 transition-colors"
           />
         </button>
-      </motion.div>
+      </motion.div> */}
 
       {/* Main Content */}
       <div className="flex flex-col lg:flex-row min-h-screen pt-14 lg:pt-0">
