@@ -23,7 +23,7 @@ const Footer = () => {
     document.body.removeChild(link);
   };
 
-  const handlePDFView = () => {
+  const handleWhitepaperView = () => {
     const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
@@ -31,6 +31,90 @@ const Footer = () => {
       <html>
         <head>
           <title>QSE Token Whitepaper</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
+  const handleTokenTheoryView = () => {
+    const pdfPath = `${window.location.origin}/assets/token-theory/HCISS - QSE Token Theory.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE Token Theory</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
+  const handleTokenomicsView = () => {
+    const pdfPath = `${window.location.origin}/assets/tokenomics/Tokenomics for QSE.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE Tokenomics</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
+  const handlePurchaseGuideView = () => {
+    const pdfPath = `${window.location.origin}/assets/purchase-guide/QSETokenPurchaseGuide.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE Token Purchase Guide</title>
+          <style>
+            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+            iframe { width: 100%; height: 100%; border: none; }
+          </style>
+        </head>
+        <body>
+          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
+        </body>
+      </html>
+      `);
+    }
+  };
+
+  const handleUseCaseView = () => {
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use_Case.pdf`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+      <html>
+        <head>
+          <title>QSE Token EVCI Use Case</title>
           <style>
             body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
             iframe { width: 100%; height: 100%; border: none; }
@@ -136,44 +220,44 @@ const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <button
-                  onClick={handlePDFView}
+                  onClick={handleWhitepaperView}
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
                   Whitepaper
                 </button>
               </li>
               <li>
-                <a
-                  href="#smart-contract"
+                <button
+                  onClick={handleTokenTheoryView}
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
-                  Smart Contract
-                </a>
-              </li>
-              {/* <li>
-                <a
-                  href="#token-audit"
-                  className="text-gray-400 hover:text-[#952dc0] transition"
-                >
-                  Token Audit
-                </a>
+                  Token Theory
+                </button>
               </li>
               <li>
-                <a
-                  href="#blog"
+                <button
+                  onClick={handlePurchaseGuideView}
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
-                  Blog
-                </a>
+                  The Guide
+                </button>
               </li>
               <li>
-                <a
-                  href="#press-kit"
+                <button
+                  onClick={handleTokenomicsView}
                   className="text-gray-400 hover:text-[#952dc0] transition"
                 >
-                  Press Kit
-                </a>
-              </li> */}
+                  Tokenomics
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={handleUseCaseView}
+                  className="text-gray-400 hover:text-[#952dc0] transition"
+                >
+                  Use Case
+                </button>
+              </li>
             </ul>
           </div>
 
