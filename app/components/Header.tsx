@@ -176,7 +176,7 @@ const Header = () => {
     {
       id: "purchase-guide",
       href: "/purchase-guide",
-      label: "Token Purchase Guide",
+      label: "Purchase Guide",
       isPurchaseGuide: true,
     },
   ];
