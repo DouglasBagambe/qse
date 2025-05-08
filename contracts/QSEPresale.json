@@ -515,9 +515,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        { "internalType": "uint8", "name": "roundId_", "type": "uint8" }
-      ],
+      "inputs": [],
       "name": "cancelWithdrawal",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -676,15 +674,14 @@
     },
     {
       "inputs": [
-        { "internalType": "address", "name": "investor_", "type": "address" },
-        {
-          "internalType": "contract IERC20",
-          "name": "coin_",
-          "type": "address"
-        }
+        { "internalType": "address", "name": "investor_", "type": "address" }
       ],
       "name": "getInvestments",
-      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "outputs": [
+        { "internalType": "uint256", "name": "_usdtAmount", "type": "uint256" },
+        { "internalType": "uint256", "name": "_usdcAmount", "type": "uint256" },
+        { "internalType": "uint256", "name": "_daiAmount", "type": "uint256" }
+      ],
       "stateMutability": "view",
       "type": "function"
     },
@@ -1105,9 +1102,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        { "internalType": "uint8", "name": "roundId_", "type": "uint8" }
-      ],
+      "inputs": [],
       "name": "withdraw",
       "outputs": [],
       "stateMutability": "nonpayable",
