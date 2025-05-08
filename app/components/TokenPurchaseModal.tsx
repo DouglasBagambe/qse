@@ -7,7 +7,19 @@
 
 import React, { useState, useEffect } from "react";
 import { useWeb3, PaymentMethod } from "./Web3Provider";
-import { ArrowRight, CheckCircle, AlertCircle, X, Wallet } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle,
+  AlertCircle,
+  X,
+  Wallet,
+  Clock,
+  Calendar,
+  ChevronDown,
+  Tag,
+  CircleDollarSign,
+  Coins,
+} from "lucide-react";
 
 interface TokenPurchaseModalProps {
   isOpen: boolean;
@@ -18,223 +30,164 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [paymentAmount, setPaymentAmount] = useState<string>("");
-  const [qseAmount, setQseAmount] = useState<string>("");
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [qseAmount, setQseAmount] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod>("ETH");
+  const [quickBuyAmount, setQuickBuyAmount] = useState(100);
+  const [selectedRound, setSelectedRound] = useState<number | null>(null);
+  const [rounds, setRounds] = useState<any[]>([]);
   const [purchaseCompleted, setPurchaseCompleted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [txHash, setTxHash] = useState<string>("");
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod>("ETH");
-  const [quickBuyAmount, setQuickBuyAmount] = useState<number>(100);
-  const [selectedRound, setSelectedRound] = useState<number>(1);
-  const [availableRounds, setAvailableRounds] = useState<any[]>([]);
-  const [claimableAmount, setClaimableAmount] = useState<string>("0");
-  const [vestingPeriodsPassed, setVestingPeriodsPassed] = useState<number>(0);
-  const [rate, setRate] = useState<string>("");
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const [txHash, setTxHash] = useState("");
+  const [isRoundDropdownOpen, setIsRoundDropdownOpen] = useState(false);
   const {
     connectWallet,
     buyTokens,
     claimTokens,
-    getClaimableAmount,
     getRounds,
     isConnected,
     isConnecting,
     account,
     qseBalance,
+    claimableAmount,
     loadQSEBalance,
     supportedPaymentMethods,
     getQSEAmountFromPayment,
     getPaymentRateForMethod,
     currentRound,
-    tgeTime,
-    isTgeSet,
     networkError,
   } = useWeb3();
 
   const MINIMUM_QSE_AMOUNT = 50;
-  const QSE_TOKEN_PRICE_USD = 0.6;
   const quickBuyOptions = [100, 250, 500, 1000, 2500];
 
   useEffect(() => {
+    const fetchRounds = async () => {
+      try {
+        const fetchedRounds = await getRounds();
+        setRounds(fetchedRounds);
+        if (fetchedRounds.length > 0) {
+          const activeRound = fetchedRounds.find(
+            (r) =>
+              Math.floor(Date.now() / 1000) >= r.startTime &&
+              Math.floor(Date.now() / 1000) <= r.endTime
+          );
+          setSelectedRound(
+            selectedRound === null
+              ? activeRound
+                ? activeRound.roundId
+                : fetchedRounds[0].roundId
+              : selectedRound
+          );
+        } else {
+          setSelectedRound(null);
+        }
+      } catch (error) {
+        setErrorMessage("Failed to load rounds");
+      }
+    };
+
     if (isConnected && account) {
       loadQSEBalance();
-      fetchClaimableAmount();
       fetchRounds();
     }
-  }, [isConnected, account, selectedRound]);
-
-  useEffect(() => {
     setErrorMessage(networkError || "");
-  }, [networkError]);
-
-  useEffect(() => {
-    async function updateRate() {
-      try {
-        const tokens = await getQSEAmountFromPayment(
-          "1",
-          selectedPaymentMethod,
-          selectedRound
-        );
-        setRate(tokens.toFixed(2));
-      } catch (error) {
-        console.error("Error calculating rate:", error);
-        setRate("N/A");
-      }
-    }
-
-    if (isConnected && currentRound) {
-      updateRate();
-    }
-  }, [
-    selectedPaymentMethod,
-    selectedRound,
-    getQSEAmountFromPayment,
-    isConnected,
-    currentRound,
-  ]);
-
-  const fetchRounds = async () => {
-    try {
-      const rounds = await getRounds();
-      setAvailableRounds(rounds);
-      if (
-        rounds.length > 0 &&
-        !rounds.some((r) => r.roundId === selectedRound)
-      ) {
-        setSelectedRound(rounds[0].roundId);
-      }
-    } catch (error) {
-      console.error("Error fetching rounds:", error);
-      setErrorMessage("Failed to load presale rounds");
-    }
-  };
-
-  const fetchClaimableAmount = () => {
-    if (!account || !selectedRound) return;
-    getClaimableAmount(selectedRound)
-      .then(({ claimable, periodsPassed }) => {
-        setClaimableAmount(claimable);
-        setVestingPeriodsPassed(periodsPassed);
-      })
-      .catch((error) =>
-        console.error("Error fetching claimable amount:", error)
-      );
-  };
+  }, [isConnected, account, selectedRound, networkError]);
 
   const calculatePaymentFromQSE = (
     qseValue: number,
-    method: PaymentMethod
+    method: PaymentMethod,
+    roundPrice: number
   ): string => {
-    const usdValue = qseValue * QSE_TOKEN_PRICE_USD;
+    const usdValue = qseValue * roundPrice;
     const paymentRate = getPaymentRateForMethod(method);
-    if (paymentRate <= 0) return "0";
-
-    const paymentValue = usdValue / paymentRate;
-    const decimals = method === "ETH" ? 6 : 6;
-    return paymentValue.toFixed(decimals);
+    return paymentRate > 0
+      ? (usdValue / paymentRate).toFixed(method === "ETH" ? 6 : 6)
+      : "0";
   };
 
-  const calculateTokens = async (
-    value: string,
-    method: PaymentMethod,
-    round: number
-  ) => {
-    if (value && !isNaN(parseFloat(value))) {
-      try {
-        const tokens = await getQSEAmountFromPayment(value, method, round);
+  const handleInputChange = async (type: "payment" | "qse", value: string) => {
+    if (type === "payment") {
+      setPaymentAmount(value);
+      if (isConnected && value && !isNaN(parseFloat(value)) && selectedRound) {
+        const tokens = await getQSEAmountFromPayment(
+          value,
+          selectedPaymentMethod,
+          selectedRound
+        );
         setQseAmount(tokens.toFixed(2));
-      } catch (error) {
-        console.error("Error calculating tokens:", error);
+      } else {
         setQseAmount("");
       }
     } else {
-      setQseAmount("");
-    }
-  };
-
-  const handlePaymentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setPaymentAmount(value);
-    if (isConnected) {
-      calculateTokens(value, selectedPaymentMethod, selectedRound);
-    }
-  };
-
-  const handleQseInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQseAmount(value);
-    if (value && !isNaN(parseFloat(value))) {
-      const tokens = parseFloat(value);
-      const payment = calculatePaymentFromQSE(tokens, selectedPaymentMethod);
-      setPaymentAmount(payment);
-    } else {
-      setPaymentAmount("");
+      setQseAmount(value);
+      if (value && !isNaN(parseFloat(value)) && selectedRound) {
+        const round = rounds.find((r) => r.roundId === selectedRound);
+        setPaymentAmount(
+          calculatePaymentFromQSE(
+            parseFloat(value),
+            selectedPaymentMethod,
+            round.tokenPrice
+          )
+        );
+      } else {
+        setPaymentAmount("");
+      }
     }
   };
 
   const handleQuickBuySelect = (amount: number) => {
     setQuickBuyAmount(amount);
-    setQseAmount(amount.toString());
-    const payment = calculatePaymentFromQSE(amount, selectedPaymentMethod);
-    setPaymentAmount(payment);
-  };
-
-  const handlePaymentMethodChange = (method: PaymentMethod) => {
-    setSelectedPaymentMethod(method);
-
-    if (qseAmount && !isNaN(parseFloat(qseAmount))) {
-      const tokens = parseFloat(qseAmount);
-      const payment = calculatePaymentFromQSE(tokens, method);
-      setPaymentAmount(payment);
-    } else if (paymentAmount && !isNaN(parseFloat(paymentAmount))) {
-      calculateTokens(paymentAmount, method, selectedRound);
+    if (selectedRound) {
+      const round = rounds.find((r) => r.roundId === selectedRound);
+      setQseAmount(amount.toString());
+      setPaymentAmount(
+        calculatePaymentFromQSE(amount, selectedPaymentMethod, round.tokenPrice)
+      );
     }
   };
 
   const validatePurchase = (): boolean => {
     if (!isConnected) {
-      setErrorMessage("Please connect your wallet first");
+      setErrorMessage("Please connect wallet");
       return false;
     }
-    if (!currentRound) {
-      setErrorMessage("No active presale round available");
+    if (!selectedRound) {
+      setErrorMessage("No rounds available");
       return false;
     }
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (currentTime < currentRound.startTime) {
-      setErrorMessage("The presale round has not yet started");
+    const round = rounds.find((r) => r.roundId === selectedRound);
+    if (!round) {
+      setErrorMessage("Selected round not found");
       return false;
     }
-    if (currentTime > currentRound.endTime) {
-      setErrorMessage("The presale round has ended");
+    const now = Math.floor(Date.now() / 1000);
+    if (now < round.startTime) {
+      setErrorMessage("Sale not started");
+      return false;
+    }
+    if (now > round.endTime) {
+      setErrorMessage("Sale ended");
       return false;
     }
     if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
-      setErrorMessage(`Please enter a valid ${selectedPaymentMethod} amount`);
+      setErrorMessage(`Enter valid ${selectedPaymentMethod} amount`);
       return false;
     }
-    if (!qseAmount || parseFloat(qseAmount) <= 0) {
-      setErrorMessage("Please enter a valid QSE amount");
-      return false;
-    }
-    if (parseFloat(qseAmount) < MINIMUM_QSE_AMOUNT) {
-      setErrorMessage(
-        `Minimum purchase amount is ${MINIMUM_QSE_AMOUNT} QSE tokens`
-      );
+    if (!qseAmount || parseFloat(qseAmount) < MINIMUM_QSE_AMOUNT) {
+      setErrorMessage(`Minimum ${MINIMUM_QSE_AMOUNT} QSE`);
       return false;
     }
     return true;
   };
 
   const executePurchase = async () => {
-    if (!validatePurchase()) return;
-
+    if (!validatePurchase() || !selectedRound) return;
     setIsSubmitting(true);
     setIsApproving(selectedPaymentMethod !== "ETH");
-    setErrorMessage("");
     try {
       const result = await buyTokens(
         paymentAmount,
@@ -243,103 +196,91 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       );
       if (result.success) {
         setPurchaseCompleted(true);
-        const hashMatch = result.message.match(
-          /Transaction: (0x[a-fA-F0-9]{64})/
+        setTxHash(
+          result.message.match(
+            /Transaction successful: (0x[a-fA-F0-9]{64})/
+          )?.[1] || ""
         );
-        if (hashMatch && hashMatch[1]) setTxHash(hashMatch[1]);
         loadQSEBalance();
-        fetchClaimableAmount();
       } else {
         setErrorMessage(result.message);
       }
     } catch (error: any) {
-      setErrorMessage(error.message || "An error occurred during purchase");
+      setErrorMessage(error.message || "Purchase failed");
     } finally {
       setIsSubmitting(false);
       setIsApproving(false);
     }
   };
 
-  const handleSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    executePurchase();
-  };
-
-  const handleQuickBuy = async () => {
-    // Update the QSE amount and payment amount regardless of connection status
-    setQseAmount(quickBuyAmount.toString());
-    const payment = calculatePaymentFromQSE(
-      quickBuyAmount,
-      selectedPaymentMethod
-    );
-    setPaymentAmount(payment);
-
-    if (!isConnected) {
-      try {
-        await connectWallet();
-        // Give time for connection state to update before proceeding
-        setTimeout(() => {
-          executePurchase();
-        }, 500);
-      } catch (error) {
-        console.error("Error connecting wallet:", error);
-        setErrorMessage("Failed to connect wallet");
-      }
-    } else {
-      executePurchase();
-    }
-  };
-
-  const executeClaimTokens = () => {
-    setIsSubmitting(true);
-    setErrorMessage("");
-    claimTokens()
-      .then((result) => {
-        if (result.success) {
-          setErrorMessage("Tokens claimed successfully!");
-          const hashMatch = result.message.match(
-            /Claimed tokens: (0x[a-fA-F0-9]{64})/
-          );
-          if (hashMatch && hashMatch[1]) setTxHash(hashMatch[1]);
-          loadQSEBalance();
-          fetchClaimableAmount();
-        } else {
-          setErrorMessage(result.message);
-        }
-      })
-      .catch((error: any) => {
-        setErrorMessage(error.message || "An error occurred during claiming");
-      })
-      .finally(() => setIsSubmitting(false));
-  };
-
-  const handleClaimTokens = () => {
-    executeClaimTokens();
-  };
-
   const handleConnectOrBuy = async () => {
     if (!isConnected) {
-      try {
-        await connectWallet();
-        // After successful connection, we need to wait for state to update
-        setTimeout(() => {
-          if (validatePurchase()) {
-            executePurchase();
-          }
-        }, 500);
-      } catch (error) {
-        console.error("Error connecting wallet:", error);
-        setErrorMessage("Failed to connect wallet");
-      }
+      await connectWallet().then((success) => {
+        if (success) setTimeout(executePurchase, 500);
+      });
     } else {
       executePurchase();
     }
+  };
+
+  const handleClaimTokens = async () => {
+    setIsSubmitting(true);
+    try {
+      const result = await claimTokens();
+      setErrorMessage(
+        result.success ? "Tokens claimed successfully!" : result.message
+      );
+      if (result.success) {
+        setTxHash(
+          result.message.match(
+            /Tokens claimed successfully: (0x[a-fA-F0-9]{64})/
+          )?.[1] || ""
+        );
+        loadQSEBalance();
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || "Claim failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRoundSelect = (roundId: number) => {
+    setSelectedRound(roundId);
+    setIsRoundDropdownOpen(false);
   };
 
   if (!isOpen) return null;
 
   const formatDate = (timestamp: number) =>
     new Date(timestamp * 1000).toLocaleString();
+  const roundPrice =
+    selectedRound && rounds.find((r) => r.roundId === selectedRound)
+      ? rounds.find((r) => r.roundId === selectedRound).tokenPrice
+      : 0;
+
+  const getSelectedRound = () =>
+    selectedRound && rounds.find((r) => r.roundId === selectedRound);
+
+  const getRoundStatus = (round: any) => {
+    const now = Math.floor(Date.now() / 1000);
+    if (now < round.startTime) return "upcoming";
+    if (now > round.endTime) return "ended";
+    return "active";
+  };
+
+  const getRoundStatusLabel = (status: string) => {
+    switch (status) {
+      case "active":
+        return { text: "ACTIVE", color: "bg-green-500" };
+      case "upcoming":
+        return { text: "UPCOMING", color: "bg-blue-500" };
+      case "ended":
+        return { text: "ENDED", color: "bg-gray-500" };
+      default:
+        return { text: "UNKNOWN", color: "bg-gray-500" };
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-start justify-center z-[2000] p-4 backdrop-blur-sm overflow-y-auto">
@@ -351,7 +292,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
         >
           <X size={20} />
         </button>
-
         <div className="p-5 md:p-8 overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
             <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 md:p-3 rounded-xl shadow-lg">
@@ -361,7 +301,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
               Buy QSE Tokens
             </h2>
           </div>
-
           {isConnected && (
             <div className="mb-6 flex justify-between items-center p-3 md:p-4 bg-blue-800/40 rounded-xl text-sm border border-blue-500/30 backdrop-blur-md">
               <div className="flex items-center gap-2 md:gap-3">
@@ -384,9 +323,8 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
               </div>
             </div>
           )}
-
           {purchaseCompleted ? (
-            <div className="text-center py-6 md:py-10 animate-fadeIn">
+            <div className="text-center py-6 md:py-10">
               <div className="inline-flex items-center justify-center w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 rounded-full bg-gradient-to-br from-green-400 to-green-600">
                 <CheckCircle size={32} className="md:hidden text-white" />
                 <CheckCircle size={48} className="hidden md:block text-white" />
@@ -404,7 +342,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-gray-300">Vesting Schedule:</span>
                   <span className="text-blue-300">
-                    20% at TGE, 80% over 12 months
+                    50% at TGE, 50% after 20 minutes
                   </span>
                 </div>
               </div>
@@ -426,90 +364,299 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
           ) : (
             <div className="flex flex-col lg:flex-row lg:space-x-6">
               <div className="w-full lg:w-3/5">
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium mb-2 text-blue-200">
-                      Presale Round
-                    </label>
-                    <select
-                      value={selectedRound}
-                      onChange={(e) => setSelectedRound(Number(e.target.value))}
-                      className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      disabled={!isConnected || availableRounds.length === 0}
-                    >
-                      {availableRounds.length === 0 ? (
-                        <option value="0">
-                          {isConnected
-                            ? "No active rounds"
-                            : "Connect wallet to load rounds"}
-                        </option>
-                      ) : (
-                        availableRounds.map((round) => (
-                          <option key={round.roundId} value={round.roundId}>
-                            Round {round.roundId}
-                          </option>
-                        ))
-                      )}
-                    </select>
-                  </div>
-
-                  {currentRound && (
-                    <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 mb-4 text-sm">
-                      <div className="flex justify-between mb-2">
-                        <span className="text-gray-300">Token Price:</span>
-                        <span className="text-white">
-                          ${currentRound.tokenPrice.toFixed(2)}
-                        </span>
+                <div className="space-y-6">
+                  {isConnected && (
+                    <div className="mb-6 p-4 bg-gradient-to-r from-indigo-800 to-blue-900 rounded-xl border border-indigo-500/30 shadow-lg flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-indigo-600 p-2 rounded-lg">
+                          <Coins size={20} className="text-indigo-200" />
+                        </div>
+                        <div>
+                          <div className="text-gray-300 text-xs">
+                            Available to Claim
+                          </div>
+                          <div className="font-semibold text-lg text-white">
+                            {parseFloat(claimableAmount).toFixed(2)}{" "}
+                            <span className="text-indigo-300">QSE</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-gray-300">Tokens Available:</span>
-                        <span className="text-white">
-                          {(
-                            currentRound.tokenAmount - currentRound.soldAmount
-                          ).toFixed(2)}{" "}
-                          QSE
-                        </span>
-                      </div>
-                      <div className="flex justify-between mb-2">
-                        <span className="text-gray-300">Start Time:</span>
-                        <span className="text-white">
-                          {formatDate(currentRound.startTime)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-300">End Time:</span>
-                        <span className="text-white">
-                          {formatDate(currentRound.endTime)}
-                        </span>
-                      </div>
+                      <button
+                        onClick={handleClaimTokens}
+                        disabled={
+                          isSubmitting ||
+                          isConnecting ||
+                          parseFloat(claimableAmount) <= 0
+                        }
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                          isSubmitting ||
+                          isConnecting ||
+                          parseFloat(claimableAmount) <= 0
+                            ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                            : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-green-500/30"
+                        }`}
+                      >
+                        {isSubmitting ? "Claiming..." : "Claim"}
+                      </button>
                     </div>
                   )}
-
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-blue-200">
+                    <label className="block text-sm font-semibold mb-2 text-blue-200">
+                      Presale Round
+                    </label>
+                    <div className="relative">
+                      <div
+                        className={`relative cursor-pointer ${isConnected && rounds.length > 0 ? "" : "opacity-50 pointer-events-none"}`}
+                        onClick={() =>
+                          setIsRoundDropdownOpen(!isRoundDropdownOpen)
+                        }
+                      >
+                        {selectedRound ? (
+                          <div className="w-full bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-700/50 rounded-xl py-3 px-4 text-white transition-all duration-300 hover:bg-indigo-900/80">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className="p-2 rounded-lg bg-indigo-800/70">
+                                  <Tag size={16} className="text-indigo-200" />
+                                </div>
+                                <div>
+                                  <span className="font-medium">
+                                    Round {selectedRound}
+                                  </span>
+                                  {getSelectedRound() && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span
+                                        className={`text-xs px-2 py-0.5 rounded-full ${getRoundStatusLabel(getRoundStatus(getSelectedRound())).color}`}
+                                      >
+                                        {
+                                          getRoundStatusLabel(
+                                            getRoundStatus(getSelectedRound())
+                                          ).text
+                                        }
+                                      </span>
+                                      <span className="text-xs text-indigo-300">
+                                        ${roundPrice.toFixed(2)} per QSE
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <ChevronDown
+                                size={20}
+                                className={`text-indigo-300 transition-transform duration-300 ${isRoundDropdownOpen ? "rotate-180" : ""}`}
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-full bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-700/50 rounded-xl py-3 px-4 text-gray-400">
+                            No rounds available
+                          </div>
+                        )}
+                        {isRoundDropdownOpen && rounds.length > 0 && (
+                          <div className="absolute left-0 right-0 mt-2 bg-blue-950 border border-blue-700/50 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto">
+                            <div className="py-2">
+                              {rounds.map((round) => {
+                                const status = getRoundStatus(round);
+                                const statusLabel = getRoundStatusLabel(status);
+                                return (
+                                  <div
+                                    key={round.roundId}
+                                    className={`px-4 py-3 hover:bg-indigo-800/60 cursor-pointer transition-colors duration-200 border-b border-blue-800/50 last:border-b-0 ${selectedRound === round.roundId ? "bg-indigo-800/40" : ""}`}
+                                    onClick={() =>
+                                      handleRoundSelect(round.roundId)
+                                    }
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-medium">
+                                            Round {round.roundId}
+                                          </span>
+                                          <span
+                                            className={`text-xs px-2 py-0.5 rounded-full ${statusLabel.color}`}
+                                          >
+                                            {statusLabel.text}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-300">
+                                          <div className="flex items-center gap-1">
+                                            <CircleDollarSign
+                                              size={12}
+                                              className="text-indigo-300"
+                                            />
+                                            <span>
+                                              ${round.tokenPrice.toFixed(2)}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-1">
+                                            <Tag
+                                              size={12}
+                                              className="text-indigo-300"
+                                            />
+                                            <span>
+                                              {(
+                                                round.tokenAmount -
+                                                round.soldAmount
+                                              ).toFixed(2)}{" "}
+                                              QSE
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="text-right text-xs text-gray-300">
+                                        <div className="flex items-center gap-1 mb-1">
+                                          <Clock
+                                            size={12}
+                                            className="text-indigo-300"
+                                          />
+                                          <span>
+                                            {new Date(
+                                              round.startTime * 1000
+                                            ).toLocaleDateString()}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <Calendar
+                                            size={12}
+                                            className="text-indigo-300"
+                                          />
+                                          <span>
+                                            {new Date(
+                                              round.endTime * 1000
+                                            ).toLocaleDateString()}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {selectedRound &&
+                    rounds.find((r) => r.roundId === selectedRound) && (
+                      <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 mb-6 backdrop-blur-md shadow-inner">
+                        <div className="flex items-center justify-between mb-3 pb-3 border-b border-blue-700/50">
+                          <h4 className="flex items-center gap-2 text-indigo-100 font-medium">
+                            <div className="bg-indigo-700/60 p-1.5 rounded-lg">
+                              <Tag size={14} className="text-indigo-200" />
+                            </div>
+                            Round {selectedRound} Details
+                          </h4>
+                          <div
+                            className={`text-xs px-2 py-0.5 font-medium rounded-full ${getRoundStatusLabel(getRoundStatus(getSelectedRound())).color}`}
+                          >
+                            {
+                              getRoundStatusLabel(
+                                getRoundStatus(getSelectedRound())
+                              ).text
+                            }
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
+                            <div className="bg-blue-800/60 p-1.5 rounded-lg">
+                              <CircleDollarSign
+                                size={14}
+                                className="text-blue-200"
+                              />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                Token Price
+                              </div>
+                              <div className="font-medium text-white">
+                                ${roundPrice.toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
+                            <div className="bg-blue-800/60 p-1.5 rounded-lg">
+                              <Tag size={14} className="text-blue-200" />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                Available
+                              </div>
+                              <div className="font-medium text-white">
+                                {(
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  ).tokenAmount -
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  ).soldAmount
+                                ).toFixed(2)}{" "}
+                                <span className="text-xs text-blue-300">
+                                  QSE
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
+                            <div className="bg-blue-800/60 p-1.5 rounded-lg">
+                              <Clock size={14} className="text-blue-200" />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                Start Time
+                              </div>
+                              <div className="font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                                {new Date(
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  ).startTime * 1000
+                                ).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
+                            <div className="bg-blue-800/60 p-1.5 rounded-lg">
+                              <Calendar size={14} className="text-blue-200" />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                End Time
+                              </div>
+                              <div className="font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                                {new Date(
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  ).endTime * 1000
+                                ).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-blue-200">
                       Payment Method
                     </label>
-                    <div className="grid grid-cols-4 gap-1">
+                    <div className="grid grid-cols-4 gap-2">
                       {supportedPaymentMethods.map((method) => (
                         <button
                           key={method}
                           type="button"
-                          className={`py-2 rounded-lg text-xs font-medium transition-all ${
+                          className={`py-2.5 rounded-lg text-xs font-medium transition-all duration-300 ${
                             selectedPaymentMethod === method
-                              ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-500/30"
-                              : "bg-blue-800/60 text-gray-300 hover:bg-blue-700/70 border border-blue-700/30"
+                              ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                              : "bg-blue-800/60 text-gray-300 hover:bg-indigo-700/70 border border-blue-700/30 hover:text-white"
                           }`}
-                          onClick={() => handlePaymentMethodChange(method)}
+                          onClick={() => setSelectedPaymentMethod(method)}
                         >
                           {method}
                         </button>
                       ))}
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-blue-200">
+                      <label className="block text-sm font-semibold mb-2 text-blue-200">
                         {selectedPaymentMethod} Amount
                       </label>
                       <div className="relative">
@@ -518,27 +665,21 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           step="0.000001"
                           min="0.000001"
                           value={paymentAmount}
-                          onChange={handlePaymentInputChange}
-                          className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                          onChange={(e) =>
+                            handleInputChange("payment", e.target.value)
+                          }
+                          className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300"
                           placeholder="0.00"
-                          required
                         />
-                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300 font-medium">
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium">
                           {selectedPaymentMethod}
                         </div>
                       </div>
-                      <div className="text-xs text-blue-300 mt-1.5 flex items-center gap-1">
-                        <span>Rate:</span>
-                        <span className="font-medium">
-                          1 {selectedPaymentMethod} = {rate || "N/A"} QSE
-                        </span>
-                      </div>
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-blue-200">
+                      <label className="block text-sm font-semibold mb-2 text-blue-200">
                         QSE Token Amount{" "}
-                        <span className="text-xs text-blue-300">
+                        <span className="text-xs text-indigo-300">
                           (min. {MINIMUM_QSE_AMOUNT} QSE)
                         </span>
                       </label>
@@ -547,88 +688,29 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           type="number"
                           min={MINIMUM_QSE_AMOUNT}
                           value={qseAmount}
-                          onChange={handleQseInputChange}
-                          className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                          onChange={(e) =>
+                            handleInputChange("qse", e.target.value)
+                          }
+                          className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300"
                           placeholder="0"
-                          required
                         />
-                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-300 font-medium">
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium">
                           QSE
                         </div>
                       </div>
-                      <div className="text-xs text-blue-300 mt-1.5">
-                        Price: 1 QSE = ${QSE_TOKEN_PRICE_USD.toFixed(2)} USD
-                      </div>
                     </div>
                   </div>
-
-                  {isTgeSet && tgeTime > 0 && (
-                    <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 md:p-6 backdrop-blur-sm">
-                      <h4 className="font-medium mb-3 text-blue-100">
-                        TGE Details:
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-300">TGE Time:</span>
-                          <span className="text-white">
-                            {formatDate(tgeTime)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-300">
-                            Vesting Schedule:
-                          </span>
-                          <span className="text-white">
-                            20% at TGE, 80% over 12 months
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {parseFloat(claimableAmount) > 0 && (
-                    <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 md:p-6 backdrop-blur-sm">
-                      <h4 className="font-medium mb-3 text-blue-100">
-                        Claimable Tokens:
-                      </h4>
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-gray-300">
-                          Available to Claim:
-                        </span>
-                        <span className="text-green-400 font-bold">
-                          {claimableAmount} QSE
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleClaimTokens}
-                        disabled={
-                          isSubmitting ||
-                          !isConnected ||
-                          parseFloat(claimableAmount) === 0
-                        }
-                        className={`w-full py-3 rounded-xl font-medium text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all ${
-                          isSubmitting ||
-                          !isConnected ||
-                          parseFloat(claimableAmount) === 0
-                            ? "opacity-60 cursor-not-allowed"
-                            : ""
-                        }`}
-                      >
-                        Claim Tokens
-                      </button>
-                    </div>
-                  )}
-
-                  {errorMessage && (
+                  {(errorMessage || networkError) && (
                     <div
-                      className={`p-3 md:p-4 rounded-xl text-sm flex items-start gap-3 ${
-                        errorMessage.includes("success")
+                      className={`p-3 rounded-xl text-sm flex items-start gap-3 ${
+                        (errorMessage && errorMessage.includes("success")) ||
+                        (networkError && networkError.includes("success"))
                           ? "bg-green-900/40 text-green-200 border border-green-500/30"
                           : "bg-red-900/40 text-red-200 border border-red-500/30"
                       }`}
                     >
-                      {errorMessage.includes("success") ? (
+                      {(errorMessage && errorMessage.includes("success")) ||
+                      (networkError && networkError.includes("success")) ? (
                         <CheckCircle
                           size={16}
                           className="text-green-400 mt-0.5"
@@ -639,16 +721,15 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           className="text-red-400 mt-0.5"
                         />
                       )}
-                      <span>{errorMessage}</span>
+                      <span>{errorMessage || networkError}</span>
                     </div>
                   )}
-
                   <button
-                    type="button" // Changed from "submit" to "button" to prevent form submission
+                    type="button"
                     onClick={handleConnectOrBuy}
-                    disabled={isSubmitting || isConnecting || !currentRound}
-                    className={`w-full py-3.5 md:py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-blue-500/30 relative overflow-hidden group ${
-                      isSubmitting || isConnecting || !currentRound
+                    disabled={isSubmitting || isConnecting}
+                    className={`w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-purple-500/30 relative overflow-hidden ${
+                      isSubmitting || isConnecting
                         ? "opacity-70 cursor-not-allowed"
                         : ""
                     }`}
@@ -664,37 +745,35 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                         "Connecting..."
                       ) : isConnected ? (
                         <>
-                          Buy QSE Tokens
+                          Buy QSE Tokens{" "}
                           <ArrowRight
                             size={18}
-                            className="transition-transform group-hover:translate-x-1"
+                            className="transition-transform duration-300 group-hover:translate-x-1"
                           />
                         </>
                       ) : (
                         <>
-                          Connect Wallet
-                          <Wallet size={18} />
+                          Connect Wallet <Wallet size={18} />
                         </>
                       )}
                     </span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                   </button>
-                </form>
-
-                <div className="lg:hidden mt-6 pt-6 border-t border-blue-700/40">
-                  <h3 className="text-lg font-medium mb-3 text-blue-100">
+                </div>
+                <div className="lg:hidden mt-8 pt-6 border-t border-indigo-700/40">
+                  <h3 className="text-lg font-semibold mb-4 text-indigo-100">
                     Quick Buy Options
                   </h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     {quickBuyOptions.slice(0, 4).map((amount) => (
                       <button
                         key={amount}
                         type="button"
                         onClick={() => handleQuickBuySelect(amount)}
-                        className={`flex flex-col justify-between p-3 rounded-lg border transition-all ${
+                        className={`flex flex-col justify-between p-3 rounded-xl border transition-all duration-300 ${
                           quickBuyAmount === amount
-                            ? "bg-blue-700/70 border-blue-500 text-white"
-                            : "bg-blue-900/40 border-blue-700/40 text-gray-300 hover:bg-blue-800/60"
+                            ? "bg-indigo-700/70 border-indigo-500 text-white shadow-md"
+                            : "bg-blue-900/40 border-indigo-700/40 text-gray-300 hover:bg-indigo-800/60"
                         }`}
                       >
                         <span className="font-medium text-lg">
@@ -702,93 +781,71 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                         </span>
                         <span className="text-xs mt-1 opacity-80">
                           ≈{" "}
-                          {calculatePaymentFromQSE(
-                            amount,
-                            selectedPaymentMethod
-                          )}{" "}
+                          {selectedRound &&
+                            calculatePaymentFromQSE(
+                              amount,
+                              selectedPaymentMethod,
+                              rounds.find((r) => r.roundId === selectedRound)
+                                .tokenPrice
+                            )}{" "}
                           {selectedPaymentMethod}
                         </span>
                       </button>
                     ))}
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleQuickBuy}
-                    disabled={isSubmitting || isConnecting}
-                    className={`w-full mt-4 py-3 rounded-xl font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 flex items-center justify-center gap-2 transition-all ${
-                      isSubmitting || isConnecting ? "opacity-60" : ""
-                    }`}
-                  >
-                    {isConnected ? "Quick Buy Now" : "Connect to Quick Buy"}
-                    <ArrowRight size={16} />
-                  </button>
                 </div>
               </div>
-
-              <div className="hidden lg:block w-2/5 border-l border-blue-700/40 pl-6">
-                <div className="bg-blue-800/30 border border-blue-600/20 rounded-xl p-5 backdrop-blur-sm">
-                  <h3 className="text-xl font-medium mb-4 text-blue-100">
+              <div className="hidden lg:block w-2/5 border-l border-indigo-700/40 pl-6">
+                <div className="bg-blue-800/30 border border-indigo-600/20 rounded-xl p-5 backdrop-blur-sm shadow-lg">
+                  <h3 className="text-xl font-semibold mb-4 text-indigo-100">
                     Quick Buy
                   </h3>
                   <p className="text-gray-300 text-sm mb-6">
-                    Select a preset amount below for faster checkout with the
-                    current payment method.
+                    Select a preset amount to populate the main fields.
                   </p>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {quickBuyOptions.map((amount) => (
                       <button
                         key={amount}
                         type="button"
                         onClick={() => handleQuickBuySelect(amount)}
-                        className={`w-full flex justify-between items-center p-4 rounded-lg border transition-all ${
+                        className={`w-full flex justify-between items-center p-4 rounded-xl border transition-all duration-300 ${
                           quickBuyAmount === amount
-                            ? "bg-blue-700/70 border-blue-500 text-white"
-                            : "bg-blue-900/40 border-blue-700/40 text-gray-300 hover:bg-blue-800/60"
+                            ? "bg-indigo-700/70 border-indigo-500 text-white shadow-md"
+                            : "bg-blue-900/40 border-indigo-700/40 text-gray-300 hover:bg-indigo-800/60"
                         }`}
                       >
                         <span className="font-medium">{amount} QSE</span>
                         <span className="text-sm">
                           ≈{" "}
-                          {calculatePaymentFromQSE(
-                            amount,
-                            selectedPaymentMethod
-                          )}{" "}
+                          {selectedRound &&
+                            calculatePaymentFromQSE(
+                              amount,
+                              selectedPaymentMethod,
+                              rounds.find((r) => r.roundId === selectedRound)
+                                .tokenPrice
+                            )}{" "}
                           {selectedPaymentMethod}
                         </span>
                       </button>
                     ))}
                   </div>
-                  <div className="mt-8">
-                    <button
-                      type="button"
-                      onClick={handleQuickBuy}
-                      disabled={isSubmitting || isConnecting}
-                      className={`w-full py-3.5 rounded-xl font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 flex items-center justify-center gap-2 transition-all ${
-                        isSubmitting || isConnecting ? "opacity-60" : ""
-                      }`}
-                    >
-                      {isConnected ? "Buy Now" : "Connect to Buy"}
-                      <ArrowRight size={18} />
-                    </button>
-                  </div>
                 </div>
-                <div className="mt-4 text-center">
-                  <p className="text-xs text-blue-300">
-                    Transactions processed securely on Arbitrum Sepolia.
+                <div className="mt-6 text-center">
+                  <p className="text-xs text-indigo-300">
+                    Secure transactions.
                   </p>
-                  <p className="text-xs text-blue-300 mt-1">
-                    QSE price fixed at ${QSE_TOKEN_PRICE_USD.toFixed(2)} per
-                    token
+                  <p className="text-xs text-indigo-300 mt-1">
+                    QSE price: ${roundPrice.toFixed(2)} per token
                   </p>
                 </div>
               </div>
             </div>
           )}
-
-          <div className="mt-6 text-center text-xs text-blue-300 lg:hidden">
-            <p>Transactions processed securely on Arbitrum Sepolia.</p>
+          <div className="mt-6 text-center text-xs text-indigo-300 lg:hidden">
+            <p>Secure transactions.</p>
             <p className="mt-1">
-              QSE price fixed at ${QSE_TOKEN_PRICE_USD.toFixed(2)} per token
+              QSE price: ${roundPrice.toFixed(2)} per token
             </p>
           </div>
         </div>

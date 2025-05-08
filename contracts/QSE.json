@@ -342,5 +342,6 @@
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ]
+  ],
+  "note": "Deployed on Arbitrum Sepolia at address: 0x94E011e06E89660a4385762050084996990754D9"
 }
