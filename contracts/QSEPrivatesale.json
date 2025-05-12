@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "QSEPresale",
-  "sourceName": "contracts/QSEPresale.sol",
+  "contractName": "QSEPrivatesale",
+  "sourceName": "contracts/QSEPrivatesale.sol",
   "abi": [
     {
       "inputs": [
