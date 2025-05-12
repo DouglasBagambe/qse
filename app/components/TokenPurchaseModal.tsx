@@ -18,6 +18,7 @@ import {
   CircleDollarSign,
   ShieldCheck,
   Zap,
+  X,
 } from "lucide-react";
 import AdminPanelModal from "./AdminPanelModal";
 
@@ -325,17 +326,20 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
             {isConnected && isOwner && (
               <button
                 onClick={() => setIsAdminPanelOpen(true)}
-                className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700 rounded-lg p-2 transition-all duration-300 hover:scale-105"
-                title="Admin Panel"
+                className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700 rounded-lg p-2 transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                title="Open Admin Panel"
               >
-                <Tag size={20} />
+                <ShieldCheck size={20} />
+                <span className="hidden sm:inline text-sm font-medium">
+                  Admin Panel
+                </span>
               </button>
             )}
             <button
               onClick={onClose}
               className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700/80 rounded-lg p-2 transition-all duration-300 hover:scale-105"
             >
-              <ArrowRight size={20} />
+              <X size={20} />
             </button>
           </div>
 
