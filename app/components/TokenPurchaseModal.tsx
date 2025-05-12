@@ -15,6 +15,9 @@ import {
   ChevronDown,
   Tag,
   Coins,
+  CircleDollarSign,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
 import AdminPanelModal from "./AdminPanelModal";
 
@@ -307,408 +310,535 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       : 0;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center backdrop-blur-sm overflow-y-auto">
-      <div className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white rounded-3xl shadow-2xl w-full max-w-4xl my-6 relative border border-blue-400/20 p-5 md:p-8 overflow-hidden">
-        {/* Only show admin button if the connected account is the owner */}
-        {isConnected && isOwner && (
-          <button
-            onClick={() => setIsAdminPanelOpen(true)}
-            className="absolute top-4 left-4 text-gray-300 hover:text-white bg-blue-800/50 hover:bg-blue-700/70 rounded-lg p-2 transition-all"
-            title="Admin Panel"
-          >
-            <Tag size={20} />
-          </button>
-        )}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-300 hover:text-white bg-blue-800/50 hover:bg-blue-700/70 rounded-lg p-2 transition-all"
-        >
-          <ArrowRight size={20} />
-        </button>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-2 md:p-3 rounded-xl shadow-lg">
-            <Wallet size={24} className="text-white" />
-          </div>
-          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-200 to-indigo-100 bg-clip-text text-transparent">
-            Buy QSE Tokens
-          </h2>
-        </div>
-        {successMessage ? (
-          <div className="text-center py-6 md:py-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 md:w-24 md:h-24 mb-4 md:mb-6 rounded-full bg-gradient-to-br from-green-400 to-green-600">
-              <CheckCircle size={32} className="md:hidden" />
-              <CheckCircle size={48} className="hidden md:block text-white" />
-            </div>
-            <h3 className="text-xl md:text-2xl font-bold mb-4 text-white">
-              Purchase Successful!
-            </h3>
-            <div className="bg-blue-800/40 border border-blue-500/30 rounded-xl p-4 md:p-6 mb-6 md:mb-8 max-w-md mx-auto">
-              <div className="flex justify-between items-center mb-3 pb-3 border-b border-blue-700/50">
-                <span className="text-gray-300">Tokens Purchased:</span>
-                <span className="text-lg md:text-xl font-bold text-white">
-                  {qseAmount} QSE
-                </span>
-              </div>
-              {txHash && (
-                <div className="mb-6 p-3 md:p-4 bg-blue-900/60 rounded-xl text-xs break-all max-w-md mx-auto border border-blue-700/50">
-                  <p className="font-medium mb-1 text-blue-300">
-                    Transaction Hash:
-                  </p>
-                  <p className="font-mono text-gray-300 select-all">{txHash}</p>
-                </div>
-              )}
+    <div className="fixed inset-0 bg-black/90 flex items-center justify-center backdrop-blur-md overflow-y-auto">
+      <div className="bg-gradient-to-br from-blue-950 to-indigo-950 text-white rounded-3xl shadow-2xl w-full max-w-4xl my-6 relative border border-blue-500/30 overflow-hidden">
+        {/* Glass panel effect overlay */}
+        <div className="absolute inset-0 bg-blue-500/5 backdrop-blur-[2px] pointer-events-none" />
+
+        {/* Top accent bar */}
+        <div className="h-1 w-full bg-gradient-to-r from-blue-400 via-indigo-500 to-blue-600" />
+
+        {/* Content container with padding */}
+        <div className="p-6 md:p-8 relative z-10">
+          {/* Admin & Close buttons */}
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            {isConnected && isOwner && (
               <button
-                onClick={onClose}
-                className="px-6 py-2.5 md:px-8 md:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30"
+                onClick={() => setIsAdminPanelOpen(true)}
+                className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700 rounded-lg p-2 transition-all duration-300 hover:scale-105"
+                title="Admin Panel"
               >
-                Close
+                <Tag size={20} />
               </button>
-            </div>
+            )}
+            <button
+              onClick={onClose}
+              className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700/80 rounded-lg p-2 transition-all duration-300 hover:scale-105"
+            >
+              <ArrowRight size={20} />
+            </button>
           </div>
-        ) : (
-          <div className="flex flex-col lg:flex-row lg:space-x-6">
-            <div className="w-full lg:w-3/5">
-              <div className="space-y-6">
+
+          {/* Header with animated gradient */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg rotate-3 hover:rotate-0 transition-all duration-500">
+              <Wallet size={28} className="text-white" />
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 via-indigo-200 to-blue-100 bg-clip-text text-transparent">
+              Buy QSE Tokens
+            </h2>
+          </div>
+
+          {successMessage ? (
+            /* Success state */
+            <div className="text-center py-10 px-4">
+              <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 animate-pulse">
+                <CheckCircle size={48} className="text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-6 text-white">
+                Purchase Successful!
+              </h3>
+              <div className="bg-blue-900/40 border border-blue-500/40 rounded-xl p-6 mb-8 max-w-md mx-auto backdrop-blur-sm">
+                <div className="flex justify-between items-center mb-4 pb-3 border-b border-blue-700/50">
+                  <span className="text-gray-300">Tokens Purchased:</span>
+                  <span className="text-xl font-bold text-white">
+                    {qseAmount} <span className="text-blue-300">QSE</span>
+                  </span>
+                </div>
+                {txHash && (
+                  <div className="mb-6 p-4 bg-blue-950/60 rounded-xl text-xs max-w-md mx-auto border border-blue-700/50">
+                    <p className="font-medium mb-1 text-blue-300">
+                      Transaction Hash:
+                    </p>
+                    <p className="font-mono text-gray-300 select-all break-all">
+                      {txHash}
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={onClose}
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Main purchase interface */
+            <div className="flex flex-col lg:flex-row lg:space-x-8">
+              {/* Main purchase form */}
+              <div className="w-full lg:w-3/5">
+                {/* Connected wallet info */}
                 {isConnected && (
-                  <div className="mb-6 flex justify-between items-center p-3 md:p-4 bg-blue-800/40 rounded-xl text-sm border border-blue-500/30 backdrop-blur-md">
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <div className="bg-blue-700 p-1.5 md:p-2 rounded-lg">
-                        <Wallet size={16} className="md:hidden" />
-                        <Wallet size={18} className="hidden md:block" />
+                  <div className="mb-6 flex justify-between items-center p-4 bg-blue-900/30 rounded-xl text-sm border border-blue-500/40 backdrop-blur-md">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-2 rounded-lg">
+                        <Wallet size={18} />
                       </div>
                       <div>
                         <div className="text-gray-300 text-xs">
                           Your QSE balance
                         </div>
-                        <div className="font-semibold text-base md:text-lg">
+                        <div className="font-semibold text-lg">
                           {parseFloat(qseBalance).toFixed(2)}{" "}
                           <span className="text-blue-300">QSE</span>
                         </div>
                       </div>
                     </div>
-                    <div className="bg-blue-950/70 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm text-blue-300 font-mono truncate max-w-[100px] md:max-w-[200px]">
+                    <div className="bg-blue-950/90 px-3 py-1.5 rounded-lg text-sm text-blue-300 font-mono truncate max-w-[200px]">
                       {account
                         ? `${account.slice(0, 4)}...${account.slice(-4)}`
                         : ""}
                     </div>
                   </div>
                 )}
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-blue-200">
-                    Presale Round
-                  </label>
-                  <div className="relative">
-                    {isLoadingRounds ? (
-                      <div className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-gray-400">
-                        Loading rounds...
-                      </div>
-                    ) : rounds.length > 0 ? (
-                      <div
-                        className={`relative cursor-pointer ${isConnected ? "" : "opacity-50 pointer-events-none"}`}
-                        onClick={() =>
-                          setIsRoundDropdownOpen(!isRoundDropdownOpen)
-                        }
-                      >
-                        <div className="w-full bg-gradient-to-r from-blue-900 to-indigo-800 border border-blue-700/50 rounded-xl py-3 px-4 text-white transition-all duration-300 hover:bg-indigo-900/80">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="p-2 rounded-lg bg-indigo-800/70">
-                                <Tag size={16} className="text-indigo-200" />
-                              </div>
-                              <div>
-                                <div className="font-medium">
-                                  Round {selectedRound}
-                                </div>
-                                {getSelectedRound() && (
-                                  <div className="flex items-center gap-2">
-                                    <span
-                                      className={`text-xs px-2 py-0.5 rounded-full ${
-                                        getRoundStatusLabel(
-                                          getRoundStatus(getSelectedRound()!)
-                                        ).color
-                                      }`}
-                                    >
-                                      {
-                                        getRoundStatusLabel(
-                                          getRoundStatus(getSelectedRound()!)
-                                        ).text
-                                      }
-                                    </span>
-                                    <span className="text-xs text-indigo-300">
-                                      ${(roundPrice || 0).toFixed(2)} per QSE
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <ChevronDown
-                              size={20}
-                              className={`text-indigo-300 transition-transform duration-300 ${
-                                isRoundDropdownOpen ? "rotate-180" : ""
-                              }`}
-                            />
+
+                {/* Purchase interface sections */}
+                <div className="space-y-6">
+                  {/* Round selection */}
+                  <div className="group">
+                    <label className="block text-sm font-semibold mb-2 text-blue-200 group-hover:text-blue-100 transition-colors">
+                      Presale Round
+                    </label>
+                    <div className="relative">
+                      {isLoadingRounds ? (
+                        <div className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-gray-400">
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin w-4 h-4 border-2 border-blue-300 border-t-transparent rounded-full" />
+                            Loading rounds...
                           </div>
                         </div>
-                        {isRoundDropdownOpen && (
-                          <div className="absolute left-0 right-0 mt-2 bg-blue-950 border border-blue-700/50 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto">
-                            <div className="py-2">
-                              {rounds.map((round) => {
-                                const status = getRoundStatus(round);
-                                const statusLabel = getRoundStatusLabel(status);
-                                return (
-                                  <div
-                                    key={round.roundId}
-                                    className={`px-4 py-3 hover:bg-indigo-800/60 cursor-pointer transition-colors duration-200 border-b border-blue-800/50 last:border-b-0 ${
-                                      selectedRound === round.roundId
-                                        ? "bg-indigo-800/40"
-                                        : ""
-                                    }`}
-                                    onClick={() =>
-                                      handleRoundSelect(round.roundId)
-                                    }
-                                  >
-                                    <div className="flex items-center">
-                                      <span className="font-medium">
-                                        Round {round.roundId}
-                                      </span>
+                      ) : rounds.length > 0 ? (
+                        <div
+                          className={`relative cursor-pointer ${isConnected ? "" : "opacity-50 pointer-events-none"}`}
+                          onClick={() =>
+                            setIsRoundDropdownOpen(!isRoundDropdownOpen)
+                          }
+                        >
+                          <div className="w-full bg-gradient-to-r from-blue-900 to-indigo-900 border border-blue-700/50 rounded-xl py-4 px-4 text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/20 group-hover:border-blue-600/70">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-indigo-800/80">
+                                  <Tag size={18} className="text-indigo-200" />
+                                </div>
+                                <div>
+                                  <div className="font-medium text-lg">
+                                    Round {selectedRound}
+                                  </div>
+                                  {getSelectedRound() && (
+                                    <div className="flex items-center gap-2 mt-0.5">
                                       <span
-                                        className={`text-xs px-2 py-0.5 rounded-full ml-2 ${statusLabel.color}`}
+                                        className={`text-xs px-2 py-0.5 rounded-full ${
+                                          getRoundStatusLabel(
+                                            getRoundStatus(getSelectedRound()!)
+                                          ).color
+                                        }`}
                                       >
-                                        {statusLabel.text}
+                                        {
+                                          getRoundStatusLabel(
+                                            getRoundStatus(getSelectedRound()!)
+                                          ).text
+                                        }
+                                      </span>
+                                      <span className="text-xs text-indigo-300">
+                                        ${(roundPrice || 0).toFixed(2)} per QSE
                                       </span>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  )}
+                                </div>
+                              </div>
+                              <ChevronDown
+                                size={20}
+                                className={`text-indigo-300 transition-transform duration-300 ${
+                                  isRoundDropdownOpen ? "rotate-180" : ""
+                                }`}
+                              />
                             </div>
                           </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-gray-400">
-                        No rounds available
+                          {isRoundDropdownOpen && (
+                            <div className="absolute left-0 right-0 mt-2 bg-blue-950/95 border border-blue-700/50 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto backdrop-blur-sm">
+                              <div className="py-2">
+                                {rounds.map((round) => {
+                                  const status = getRoundStatus(round);
+                                  const statusLabel =
+                                    getRoundStatusLabel(status);
+                                  return (
+                                    <div
+                                      key={round.roundId}
+                                      className={`px-4 py-3 hover:bg-indigo-800/60 cursor-pointer transition-colors duration-200 border-b border-blue-800/50 last:border-b-0 ${
+                                        selectedRound === round.roundId
+                                          ? "bg-indigo-800/40"
+                                          : ""
+                                      }`}
+                                      onClick={() =>
+                                        handleRoundSelect(round.roundId)
+                                      }
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <span className="font-medium">
+                                          Round {round.roundId}
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm text-indigo-300">
+                                            ${round.tokenPrice.toFixed(2)}
+                                          </span>
+                                          <span
+                                            className={`text-xs px-2 py-0.5 rounded-full ${statusLabel.color}`}
+                                          >
+                                            {statusLabel.text}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-gray-400">
+                          No rounds available
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Round details card */}
+                  {selectedRound &&
+                    rounds.find((r) => r.roundId === selectedRound) && (
+                      <div className="bg-gradient-to-br from-blue-900/40 to-indigo-900/40 border border-blue-500/30 rounded-xl p-5 mb-6 backdrop-blur-md shadow-inner">
+                        {/* Header Section */}
+                        <div className="flex items-center justify-between mb-4 pb-3 border-b border-blue-700/50">
+                          <h4 className="flex items-center gap-2 text-indigo-100 font-medium">
+                            <div className="bg-indigo-700/60 p-1.5 rounded-lg flex items-center justify-center">
+                              <Tag size={16} className="text-indigo-200" />
+                            </div>
+                            Round {selectedRound} Details
+                          </h4>
+                          <div className="text-xs text-indigo-300 font-medium">
+                            {
+                              getRoundStatusLabel(
+                                getRoundStatus(getSelectedRound()!)
+                              ).text
+                            }
+                          </div>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          {/* Token Price */}
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-3 hover:bg-blue-800/30 transition-all">
+                            <div className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-lg">
+                              <CircleDollarSign
+                                size={16}
+                                className="text-blue-200"
+                              />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                Token Price
+                              </div>
+                              <div className="font-medium text-white">
+                                ${(roundPrice ?? 0).toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Available Tokens */}
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-3 hover:bg-blue-800/30 transition-all">
+                            <div className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-lg">
+                              <Coins size={16} className="text-blue-200" />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                Available
+                              </div>
+                              <div className="font-medium text-white">
+                                {(
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  )!.tokenAmount -
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  )!.soldAmount
+                                ).toFixed(2)}{" "}
+                                <span className="text-xs text-blue-300">
+                                  QSE
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Start Time */}
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-3 hover:bg-blue-800/30 transition-all">
+                            <div className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-lg">
+                              <Clock size={16} className="text-blue-200" />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                Start Time
+                              </div>
+                              <div className="font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                                {new Date(
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  )!.startTime * 1000
+                                ).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* End Time */}
+                          <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-3 hover:bg-blue-800/30 transition-all">
+                            <div className="bg-gradient-to-br from-blue-800 to-indigo-900 p-2 rounded-lg">
+                              <Calendar size={16} className="text-blue-200" />
+                            </div>
+                            <div>
+                              <div className="text-gray-300 text-xs">
+                                End Time
+                              </div>
+                              <div className="font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                                {new Date(
+                                  rounds.find(
+                                    (r) => r.roundId === selectedRound
+                                  )!.endTime * 1000
+                                ).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
+
+                  {/* Payment method selection */}
+                  <div className="group">
+                    <label className="block text-sm font-semibold mb-2 text-blue-200 group-hover:text-blue-100 transition-colors">
+                      Payment Method
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {supportedPaymentMethods.map((method) => (
+                        <button
+                          key={method}
+                          type="button"
+                          className={`py-3 rounded-lg text-xs font-medium transition-all duration-300 hover:shadow-md ${
+                            selectedPaymentMethod === method
+                              ? "bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-lg shadow-indigo-600/30 border border-indigo-500/50"
+                              : "bg-blue-900/50 text-gray-300 hover:bg-indigo-800/60 border border-blue-800/50 hover:text-white"
+                          }`}
+                          onClick={() => setSelectedPaymentMethod(method)}
+                        >
+                          {method}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Amount inputs */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="group">
+                      <label className="block text-sm font-semibold mb-2 text-blue-200 group-hover:text-blue-100 transition-colors">
+                        {selectedPaymentMethod} Amount
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          step="0.000001"
+                          min="0.000001"
+                          value={paymentAmount}
+                          onChange={(e) =>
+                            handleInputChange("payment", e.target.value)
+                          }
+                          className="w-full bg-blue-900/70 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300"
+                          placeholder="0.00"
+                        />
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium">
+                          {selectedPaymentMethod}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="group">
+                      <label className="block text-sm font-semibold mb-2 text-blue-200 group-hover:text-blue-100 transition-colors">
+                        QSE Token Amount{" "}
+                        <span className="text-xs text-indigo-300">
+                          (min. {MINIMUM_QSE_AMOUNT} QSE)
+                        </span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min={MINIMUM_QSE_AMOUNT}
+                          value={qseAmount}
+                          onChange={(e) =>
+                            handleInputChange("qse", e.target.value)
+                          }
+                          className="w-full bg-blue-900/70 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300"
+                          placeholder="0"
+                        />
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium">
+                          QSE
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Error messages */}
+                  {(errorMessage || networkError) && (
+                    <div
+                      className={`p-4 rounded-xl text-sm flex items-start gap-3 shadow-inner ${
+                        errorMessage.includes("success")
+                          ? "bg-green-900/40 text-green-200 border border-green-500/30"
+                          : "bg-red-900/40 text-red-200 border border-red-500/30"
+                      }`}
+                    >
+                      {errorMessage.includes("success") ? (
+                        <CheckCircle
+                          size={18}
+                          className="text-green-400 mt-0.5"
+                        />
+                      ) : (
+                        <AlertCircle
+                          size={18}
+                          className="text-red-400 mt-0.5"
+                        />
+                      )}
+                      <span>{errorMessage || networkError}</span>
+                    </div>
+                  )}
+
+                  {/* Action button */}
+                  {isConnected ? (
+                    <button
+                      disabled={isSubmitting || isApproving || isLoadingRounds}
+                      onClick={executePurchase}
+                      className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+                    >
+                      {isApproving
+                        ? "Approving..."
+                        : isSubmitting
+                          ? "Purchasing..."
+                          : isLoadingRounds
+                            ? "Loading Rounds..."
+                            : "Buy QSE Tokens"}
+                    </button>
+                  ) : (
+                    <button
+                      disabled={isConnecting}
+                      onClick={connectWallet}
+                      className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
+                    >
+                      {isConnecting ? (
+                        <>
+                          <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2" />
+                          Connecting...
+                        </>
+                      ) : (
+                        <>
+                          Connect Wallet
+                          <Wallet size={18} />
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
-                {selectedRound && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
-                      <div className="bg-blue-800/60 p-1.5 rounded-lg">
-                        <Coins size={14} className="text-blue-200" />
-                      </div>
-                      <div>
-                        <div className="text-gray-300 text-xs">Available</div>
-                        <div className="font-medium text-white">
-                          {(
-                            getSelectedRound()!.tokenAmount -
-                            getSelectedRound()!.soldAmount
-                          ).toFixed(2)}{" "}
-                          <span className="text-xs text-blue-300">QSE</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
-                      <div className="bg-blue-800/60 p-1.5 rounded-lg">
-                        <Clock size={14} className="text-blue-200" />
-                      </div>
-                      <div>
-                        <div className="text-gray-300 text-xs">Start Time</div>
-                        <div className="font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
-                          {new Date(
-                            getSelectedRound()!.startTime * 1000
-                          ).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
-                      <div className="bg-blue-800/60 p-1.5 rounded-lg">
-                        <Calendar size={14} className="text-blue-200" />
-                      </div>
-                      <div>
-                        <div className="text-gray-300 text-xs">End Time</div>
-                        <div className="font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
-                          {new Date(
-                            getSelectedRound()!.endTime * 1000
-                          ).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-blue-900/30 rounded-lg p-3 flex items-center gap-2">
-                      <div className="bg-blue-800/60 p-1.5 rounded-lg">
-                        <Tag size={14} className="text-blue-200" />
-                      </div>
-                      <div>
-                        <div className="text-gray-300 text-xs">Token Price</div>
-                        <div className="font-medium text-white">
-                          ${(roundPrice ?? 0).toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-blue-200">
-                    Payment Method
-                  </label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {supportedPaymentMethods.map((method) => (
+              </div>
+
+              {/* Right sidebar with quick buy options */}
+              <div className="hidden lg:block w-2/5">
+                <div className="bg-gradient-to-br from-indigo-900/30 to-blue-900/30 border border-indigo-600/30 rounded-xl p-6 backdrop-blur-sm shadow-lg">
+                  <h3 className="text-xl font-semibold mb-4 text-indigo-100 flex items-center gap-2">
+                    <Zap size={18} className="text-indigo-400" />
+                    Quick Buy
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-6">
+                    Select a preset amount to populate the main fields.
+                  </p>
+                  <div className="space-y-3">
+                    {QUICK_BUY_OPTIONS.map((amount) => (
                       <button
-                        key={method}
+                        key={amount}
                         type="button"
-                        className={`py-2.5 rounded-lg text-xs font-medium transition-all duration-300 ${
-                          selectedPaymentMethod === method
-                            ? "bg-gradient-to-r from-blue-900 to-indigo-600 text-white shadow-md shadow-indigo-500/30"
-                            : "bg-blue-800/60 text-gray-300 hover:bg-indigo-700/70 border border-blue-700/30 hover:text-white"
+                        onClick={() => handleQuickBuySelect(amount)}
+                        className={`w-full flex justify-between items-center p-4 rounded-xl border transition-all duration-300 ${
+                          quickBuyAmount === amount
+                            ? "bg-gradient-to-r from-indigo-700/70 to-blue-700/70 border-indigo-500 text-white shadow-md transform scale-105"
+                            : "bg-blue-900/40 border-indigo-700/40 text-gray-300 hover:bg-indigo-800/60 hover:border-indigo-600/50"
                         }`}
-                        onClick={() => setSelectedPaymentMethod(method)}
                       >
-                        {method}
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-2 h-2 rounded-full ${quickBuyAmount === amount ? "bg-blue-300" : "bg-blue-700"}`}
+                          />
+                          <span className="font-medium">{amount} QSE</span>
+                        </div>
+                        <span className="text-sm">
+                          ={" "}
+                          {selectedRound &&
+                            calculatePaymentFromQSE(
+                              amount,
+                              selectedPaymentMethod,
+                              rounds.find((r) => r.roundId === selectedRound)
+                                ?.tokenPrice || 0
+                            )}{" "}
+                          {selectedPaymentMethod}
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-200">
-                      {selectedPaymentMethod} Amount
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        step="0.000001"
-                        min="0.000001"
-                        value={paymentAmount}
-                        onChange={(e) =>
-                          handleInputChange("payment", e.target.value)
-                        }
-                        className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300"
-                        placeholder="0.00"
-                      />
-                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium">
-                        {selectedPaymentMethod}
-                      </div>
+
+                {/* Security notice */}
+                <div className="mt-6 p-4 rounded-xl bg-blue-900/20 border border-blue-800/30">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-1.5 bg-blue-900/60 rounded-lg">
+                      <ShieldCheck size={16} className="text-blue-300" />
                     </div>
+                    <p className="text-sm text-blue-200 font-medium">
+                      Secure Transaction
+                    </p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-200">
-                      QSE Token Amount{" "}
-                      <span className="text-xs text-indigo-300">
-                        (min. {MINIMUM_QSE_AMOUNT} QSE)
-                      </span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        min={MINIMUM_QSE_AMOUNT}
-                        value={qseAmount}
-                        onChange={(e) =>
-                          handleInputChange("qse", e.target.value)
-                        }
-                        className="w-full bg-blue-900/60 border border-blue-700/50 rounded-xl py-3 px-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-400 transition-all duration-300"
-                        placeholder="0"
-                      />
-                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium">
-                        QSE
-                      </div>
-                    </div>
+                  <p className="text-xs text-indigo-300 ml-8">
+                    All purchases are securely processed and protected.
+                  </p>
+                  <div className="flex items-center gap-2 mt-3 ml-8">
+                    <div className="h-px flex-grow bg-blue-800/50" />
+                    <p className="text-xs text-indigo-300">
+                      QSE price: ${(roundPrice ?? 0).toFixed(2)} per token
+                    </p>
+                    <div className="h-px flex-grow bg-blue-800/50" />
                   </div>
                 </div>
-                {(errorMessage || networkError) && (
-                  <div
-                    className={`p-3 rounded-xl text-sm flex items-start gap-3 ${
-                      errorMessage.includes("success")
-                        ? "bg-green-900/40 text-green-200 border border-green-500/30"
-                        : "bg-red-900/40 text-red-200 border border-red-500/30"
-                    }`}
-                  >
-                    {errorMessage.includes("success") ? (
-                      <CheckCircle
-                        size={16}
-                        className="text-green-400 mt-0.5"
-                      />
-                    ) : (
-                      <AlertCircle size={16} className="text-red-400 mt-0.5" />
-                    )}
-                    <span>{errorMessage || networkError}</span>
-                  </div>
-                )}
-                {isConnected ? (
-                  <button
-                    disabled={isSubmitting || isApproving || isLoadingRounds}
-                    onClick={executePurchase}
-                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isApproving
-                      ? "Approving..."
-                      : isSubmitting
-                        ? "Purchasing..."
-                        : isLoadingRounds
-                          ? "Loading Rounds..."
-                          : "Buy QSE Tokens"}
-                  </button>
-                ) : (
-                  <button
-                    disabled={isConnecting}
-                    onClick={connectWallet}
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2"
-                  >
-                    {isConnecting ? "Connecting..." : "Connect Wallet"}
-                    <Wallet size={18} />
-                  </button>
-                )}
               </div>
             </div>
-            <div className="hidden lg:block w-2/5 border-l border-indigo-700/40 pl-6">
-              <div className="bg-blue-800/30 border border-indigo-600/20 rounded-xl p-5 backdrop-blur-sm shadow-lg">
-                <h3 className="text-xl font-semibold mb-4 text-indigo-100">
-                  Quick Buy
-                </h3>
-                <p className="text-gray-300 text-sm mb-6">
-                  Select a preset amount to populate the main fields.
-                </p>
-                <div className="space-y-4">
-                  {QUICK_BUY_OPTIONS.map((amount) => (
-                    <button
-                      key={amount}
-                      type="button"
-                      onClick={() => handleQuickBuySelect(amount)}
-                      className={`w-full flex justify-between items-center p-4 rounded-xl border transition-all duration-300 ${
-                        quickBuyAmount === amount
-                          ? "bg-indigo-700/70 border-indigo-500 text-white shadow-md"
-                          : "bg-blue-900/40 border-indigo-700/40 text-gray-300 hover:bg-indigo-800/60"
-                      }`}
-                    >
-                      <span className="font-medium">{amount} QSE</span>
-                      <span className="text-sm">
-                        ={" "}
-                        {selectedRound &&
-                          calculatePaymentFromQSE(
-                            amount,
-                            selectedPaymentMethod,
-                            rounds.find((r) => r.roundId === selectedRound)
-                              ?.tokenPrice || 0
-                          )}{" "}
-                        {selectedPaymentMethod}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-6 text-center">
-                <p className="text-xs text-indigo-300">Secure transactions.</p>
-                <p className="text-xs text-indigo-300 mt-1">
-                  QSE price: ${(roundPrice ?? 0).toFixed(2)} per token
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        <AdminPanelModal
-          isOpen={isAdminPanelOpen}
-          onClose={() => setIsAdminPanelOpen(false)}
-          refreshRounds={fetchRounds}
-        />
+          )}
+
+          {/* Admin panel modal */}
+          <AdminPanelModal
+            isOpen={isAdminPanelOpen}
+            onClose={() => setIsAdminPanelOpen(false)}
+            refreshRounds={fetchRounds}
+          />
+        </div>
       </div>
     </div>
   );
