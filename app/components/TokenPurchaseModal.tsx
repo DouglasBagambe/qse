@@ -337,7 +337,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
             <div className="p-4 sm:p-6 md:p-8 relative z-10">
               {/* Admin button - moved from close button area */}
               {isConnected && isOwner && (
-                <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+                <div className="absolute top-3 sm:top-4 right-14 sm:right-16">
                   <button
                     onClick={() => setIsAdminPanelOpen(true)}
                     className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700 rounded-lg p-1.5 sm:p-2 transition-all duration-300 hover:scale-105 flex items-center gap-1 sm:gap-2"
@@ -349,14 +349,16 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       Admin Panel
                     </span>
                   </button>
-                  <button
-                    onClick={onClose}
-                    className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700/80 rounded-lg p-2 transition-all duration-300 hover:scale-105 backdrop-blur-sm ml-auto"
-                  >
-                    <X size={20} />
-                  </button>
                 </div>
               )}
+              <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+                <button
+                  onClick={onClose}
+                  className="text-gray-300 hover:text-white bg-blue-800/40 hover:bg-blue-700/80 rounded-lg p-2 transition-all duration-300 hover:scale-105 backdrop-blur-sm ml-2"
+                >
+                  <X size={20} />
+                </button>
+              </div>
 
               {/* Header with animated gradient */}
               <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 mt-4 sm:mt-0">
