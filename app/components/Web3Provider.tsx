@@ -162,6 +162,19 @@ interface Web3ContextType {
   getUserRounds: (user: string) => Promise<number[]>;
   pause: () => Promise<{ success: boolean; message: string }>;
   unpause: () => Promise<{ success: boolean; message: string }>;
+  approveTokens: (
+    spender: string,
+    amount: string
+  ) => Promise<{ success: boolean; message: string }>;
+  transferTokens: (
+    to: string,
+    amount: string
+  ) => Promise<{ success: boolean; message: string }>;
+  getTokenBalance: (address: string) => Promise<string>;
+  transferOwnership: (
+    newOwner: string
+  ) => Promise<{ success: boolean; message: string }>;
+  getRound: (roundId: number) => Promise<Round | null>;
 }
 
 const Web3Context = createContext<Web3ContextType>({} as Web3ContextType);
@@ -1239,6 +1252,106 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // New Token Management Functions
+  const approveTokens = async (
+    spender: string,
+    amount: string
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!signer || !qseToken || !account) {
+      return { success: false, message: "Wallet not connected" };
+    }
+    try {
+      const amountWei = ethers.parseUnits(amount, 18);
+      const tx = await qseToken.approve(spender, amountWei, {
+        gasLimit: 100000,
+      });
+      await tx.wait();
+      return {
+        success: true,
+        message: `Approved ${amount} tokens for ${spender}`,
+      };
+    } catch (error: any) {
+      const message = error.message.includes("insufficient")
+        ? "Insufficient token balance"
+        : `Failed to approve tokens: ${error.message}`;
+      return { success: false, message };
+    }
+  };
+
+  const transferTokens = async (
+    to: string,
+    amount: string
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!signer || !qseToken || !account) {
+      return { success: false, message: "Wallet not connected" };
+    }
+    try {
+      const amountWei = ethers.parseUnits(amount, 18);
+      const tx = await qseToken.transfer(to, amountWei, {
+        gasLimit: 100000,
+      });
+      await tx.wait();
+      return {
+        success: true,
+        message: `Transferred ${amount} tokens to ${to}`,
+      };
+    } catch (error: any) {
+      const message = error.message.includes("insufficient")
+        ? "Insufficient token balance"
+        : `Failed to transfer tokens: ${error.message}`;
+      return { success: false, message };
+    }
+  };
+
+  const getTokenBalance = async (address: string): Promise<string> => {
+    if (!qseToken) return "0";
+    try {
+      const balance = await qseToken.balanceOf(address);
+      return ethers.formatUnits(balance, 18);
+    } catch (error) {
+      console.error("Failed to get token balance:", error);
+      return "0";
+    }
+  };
+
+  const transferOwnership = async (
+    newOwner: string
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!signer || !qsePresale || !account) {
+      return { success: false, message: "Wallet not connected" };
+    }
+    try {
+      const tx = await qsePresale.transferOwnership(newOwner, {
+        gasLimit: 100000,
+      });
+      await tx.wait();
+      return { success: true, message: `Ownership transferred to ${newOwner}` };
+    } catch (error: any) {
+      const message = error.message.includes("NotOwner")
+        ? "Only contract owner can transfer ownership"
+        : `Failed to transfer ownership: ${error.message}`;
+      return { success: false, message };
+    }
+  };
+
+  const getRound = async (roundId: number): Promise<Round | null> => {
+    if (!qsePresale) return null;
+    try {
+      const round = await qsePresale.getRound(roundId);
+      return {
+        roundId: Number(round.roundId),
+        tokenPrice: Number(ethers.formatUnits(round.tokenPrice, 6)),
+        tokenAmount: Number(ethers.formatUnits(round.tokenAmount, 18)),
+        startTime: Number(round.startTime),
+        endTime: Number(round.endTime),
+        soldAmount: Number(ethers.formatUnits(round.soldAmount, 18)),
+      };
+    } catch (error) {
+      console.error("Failed to get round:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (!window.ethereum) {
       setNetworkError("MetaMask not detected");
@@ -1339,6 +1452,11 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     getUserRounds,
     pause,
     unpause,
+    approveTokens,
+    transferTokens,
+    getTokenBalance,
+    transferOwnership,
+    getRound,
   };
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;
