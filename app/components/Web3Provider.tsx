@@ -549,34 +549,64 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     if (!qsePresale) return [];
     const rounds: Round[] = [];
     try {
-      for (let i = 1; i <= 100; i++) {
+      // Use any available provider - either the signer's provider or our own provider
+      const currentProvider = signer?.provider || provider;
+      if (!currentProvider) return [];
+
+      // Create a read-only contract instance
+      const presaleContract = new ethers.Contract(
+        CONTRACTS.QSE_PRESALE,
+        QSEPrivateSaleArtifact.abi, // Use the full ABI instead of minimal interface
+        currentProvider
+      );
+
+      // Fetch round count or use a fixed number for testing
+      let maxRounds = 2;
+      try {
+        // If the contract has a roundCount method, use it
+        maxRounds = (await presaleContract.roundCount?.()) || 10;
+      } catch (countError) {
+        // Fallback to checking rounds one by one
+      }
+
+      for (let i = 1; i <= maxRounds; i++) {
         try {
-          const round = await qsePresale.getRound(i);
-          if (Number(round.startTime) === 0) break;
-          rounds.push({
-            roundId: Number(round.roundId),
-            tokenPrice: Number(ethers.formatUnits(round.tokenPrice, 6)),
-            tokenAmount: Number(ethers.formatUnits(round.tokenAmount, 18)),
-            startTime: Number(round.startTime),
-            endTime: Number(round.endTime),
-            soldAmount: Number(ethers.formatUnits(round.soldAmount, 18)),
-          });
-        } catch (error) {
+          const round = await presaleContract.getRound(i);
+
+          // Ensure we're getting a valid round with actual data
+          if (round && Number(round.tokenAmount) > 0) {
+            rounds.push({
+              roundId: Number(round.roundId),
+              tokenPrice: Number(round.tokenPrice),
+              tokenAmount: Number(round.tokenAmount),
+              startTime: Number(round.startTime),
+              endTime: Number(round.endTime),
+              soldAmount: Number(round.soldAmount),
+            });
+          }
+        } catch (roundError) {
+          console.log(`No more rounds found after ${i - 1} rounds`);
           break;
         }
       }
-      const activeRound = await getCurrentActiveRound(rounds);
-      setCurrentRound(activeRound);
-      if (activeRound) {
-        setTokenPrice(Number(ethers.formatUnits(activeRound.tokenPrice, 6)));
-      }
-      return rounds;
-    } catch (error) {
-      setNetworkError(`Failed to fetch rounds: ${(error as Error).message}`);
-      return [];
-    }
-  };
 
+      // Format the values after all rounds are fetched
+      rounds.forEach((round) => {
+        round.tokenPrice = round.tokenPrice / 1e6;
+        round.tokenAmount = round.tokenAmount / 1e18;
+        round.soldAmount = round.soldAmount / 1e18;
+      });
+
+      if (rounds.length > 0) {
+        const activeRound = await getCurrentActiveRound(rounds);
+        setCurrentRound(activeRound);
+        if (activeRound) setTokenPrice(activeRound.tokenPrice);
+      }
+    } catch (error: any) {
+      console.error("Error fetching rounds:", error);
+    }
+    return rounds;
+  };
   const getTokensAvailable = async (roundId: number): Promise<string> => {
     if (!qsePresale) return "0";
     try {
