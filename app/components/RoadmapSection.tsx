@@ -12,7 +12,7 @@ const RoadmapSection = () => {
       tasks: [
         { text: "Infrastructure Setup", completed: true },
         { text: "Smart Contract Basics", completed: true },
-        { text: "Small Pilot Launch", completed: true },
+        { text: "Small Pilot Launch", completed: false },
         { text: "Stakeholder Onboarding", completed: false },
       ],
     },
