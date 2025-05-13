@@ -549,43 +549,44 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     if (!qsePresale) return [];
     const rounds: Round[] = [];
     try {
-      // Use any available provider - either the signer's provider or our own provider
       const currentProvider = signer?.provider || provider;
       if (!currentProvider) return [];
 
-      // Create a read-only contract instance
       const presaleContract = new ethers.Contract(
         CONTRACTS.QSE_PRESALE,
-        QSEPrivateSaleArtifact.abi, // Use the full ABI instead of minimal interface
+        QSEPrivateSaleArtifact.abi,
         currentProvider
       );
 
-      // Fetch round count or use a fixed number for testing
-      let maxRounds = 2;
-      try {
-        // If the contract has a roundCount method, use it
-        maxRounds = (await presaleContract.roundCount?.()) || 10;
-      } catch (countError) {
-        // Fallback to checking rounds one by one
-      }
-
-      for (let i = 1; i <= maxRounds; i++) {
+      // Start from round 1 and continue until we find an invalid round
+      let roundId = 1;
+      while (true) {
         try {
-          const round = await presaleContract.getRound(i);
+          const round = await presaleContract.getRound(roundId);
 
-          // Ensure we're getting a valid round with actual data
-          if (round && Number(round.tokenAmount) > 0) {
-            rounds.push({
-              roundId: Number(round.roundId),
-              tokenPrice: Number(round.tokenPrice),
-              tokenAmount: Number(round.tokenAmount),
-              startTime: Number(round.startTime),
-              endTime: Number(round.endTime),
-              soldAmount: Number(round.soldAmount),
-            });
+          // If we get an empty round or invalid data, break
+          if (
+            !round ||
+            !round.tokenPrice ||
+            !round.tokenAmount ||
+            round.tokenAmount.toString() === "0"
+          ) {
+            break;
           }
+
+          rounds.push({
+            roundId: Number(round.roundId),
+            tokenPrice: Number(round.tokenPrice),
+            tokenAmount: Number(round.tokenAmount),
+            startTime: Number(round.startTime),
+            endTime: Number(round.endTime),
+            soldAmount: Number(round.soldAmount),
+          });
+
+          roundId++;
         } catch (roundError) {
-          console.log(`No more rounds found after ${i - 1} rounds`);
+          // If we get an error, it means this round doesn't exist, so we can stop
+          console.log(`No more rounds found after round ${roundId - 1}`);
           break;
         }
       }
@@ -607,6 +608,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     }
     return rounds;
   };
+
   const getTokensAvailable = async (roundId: number): Promise<string> => {
     if (!qsePresale) return "0";
     try {
