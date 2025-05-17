@@ -121,14 +121,7 @@ const Home = () => {
               </button>
             </div>
           </div>
-
-          {/* Updated stats bar with bg-blue-700 */}
-          {/* <StatsBar
-            tokenPrice=" "
-            raisedAmount=" "
-            targetAmount=" "
-            presaleEndDate={presaleEndDate}
-          /> */}
+          {/* <StatsBar /> */}
         </div>{" "}
       </section>
 
