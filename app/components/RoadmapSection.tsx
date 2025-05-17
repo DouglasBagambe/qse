@@ -5,7 +5,7 @@ const RoadmapSection = () => {
   const roadmapItems = [
     {
       phase: "Phase 1",
-      date: "Q1 2025",
+      // date: "Q1 2025",
       title: "Foundation and Pilot",
       description:
         "We establish the foundational infrastructure and launch our initial pilot program.",
@@ -18,7 +18,7 @@ const RoadmapSection = () => {
     },
     {
       phase: "Phase 2",
-      date: "Q2 2025",
+      // date: "Q2 2025",
       title: "Careful Expansion",
       description:
         "Expand our pilot program and begin implementing key features for growth.",
@@ -31,7 +31,7 @@ const RoadmapSection = () => {
     },
     {
       phase: "Phase 3",
-      date: "Q3 2025",
+      // date: "Q3 2025",
       title: "Deeper Security and Optimization",
       description:
         "Enhance platform security and optimize with advanced technologies.",
@@ -44,7 +44,7 @@ const RoadmapSection = () => {
     },
     {
       phase: "Phase 4",
-      date: "Q4 2025",
+      // date: "Q4 2025",
       title: "Wider Adoption",
       description:
         "Scale deployment and improve user experience for broader market adoption.",
@@ -88,7 +88,7 @@ const RoadmapSection = () => {
                           ${index % 2 === 0 ? "md:mr-auto" : "md:ml-auto"}`}
                 >
                   <div className="bg-blue-800/40 rounded-lg px-3 py-1 text-xs text-blue-200 inline-block mb-2">
-                    {item.phase} • {item.date}
+                    {item.phase} • {/* {item.date} */}
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">
                     {item.title}
