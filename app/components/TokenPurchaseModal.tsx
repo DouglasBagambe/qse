@@ -519,8 +519,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                                   <div className="py-1 sm:py-2">
                                     {rounds.map((round) => {
                                       const status = getRoundStatus(round);
-                                      const statusLabel =
-                                        getRoundStatusLabel(status);
+                                      const statusLabel: {
+                                        color: string;
+                                        text: string;
+                                      } = getRoundStatusLabel(status);
                                       return (
                                         <div
                                           key={round.roundId}
@@ -582,12 +584,20 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                                 </div>
                                 Round {selectedRound} Details
                               </h4>
-                              <div className="text-xs text-indigo-300 font-medium">
-                                {
-                                  getRoundStatusLabel(
-                                    getRoundStatus(getSelectedRound()!)
-                                  ).text
-                                }
+                              <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-0.5">
+                                <span
+                                  className={`text-xs px-1.5 sm:px-2 py-0.5 rounded-full ${
+                                    getRoundStatusLabel(
+                                      getRoundStatus(getSelectedRound()!)
+                                    ).color
+                                  }`}
+                                >
+                                  {
+                                    getRoundStatusLabel(
+                                      getRoundStatus(getSelectedRound()!)
+                                    ).text
+                                  }
+                                </span>
                               </div>
                             </div>
 
