@@ -75,23 +75,7 @@ const Header = () => {
     if (!isClient) return;
 
     const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
-    const newWindow = window.open("", "_blank");
-    if (newWindow) {
-      newWindow.document.write(`
-      <html>
-        <head>
-          <title>QSE Token Whitepaper</title>
-          <style>
-            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-            iframe { width: 100%; height: 100%; border: none; }
-          </style>
-        </head>
-        <body>
-          <iframe src="${pdfPath}" type="application/pdf" width="100%" height="100%"></iframe>
-        </body>
-      </html>
-      `);
-    }
+    window.open(pdfPath, "_blank");
   };
 
   const handleTokenTheoryPDFView = () => {
