@@ -17,6 +17,7 @@ const Header = () => {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname(); // Get current path for active link highlighting
   const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Set isClient to true once component mounts on client
   useEffect(() => {
@@ -71,11 +72,31 @@ const Header = () => {
     setShowPurchaseModal(true);
   };
 
-  const handlePDFView = () => {
+  const handlePDFView = async () => {
     if (!isClient) return;
 
+    setIsLoading(true);
     const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
-    window.open(pdfPath, "_blank");
+
+    try {
+      // Check if PDF exists and is accessible
+      const response = await fetch(pdfPath, { method: "HEAD" });
+      if (response.ok) {
+        window.open(pdfPath, "_blank");
+      } else {
+        console.error("PDF file not accessible");
+        alert(
+          "Sorry, the PDF is temporarily unavailable. Please try again later."
+        );
+      }
+    } catch (error) {
+      console.error("Error accessing PDF:", error);
+      alert(
+        "Sorry, there was an error accessing the PDF. Please try again later."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTokenTheoryPDFView = () => {
@@ -520,6 +541,16 @@ const Header = () => {
         )}
       </header>
       <div className="pt-20 md:pt-24"></div>
+
+      {/* Add this near the mobile menu links mapping */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
+          <div className="bg-white p-4 rounded-lg shadow-lg flex items-center space-x-3">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <p className="text-gray-700">Loading PDF...</p>
+          </div>
+        </div>
+      )}
     </>
   );
 };
