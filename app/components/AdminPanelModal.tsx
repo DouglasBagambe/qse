@@ -183,7 +183,7 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       return;
     }
     const roundIdNum = parseInt(roundId);
-    const price = parseInt(tokenPrice);
+    const price = Math.round(parseFloat(tokenPrice) * 100) / 100;
     const amount = parseInt(tokenAmount);
     const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
     const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
