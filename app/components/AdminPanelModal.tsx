@@ -719,9 +719,9 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 </div>
               )}
               {errorMessage && (
-                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-900/40 border border-red-500/30 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 animate-fadeIn">
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-900/40 border border-red-500/30 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 animate-fadeIn w-full max-w-full">
                   <AlertCircle size={16} className="text-red-400 mt-0.5" />
-                  <span className="text-red-200">{errorMessage}</span>
+                  <span className="text-red-200 break-all whitespace-pre-wrap">{errorMessage}</span>
                 </div>
               )}
 
