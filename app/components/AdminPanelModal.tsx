@@ -60,7 +60,7 @@ interface AdminPanelModalProps {
 const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   isOpen,
   onClose,
-  refreshRounds = async () => {}, // Provide default empty function
+  refreshRounds = async () => { }, // Provide default empty function
 }) => {
   const [activeTab, setActiveTab] = useState("rounds");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -158,18 +158,10 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   const checkPauseStatus = async () => {
     try {
-      // Since we don't have a direct way to check pause status,
-      // we'll try to call a function that would fail if paused
-      const round = await web3.getRound(1);
-      setIsPaused(false);
+      const isPausedStatus = await web3.getPauseStatus();
+      setIsPaused(isPausedStatus);
     } catch (error) {
-      const contractError = error as ContractError;
-      // If the error message contains "paused", we'll assume the contract is paused
-      if (contractError.message?.toLowerCase().includes("paused")) {
-        setIsPaused(true);
-      } else {
-        console.error("Failed to check pause status:", contractError);
-      }
+      console.error("Failed to check pause status:", error);
     }
   };
 
@@ -183,7 +175,7 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       return;
     }
     const roundIdNum = parseInt(roundId);
-    const price = Math.round(parseFloat(tokenPrice) * 100) / 100;
+    const price = Math.round(parseFloat(tokenPrice) * 100) / 100; 
     const amount = parseInt(tokenAmount);
     const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
     const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
@@ -708,11 +700,10 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm sm:text-base font-medium rounded-t-lg transition-all duration-300 ${
-                      activeTab === tab.id
+                    className={`flex items-center gap-2 px-4 py-2 text-sm sm:text-base font-medium rounded-t-lg transition-all duration-300 ${activeTab === tab.id
                         ? "bg-blue-700/60 text-blue-100 border-b-2 border-indigo-500"
                         : "text-gray-300 hover:text-white hover:bg-blue-800/40"
-                    }`}
+                      }`}
                   >
                     <tab.icon size={16} />
                     {tab.label}
@@ -785,6 +776,7 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                           <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium text-xs sm:text-sm">
                             USD
                           </div>
+   
                         </div>
                       </div>
                       <div className="group">
@@ -1327,11 +1319,10 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       <button
                         disabled={isSubmitting || isPaused}
                         onClick={handlePause}
-                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${
-                          isPaused
+                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${isPaused
                             ? "bg-gray-600"
                             : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 hover:shadow-red-500/30"
-                        }`}
+                          }`}
                       >
                         {isSubmitting ? (
                           <div className="flex items-center justify-center gap-2">
@@ -1348,11 +1339,10 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       <button
                         disabled={isSubmitting || !isPaused}
                         onClick={handleUnpause}
-                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${
-                          !isPaused
+                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${!isPaused
                             ? "bg-gray-600"
                             : "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:shadow-green-500/30"
-                        }`}
+                          }`}
                       >
                         {isSubmitting ? (
                           <div className="flex items-center justify-center gap-2">

@@ -98,9 +98,8 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   }, [account, contractOwner]);
 
   const fetchRounds = useCallback(async () => {
-    // Don't fetch if we're already loading or have rounds
-    if (isLoadingRounds || rounds.length > 0) return;
-
+    if (isLoadingRounds) return;
+    
     setIsLoadingRounds(true);
     try {
       const fetchedRounds = await getRounds();
@@ -125,9 +124,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     } finally {
       setIsLoadingRounds(false);
     }
-  }, [getRounds, isLoadingRounds, rounds.length]);
+  }, [getRounds]);
 
-  // Enhanced useEffect for contract owner loading with error handling
+  // Update the useEffect to handle connection changes properly
   useEffect(() => {
     if (isConnected && account) {
       loadQSEBalance();
@@ -146,6 +145,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       };
 
       fetchOwner();
+    } else {
+      setRounds([]);
+      setSelectedRound(null);
+      setContractOwner(null);
     }
     setErrorMessage("");
   }, [isConnected, account, loadQSEBalance, fetchRounds, getContractOwner]);
