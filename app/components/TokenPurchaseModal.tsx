@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useWeb3, PaymentMethod } from "./Web3Provider";
 import {
   ArrowRight,
@@ -59,24 +59,53 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const [txHash, setTxHash] = useState("");
   const [isAdminPanelOpen, setIsAdminPanelOpen] = useState(false);
   const [contractOwner, setContractOwner] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isOwnerInitialized, setIsOwnerInitialized] = useState(false);
+  const ownerInitializedRef = useRef(false);
+  const roundsInitializedRef = useRef(false);
 
   const {
+    account,
     isConnected,
     isConnecting,
-    account,
     networkError,
+    connectWallet,
+    getRounds,
+    getContractOwner,
+    loadQSEBalance,
     qseBalance,
     supportedPaymentMethods,
-    connectWallet,
     buyTokens,
-    getRounds,
     getTokenAmountFromPayment,
     getPaymentAmountForTokens,
     getPaymentRateForMethod,
-    loadQSEBalance,
-    getContractOwner,
     getTokensAvailable,
   } = useWeb3();
+
+  const refreshRounds = useCallback(async () => {
+    if (!isConnected || !account) return;
+    
+    setIsLoadingRounds(true);
+    try {
+      const fetchedRounds = await getRounds();
+      if (fetchedRounds && fetchedRounds.length > 0) {
+        setRounds(fetchedRounds);
+        const now = Math.floor(Date.now() / 1000);
+        const activeRound = fetchedRounds.find(
+          (r) => now >= r.startTime && now <= r.endTime
+        );
+        setSelectedRound(activeRound?.roundId ?? fetchedRounds[0].roundId);
+      } else {
+        setRounds([]);
+        setSelectedRound(null);
+      }
+    } catch (error) {
+      console.error("Error refreshing rounds:", error);
+      setErrorMessage("Failed to refresh rounds");
+    } finally {
+      setIsLoadingRounds(false);
+    }
+  }, [isConnected, account, getRounds]);
 
   // Improved isOwner check with proper null/undefined handling and debug logging
   const isOwner = useMemo(() => {
@@ -97,64 +126,181 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     return isMatch;
   }, [account, contractOwner]);
 
-  const fetchRounds = useCallback(async () => {
-    if (isLoadingRounds) return;
-    
-    setIsLoadingRounds(true);
-    try {
-      const fetchedRounds = await getRounds();
-      console.log("Fetched rounds:", fetchedRounds); // Debug log
-      if (fetchedRounds && fetchedRounds.length > 0) {
-        setRounds(fetchedRounds);
-        // Find active round or default to first round
-        const now = Math.floor(Date.now() / 1000);
-        const activeRound = fetchedRounds.find(
-          (r) => now >= r.startTime && now <= r.endTime
-        );
-        setSelectedRound(activeRound?.roundId ?? fetchedRounds[0].roundId);
-      } else {
+  // Handle wallet connection state changes and initialization
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeData = async () => {
+      if (!isConnected || !account) {
+        // Reset state when disconnected
         setRounds([]);
         setSelectedRound(null);
+        setContractOwner(null);
+        setIsInitialized(false);
+        setIsOwnerInitialized(false);
+        setIsLoadingRounds(false);
+        // Note: qseBalance is managed by Web3Provider, no need to reset here
+        ownerInitializedRef.current = false;
+        roundsInitializedRef.current = false;
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching rounds:", error);
-      setErrorMessage("Failed to load rounds");
-      setRounds([]);
-      setSelectedRound(null);
-    } finally {
-      setIsLoadingRounds(false);
-    }
-  }, [getRounds]);
 
-  // Update the useEffect to handle connection changes properly
-  useEffect(() => {
-    if (isConnected && account) {
-      loadQSEBalance();
-      fetchRounds();
-
-      // Improved owner address fetching
-      const fetchOwner = async () => {
+      // Initialize contract owner if needed
+      if (!ownerInitializedRef.current) {
+        console.log("Fetching contract owner...");
         try {
+          // Add a small delay to ensure contract is initialized
+          await new Promise(resolve => setTimeout(resolve, 1000));
           const owner = await getContractOwner();
           console.log("Contract owner fetched:", owner);
-          setContractOwner(owner ? owner.toLowerCase() : null);
+          if (mounted) {
+            const ownerAddress = owner ? owner.toLowerCase() : null;
+            console.log("Setting contract owner to:", ownerAddress);
+            setContractOwner(ownerAddress);
+            setIsOwnerInitialized(true);
+            ownerInitializedRef.current = true;
+          }
         } catch (error) {
           console.error("Failed to get contract owner:", error);
-          setContractOwner(null);
+          if (mounted) {
+            setContractOwner(null);
+            setIsOwnerInitialized(true);
+            ownerInitializedRef.current = true;
+          }
         }
-      };
+      }
 
-      fetchOwner();
-    } else {
-      setRounds([]);
-      setSelectedRound(null);
-      setContractOwner(null);
+      // Initialize rounds and balance immediately when connected
+      if (!roundsInitializedRef.current) {
+        setIsLoadingRounds(true);
+        try {
+          // Load balance first
+          await loadQSEBalance();
+          console.log("Initial QSE balance loaded:", qseBalance);
+          
+          const fetchedRounds = await getRounds();
+          if (mounted) {
+            if (fetchedRounds && fetchedRounds.length > 0) {
+              setRounds(fetchedRounds);
+              const now = Math.floor(Date.now() / 1000);
+              const activeRound = fetchedRounds.find(
+                (r) => now >= r.startTime && now <= r.endTime
+              );
+              setSelectedRound(activeRound?.roundId ?? fetchedRounds[0].roundId);
+            } else {
+              setRounds([]);
+              setSelectedRound(null);
+            }
+            setIsInitialized(true);
+            roundsInitializedRef.current = true;
+          }
+        } catch (error) {
+          console.error("Error fetching rounds:", error);
+          if (mounted) {
+            setErrorMessage("Failed to load rounds");
+            setRounds([]);
+            setSelectedRound(null);
+          }
+        } finally {
+          if (mounted) {
+            setIsLoadingRounds(false);
+          }
+        }
+      }
+    };
+
+    // Call initializeData immediately
+    initializeData();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isConnected, account, getContractOwner, getRounds, loadQSEBalance, qseBalance]);
+
+  // Add a separate effect to handle balance updates
+  useEffect(() => {
+    if (!isConnected || !account) return;
+
+    const updateBalance = async () => {
+      try {
+        await loadQSEBalance();
+        console.log("Updated QSE balance:", qseBalance);
+      } catch (error) {
+        console.error("Error updating balance:", error);
+      }
+    };
+
+    // Update balance immediately on connection
+    updateBalance();
+
+    // Set up interval for balance updates
+    const balanceIntervalId = setInterval(updateBalance, 30000); // Update balance every 30 seconds
+
+    return () => {
+      clearInterval(balanceIntervalId);
+    };
+  }, [isConnected, account, loadQSEBalance, qseBalance]);
+
+  // Add a separate effect to handle round updates
+  useEffect(() => {
+    if (!isConnected || !account || !roundsInitializedRef.current) return;
+
+    // Initial fetch
+    const fetchRounds = async () => {
+      try {
+        const fetchedRounds = await getRounds();
+        if (fetchedRounds && fetchedRounds.length > 0) {
+          setRounds(fetchedRounds);
+          const now = Math.floor(Date.now() / 1000);
+          const activeRound = fetchedRounds.find(
+            (r) => now >= r.startTime && now <= r.endTime
+          );
+          // Only update selectedRound if it's not already set or if the current selection is invalid
+          if (!selectedRound || !fetchedRounds.find(r => r.roundId === selectedRound)) {
+            setSelectedRound(activeRound?.roundId ?? fetchedRounds[0].roundId);
+          }
+        }
+      } catch (error) {
+        console.error("Error updating rounds:", error);
+      }
+    };
+
+    // Fetch immediately
+    fetchRounds();
+
+    // Then set up interval for updates
+    const intervalId = setInterval(fetchRounds, 30000); // Update rounds every 30 seconds
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isConnected, account, getRounds, selectedRound]);
+
+  // Add effect to handle round selection changes
+  useEffect(() => {
+    if (selectedRound) {
+      console.log("Selected round changed to:", selectedRound);
+      // Update token amount when round changes
+      if (qseAmount) {
+        handleInputChange("qse", qseAmount);
+      }
     }
-    setErrorMessage("");
-  }, [isConnected, account, loadQSEBalance, fetchRounds, getContractOwner]);
+  }, [selectedRound, qseAmount]);
 
-  const getSelectedRound = () =>
-    rounds.find((r) => r.roundId === selectedRound);
+  const handleRoundChange = (roundId: number) => {
+    console.log("Handling round change to:", roundId);
+    setSelectedRound(roundId);
+    // Reset token amount when changing rounds
+    setQseAmount("");
+    setPaymentAmount("");
+  };
+
+  const getSelectedRound = () => {
+    if (!selectedRound) return null;
+    const round = rounds.find((r) => r.roundId === selectedRound);
+    console.log("Getting selected round:", { selectedRound, foundRound: round });
+    return round;
+  };
 
   const getRoundStatus = (round: Round) => {
     const now = Math.floor(Date.now() / 1000);
@@ -233,14 +379,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       );
       setPaymentAmount(payment.toFixed(6));
     }
-  };
-
-  const handleRoundSelect = (roundId: number) => {
-    setSelectedRound(roundId);
-    setIsRoundDropdownOpen(false);
-    setQseAmount("");
-    setPaymentAmount("");
-    setQuickBuyAmount(null);
   };
 
   const validatePurchase = async (): Promise<boolean> => {
@@ -539,7 +677,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                                               : ""
                                           }`}
                                           onClick={() =>
-                                            handleRoundSelect(round.roundId)
+                                            handleRoundChange(round.roundId)
                                           }
                                         >
                                           <div className="flex items-center justify-between">
@@ -972,7 +1110,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
               <AdminPanelModal
                 isOpen={isAdminPanelOpen}
                 onClose={() => setIsAdminPanelOpen(false)}
-                refreshRounds={fetchRounds}
+                refreshRounds={refreshRounds}
               />
             </div>
           </div>
