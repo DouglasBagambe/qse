@@ -20,16 +20,13 @@ import QSEArtifact from "../../contracts/QSE.json";
 import QSEPrivateSaleArtifact from "../../contracts/QSEPrivatesale.json";
 
 const config = createConfig({
-  chains: [arbitrumSepolia, sepolia, mainnet],
+  chains: [sepolia, mainnet],
   transports: {
-    [arbitrumSepolia.id]: http(
-      "https://arbitrum-sepolia.infura.io/v3/201fb4feef8441f5ace3a42c8b4501df"
-    ),
     [sepolia.id]: http(
-      "https://sepolia.infura.io/v3/201fb4feef8441f5ace3a42c8b4501df"
+      `https://sepolia.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`
     ),
     [mainnet.id]: http(
-      "https://mainnet.infura.io/v3/201fb4feef8441f5ace3a42c8b4501df"
+      `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`
     ),
   },
   connectors: [injected()],
@@ -175,6 +172,7 @@ interface Web3ContextType {
     newOwner: string
   ) => Promise<{ success: boolean; message: string }>;
   getRound: (roundId: number) => Promise<Round | null>;
+  getPauseStatus: () => Promise<boolean>;
 }
 
 const Web3Context = createContext<Web3ContextType>({} as Web3ContextType);
@@ -571,22 +569,10 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         currentProvider
       );
 
-      // Start from round 1 and continue until we find an invalid round
-      let roundId = 1;
-      while (true) {
-        try {
-          const round = await presaleContract.getRound(roundId);
-
-          // If we get an empty round or invalid data, break
-          if (
-            !round ||
-            !round.tokenPrice ||
-            !round.tokenAmount ||
-            round.tokenAmount.toString() === "0"
-          ) {
-            break;
-          }
-
+      // Try to get round 1 first to check if any rounds exist
+      try {
+        const round = await presaleContract.getRound(1);
+        if (round && round.tokenPrice && round.tokenPrice.toString() !== "0") {
           rounds.push({
             roundId: Number(round.roundId),
             tokenPrice: Number(round.tokenPrice),
@@ -596,12 +582,34 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
             soldAmount: Number(round.soldAmount),
           });
 
-          roundId++;
-        } catch (roundError) {
-          // If we get an error, it means this round doesn't exist, so we can stop
-          console.log(`No more rounds found after round ${roundId - 1}`);
-          break;
+          // If round 1 exists, check for more rounds
+          let roundId = 2;
+          while (true) {
+            try {
+              const nextRound = await presaleContract.getRound(roundId);
+              if (!nextRound || !nextRound.tokenPrice || nextRound.tokenPrice.toString() === "0") {
+                break;
+              }
+
+              rounds.push({
+                roundId: Number(nextRound.roundId),
+                tokenPrice: Number(nextRound.tokenPrice),
+                tokenAmount: Number(nextRound.tokenAmount),
+                startTime: Number(nextRound.startTime),
+                endTime: Number(nextRound.endTime),
+                soldAmount: Number(nextRound.soldAmount),
+              });
+
+              roundId++;
+            } catch (roundError) {
+              // Break the loop if we get an error (round doesn't exist)
+              break;
+            }
+          }
         }
+      } catch (error) {
+        // No rounds exist yet, this is a normal state when the contract is fresh
+        console.log("No rounds have been created yet");
       }
 
       // Format the values after all rounds are fetched
@@ -615,6 +623,9 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         const activeRound = await getCurrentActiveRound(rounds);
         setCurrentRound(activeRound);
         if (activeRound) setTokenPrice(activeRound.tokenPrice);
+      } else {
+        setCurrentRound(null);
+        setTokenPrice(0);
       }
     } catch (error: any) {
       console.error("Error fetching rounds:", error);
@@ -1318,6 +1329,16 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const getPauseStatus = async (): Promise<boolean> => {
+    if (!qsePresale) return false;
+    try {
+      return await qsePresale.paused();
+    } catch (error) {
+      console.error("Failed to get pause status:", error);
+      return false;
+    }
+  };
+
   const transferOwnership = async (
     newOwner: string
   ): Promise<{ success: boolean; message: string }> => {
@@ -1342,6 +1363,11 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     if (!qsePresale) return null;
     try {
       const round = await qsePresale.getRound(roundId);
+
+      if (!round || !round.tokenPrice || round.tokenPrice.toString() === "0") {
+        return null;
+      }
+      
       return {
         roundId: Number(round.roundId),
         tokenPrice: Number(ethers.formatUnits(round.tokenPrice, 6)),
@@ -1381,18 +1407,26 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     };
     checkAccounts();
 
-    window.ethereum?.on("accountsChanged", (accounts: string[]) => {
-      setAccount(accounts[0] || null);
-      setIsConnected(!!accounts.length);
-      if (accounts.length) {
-        connectWallet();
-      } else {
+    window.ethereum?.on("accountsChanged", async (accounts: string[]) => {
+      if (accounts.length === 0) {
+        // Disconnected
+        setAccount(null);
+        setIsConnected(false);
         setQseToken(null);
         setQsePresale(null);
         setQseBalance("0");
         setFundsRaised("0");
         setCurrentRound(null);
         setTokenPrice(0);
+        setSigner(null);
+        setProvider(null);
+      } else {
+        // New account connected
+        const signer = await ethProvider.getSigner();
+        setAccount(accounts[0]);
+        setIsConnected(true);
+        setSigner(signer);
+        await initializeContracts(signer);
       }
     });
 
@@ -1461,6 +1495,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     getTokenBalance,
     transferOwnership,
     getRound,
+    getPauseStatus,
   };
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;

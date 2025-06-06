@@ -98,9 +98,8 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   }, [account, contractOwner]);
 
   const fetchRounds = useCallback(async () => {
-    // Don't fetch if we're already loading or have rounds
-    if (isLoadingRounds || rounds.length > 0) return;
-
+    if (isLoadingRounds) return;
+    
     setIsLoadingRounds(true);
     try {
       const fetchedRounds = await getRounds();
@@ -125,9 +124,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     } finally {
       setIsLoadingRounds(false);
     }
-  }, [getRounds, isLoadingRounds, rounds.length]);
+  }, [getRounds]);
 
-  // Enhanced useEffect for contract owner loading with error handling
+  // Update the useEffect to handle connection changes properly
   useEffect(() => {
     if (isConnected && account) {
       loadQSEBalance();
@@ -146,6 +145,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       };
 
       fetchOwner();
+    } else {
+      setRounds([]);
+      setSelectedRound(null);
+      setContractOwner(null);
     }
     setErrorMessage("");
   }, [isConnected, account, loadQSEBalance, fetchRounds, getContractOwner]);
@@ -830,7 +833,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       {/* Error messages */}
                       {(errorMessage || networkError) && (
                         <div
-                          className={`p-3 sm:p-4 rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 shadow-inner ${
+                          className={`w-full max-w-full overflow-x-auto max-h-40 overflow-y-auto p-3 sm:p-4 rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 shadow-inner mb-4 ${
                             errorMessage.includes("success")
                               ? "bg-green-900/40 text-green-200 border border-green-500/30"
                               : "bg-red-900/40 text-red-200 border border-red-500/30"
@@ -840,10 +843,12 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                             <CheckCircle
                               size={16}
                               className="text-green-400 mt-0.5 flex-shrink-0"
+                              className="text-green-400 mt-0.5 flex-shrink-0"
                             />
                           ) : (
                             <AlertCircle
                               size={16}
+                              className="text-red-400 mt-0.5 flex-shrink-0"
                               className="text-red-400 mt-0.5 flex-shrink-0"
                             />
                           )}
