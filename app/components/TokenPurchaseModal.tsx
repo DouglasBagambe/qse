@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // app/components/TokenPurchaseModal.tsx
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -99,7 +100,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
 
   const fetchRounds = useCallback(async () => {
     if (isLoadingRounds) return;
-    
+
     setIsLoadingRounds(true);
     try {
       const fetchedRounds = await getRounds();
@@ -843,12 +844,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                             <CheckCircle
                               size={16}
                               className="text-green-400 mt-0.5 flex-shrink-0"
-                              className="text-green-400 mt-0.5 flex-shrink-0"
                             />
                           ) : (
                             <AlertCircle
                               size={16}
-                              className="text-red-400 mt-0.5 flex-shrink-0"
                               className="text-red-400 mt-0.5 flex-shrink-0"
                             />
                           )}
@@ -928,14 +927,11 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                             </div>
                             <span className="text-sm">
                               ={" "}
-                              {selectedRound &&
-                                calculatePaymentFromQSE(
-                                  amount,
-                                  selectedPaymentMethod,
-                                  rounds.find(
-                                    (r) => r.roundId === selectedRound
-                                  )?.tokenPrice || 0
-                                )}{" "}
+                              {calculatePaymentFromQSE(
+                                amount,
+                                selectedPaymentMethod,
+                                roundPrice ?? 0
+                              )}{" "}
                               {selectedPaymentMethod}
                             </span>
                           </button>
