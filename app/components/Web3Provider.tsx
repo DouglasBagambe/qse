@@ -249,7 +249,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       );
       const presale = new ethers.Contract(
         CONTRACTS.QSE_PRESALE,
-        QSEPrivateSaleArtifact.abi,
+        QSEPrivateSaleArtifact,
         signer
       );
 
@@ -565,51 +565,34 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
 
       const presaleContract = new ethers.Contract(
         CONTRACTS.QSE_PRESALE,
-        QSEPrivateSaleArtifact.abi,
+        QSEPrivateSaleArtifact,
         currentProvider
       );
 
-      // Try to get round 1 first to check if any rounds exist
-      try {
-        const round = await presaleContract.getRound(1);
-        if (round && round.tokenPrice && round.tokenPrice.toString() !== "0") {
-          rounds.push({
-            roundId: Number(round.roundId),
-            tokenPrice: Number(round.tokenPrice),
-            tokenAmount: Number(round.tokenAmount),
-            startTime: Number(round.startTime),
-            endTime: Number(round.endTime),
-            soldAmount: Number(round.soldAmount),
-          });
+      // Get the current block number
+      const currentBlock = await currentProvider.getBlockNumber();
 
-          // If round 1 exists, check for more rounds
-          let roundId = 2;
-          while (true) {
-            try {
-              const nextRound = await presaleContract.getRound(roundId);
-              if (!nextRound || !nextRound.tokenPrice || nextRound.tokenPrice.toString() === "0") {
-                break;
-              }
-
-              rounds.push({
-                roundId: Number(nextRound.roundId),
-                tokenPrice: Number(nextRound.tokenPrice),
-                tokenAmount: Number(nextRound.tokenAmount),
-                startTime: Number(nextRound.startTime),
-                endTime: Number(nextRound.endTime),
-                soldAmount: Number(nextRound.soldAmount),
-              });
-
-              roundId++;
-            } catch (roundError) {
-              // Break the loop if we get an error (round doesn't exist)
-              break;
-            }
+      // Get all RoundCreated events from block 0 to current block
+      const roundCreatedFilter = presaleContract.filters.RoundCreated();
+      const events = await presaleContract.queryFilter(roundCreatedFilter, 0, currentBlock);
+      
+      // Process each event to get round details
+      for (const event of events) {
+        if ('args' in event) {
+          const roundId = Number(event.args[0]);
+          const round = await presaleContract.getRound(roundId);
+          
+          if (round && round.tokenPrice && round.tokenPrice.toString() !== "0") {
+            rounds.push({
+              roundId: Number(round.roundId),
+              tokenPrice: Number(round.tokenPrice),
+              tokenAmount: Number(round.tokenAmount),
+              startTime: Number(round.startTime),
+              endTime: Number(round.endTime),
+              soldAmount: Number(round.soldAmount),
+            });
           }
         }
-      } catch (error) {
-        // No rounds exist yet, this is a normal state when the contract is fresh
-        console.log("No rounds have been created yet");
       }
 
       // Format the values after all rounds are fetched
@@ -619,6 +602,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         round.soldAmount = round.soldAmount / 1e18;
       });
 
+      // Only update state if we have rounds
       if (rounds.length > 0) {
         const activeRound = await getCurrentActiveRound(rounds);
         setCurrentRound(activeRound);
@@ -627,10 +611,12 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         setCurrentRound(null);
         setTokenPrice(0);
       }
+
+      return rounds;
     } catch (error: any) {
       console.error("Error fetching rounds:", error);
+      return [];
     }
-    return rounds;
   };
 
   const getTokensAvailable = async (roundId: number): Promise<string> => {
