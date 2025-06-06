@@ -829,7 +829,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                       {/* Error messages */}
                       {(errorMessage || networkError) && (
                         <div
-                          className={`p-3 sm:p-4 rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 shadow-inner ${
+                          className={`w-full max-w-full overflow-x-auto max-h-40 overflow-y-auto p-3 sm:p-4 rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 shadow-inner mb-4 ${
                             errorMessage.includes("success")
                               ? "bg-green-900/40 text-green-200 border border-green-500/30"
                               : "bg-red-900/40 text-red-200 border border-red-500/30"
@@ -838,15 +838,17 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           {errorMessage.includes("success") ? (
                             <CheckCircle
                               size={16}
-                              className="text-green-400 mt-0.5"
+                              className="text-green-400 mt-0.5 flex-shrink-0"
                             />
                           ) : (
                             <AlertCircle
                               size={16}
-                              className="text-red-400 mt-0.5"
+                              className="text-red-400 mt-0.5 flex-shrink-0"
                             />
                           )}
-                          <span>{errorMessage || networkError}</span>
+                          <div className="flex-1 min-w-0">
+                            <span className="break-all whitespace-pre-wrap block">{errorMessage || networkError}</span>
+                          </div>
                         </div>
                       )}
 
