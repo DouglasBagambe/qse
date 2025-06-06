@@ -739,12 +739,16 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error: any) {
       const message =
         error.code === "ACTION_REJECTED"
-          ? "Transaction rejected by user"
+          ? "Transaction was cancelled"
           : error.message.includes("insufficient funds")
-            ? "Insufficient funds for transaction"
+            ? "Not enough funds to complete the transaction"
             : error.message.includes("paused")
-              ? "Contract is paused"
-              : `Purchase failed: ${error.message}`;
+              ? "Token sale is currently paused"
+              : error.message.includes("execution reverted")
+                ? "Transaction failed - please try again"
+                : error.message.includes("user rejected")
+                  ? "Transaction was rejected"
+                  : "Unable to complete the transaction - please try again";
       return { success: false, message };
     }
   };

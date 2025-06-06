@@ -242,25 +242,25 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
 
   const validatePurchase = async (): Promise<boolean> => {
     if (!isConnected) {
-      setErrorMessage("Please connect wallet");
+      setErrorMessage("Please connect your wallet to continue");
       return false;
     }
     if (!selectedRound) {
-      setErrorMessage("No rounds available");
+      setErrorMessage("Please select a round to purchase tokens");
       return false;
     }
     const round = rounds.find((r) => r.roundId === selectedRound);
     if (!round) {
-      setErrorMessage("Selected round not found");
+      setErrorMessage("Selected round is no longer available");
       return false;
     }
     const now = Math.floor(Date.now() / 1000);
     if (now < round.startTime) {
-      setErrorMessage("Sale not started");
+      setErrorMessage("This round hasn't started yet");
       return false;
     }
     if (now > round.endTime) {
-      setErrorMessage("Sale ended");
+      setErrorMessage("This round has ended");
       return false;
     }
     if (
@@ -268,16 +268,20 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       isNaN(parseFloat(qseAmount)) ||
       parseFloat(qseAmount) <= 0
     ) {
-      setErrorMessage("Enter valid QSE amount");
+      setErrorMessage("Please enter a valid amount of QSE tokens");
       return false;
     }
     if (parseFloat(qseAmount) < MINIMUM_QSE_AMOUNT) {
-      setErrorMessage(`Minimum ${MINIMUM_QSE_AMOUNT} QSE required`);
+      setErrorMessage(
+        `Minimum purchase amount is ${MINIMUM_QSE_AMOUNT} QSE tokens`
+      );
       return false;
     }
     const tokensAvailable = parseFloat(await getTokensAvailable(selectedRound));
     if (parseFloat(qseAmount) > tokensAvailable) {
-      setErrorMessage(`Only ${tokensAvailable.toFixed(2)} QSE available`);
+      setErrorMessage(
+        `Only ${tokensAvailable.toFixed(2)} QSE tokens are available in this round`
+      );
       return false;
     }
     return true;
@@ -296,17 +300,17 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
         selectedRound
       );
       if (result.success) {
-        setSuccessMessage(result.message);
+        setSuccessMessage(`Successfully purchased ${qseAmount} QSE tokens`);
         setTxHash(result.message.match(/: (0x[a-fA-F0-9]{64})/)?.[1] || "");
         setPaymentAmount("");
         setQseAmount("");
         setQuickBuyAmount(null);
         await loadQSEBalance();
       } else {
-        setErrorMessage(result.message || "Purchase failed");
+        setErrorMessage(result.message);
       }
     } catch (error) {
-      setErrorMessage("Transaction failed. Please try again.");
+      setErrorMessage("Unable to complete the transaction - please try again");
     } finally {
       setIsSubmitting(false);
       setIsApproving(false);
@@ -835,15 +839,17 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                           {errorMessage.includes("success") ? (
                             <CheckCircle
                               size={16}
-                              className="text-green-400 mt-0.5"
+                              className="text-green-400 mt-0.5 flex-shrink-0"
                             />
                           ) : (
                             <AlertCircle
                               size={16}
-                              className="text-red-400 mt-0.5"
+                              className="text-red-400 mt-0.5 flex-shrink-0"
                             />
                           )}
-                          <span>{errorMessage || networkError}</span>
+                          <span className="break-words overflow-hidden">
+                            {errorMessage || networkError}
+                          </span>
                         </div>
                       )}
 
