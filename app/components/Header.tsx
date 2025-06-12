@@ -78,6 +78,13 @@ const Header = () => {
     window.open(pdfPath, "_blank");
   };
 
+  const handleAuditView = () => {
+    if (!isClient) return;
+
+    const pdfPath = `${window.location.origin}/assets/audit/SmartContract_Audit_Solidproof_QuantumSec.ai_5.pdf`;
+    window.open(pdfPath, "_blank");
+  };
+
   const handleTokenTheoryPDFView = () => {
     if (!isClient) return;
 
@@ -143,25 +150,17 @@ const Header = () => {
       label: "Token Theory",
       isTokenTheory: true,
     },
-    // {
-    //   id: "ecosystem",
-    //   href: "#ecosystem",
-    //   label: "Ecosystem",
-    //   isSection: true,
-    //   sectionId: "ecosystem",
-    // },
-    // {
-    //   id: "roadmap",
-    //   href: "#roadmap",
-    //   label: "RoadMap",
-    //   isRoadmap: true,
-    //   sectionId: "roadmap",
-    // },
     {
       id: "purchase-guide",
       href: "/purchase-guide",
       label: "Purchase Guide",
       isPurchaseGuide: true,
+    },
+    {
+      id: "audit",
+      href: "#",
+      label: "Audit",
+      isAudit: true,
     },
   ];
 
@@ -187,6 +186,11 @@ const Header = () => {
 
     // For the tokenomics page
     if (link.isTokenomics && pathname === "/tokenomics") {
+      return true;
+    }
+
+    // For the audit link
+    if (link.isAudit && pathname === "/" && window.location.hash === "#audit") {
       return true;
     }
 
@@ -260,6 +264,8 @@ const Header = () => {
                         window.location.href = "/";
                       } else if (link.isWhitepaper) {
                         handlePDFView();
+                      } else if (link.isAudit) {
+                        handleAuditView();
                       } else if (link.isTokenTheory) {
                         window.location.href = "/token-theory";
                       } else if (link.isTokenomics) {
@@ -456,6 +462,8 @@ const Header = () => {
                         window.location.href = "/";
                       } else if (link.isWhitepaper) {
                         handlePDFView();
+                      } else if (link.isAudit) {
+                        handleAuditView();
                       } else if (link.isTokenTheory) {
                         window.location.href = "/token-theory";
                       } else if (link.isTokenomics) {
