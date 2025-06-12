@@ -384,7 +384,7 @@ const Footer = () => {
                 className="text-white border border-blue-700 rounded-full px-6 py-2 w-full hover:bg-blue-700 hover:text-white transition-colors duration-300 flex items-center justify-center"
               >
                 <Download className="w-4 h-4 mr-2" />
-                Download Audit Report
+                Download The Audit Report
               </button>
             </div>
           </div>
