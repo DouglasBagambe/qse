@@ -25,7 +25,7 @@ import {
   Import,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 const PurchaseGuidePage = () => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -148,12 +148,12 @@ const PurchaseGuidePage = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } },
   };
 
-  const contentVariants = {
+  const contentVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
@@ -166,7 +166,7 @@ const PurchaseGuidePage = () => {
     },
   };
 
-  const sidebarVariants = {
+  const sidebarVariants: Variants = {
     hidden: { x: "-100%", opacity: 0 },
     visible: {
       x: 0,
@@ -187,7 +187,7 @@ const PurchaseGuidePage = () => {
     },
   };
 
-  const overlayVariants = {
+  const overlayVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.3 } },
     exit: { opacity: 0, transition: { duration: 0.3 } },
