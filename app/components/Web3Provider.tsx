@@ -42,13 +42,13 @@ const CONTRACTS = {
   STABLECOINS: {
     USDT:
       process.env.NEXT_PUBLIC_USDT_ADDRESS ||
-      "0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0",
+      "0x4F5D783857e4e137452d38580E1d53C61b6c7a4d",
     USDC:
       process.env.NEXT_PUBLIC_USDC_ADDRESS ||
-      "0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8",
+      "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
     DAI:
       process.env.NEXT_PUBLIC_DAI_ADDRESS ||
-      "0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357",
+      "0xff34b3d4aee8ddcd6f9afffb6fe49bd371b8a357",
   },
 };
 
@@ -574,15 +574,23 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
 
       // Get all RoundCreated events from block 0 to current block
       const roundCreatedFilter = presaleContract.filters.RoundCreated();
-      const events = await presaleContract.queryFilter(roundCreatedFilter, 0, currentBlock);
-      
+      const events = await presaleContract.queryFilter(
+        roundCreatedFilter,
+        0,
+        currentBlock
+      );
+
       // Process each event to get round details
       for (const event of events) {
-        if ('args' in event) {
+        if ("args" in event) {
           const roundId = Number(event.args[0]);
           const round = await presaleContract.getRound(roundId);
-          
-          if (round && round.tokenPrice && round.tokenPrice.toString() !== "0") {
+
+          if (
+            round &&
+            round.tokenPrice &&
+            round.tokenPrice.toString() !== "0"
+          ) {
             rounds.push({
               roundId: Number(round.roundId),
               tokenPrice: Number(round.tokenPrice),
@@ -1353,7 +1361,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       if (!round || !round.tokenPrice || round.tokenPrice.toString() === "0") {
         return null;
       }
-      
+
       return {
         roundId: Number(round.roundId),
         tokenPrice: Number(ethers.formatUnits(round.tokenPrice, 6)),
