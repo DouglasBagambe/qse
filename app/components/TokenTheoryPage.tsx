@@ -184,7 +184,13 @@ const TokenTheoryPage = () => {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
   };
 
   const contentVariants = {
@@ -194,7 +200,7 @@ const TokenTheoryPage = () => {
       y: 0,
       transition: {
         duration: 0.7,
-        ease: "easeOut",
+        ease: [0.4, 0, 0.2, 1],
         staggerChildren: 0.1,
       },
     },
@@ -215,7 +221,7 @@ const TokenTheoryPage = () => {
       x: "-100%",
       opacity: 0,
       transition: {
-        ease: "easeInOut",
+        ease: [0.4, 0, 0.2, 1],
         duration: 0.3,
       },
     },
@@ -223,8 +229,20 @@ const TokenTheoryPage = () => {
 
   const overlayVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1],
+      },
+    },
   };
 
   if (isLoading) {
