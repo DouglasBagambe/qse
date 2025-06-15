@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// PurchaseGuidePage.tsx
+// PurchaseGuidePage.tsx .
 
 "use client";
 import React, { useState, useEffect, useRef } from "react";
