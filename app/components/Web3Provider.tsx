@@ -207,7 +207,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
   const fetchEthPrice = async (): Promise<void> => {
     try {
       const now = Date.now();
-      // Only fetch if it's been more than 5 minutes since last update
       if (now - lastEthPriceUpdate < 5 * 60 * 1000) {
         return;
       }
@@ -222,10 +221,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         setLastEthPriceUpdate(now);
       }
     } catch (error) {
-      console.warn(
-        "Failed to fetch ETH price, using previous value:",
-        ethPrice
-      );
       // Keep using the previous ethPrice value
     }
   };
@@ -659,7 +654,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
 
       return rounds;
     } catch (error: any) {
-      console.error("Error fetching rounds:", error);
       return [];
     }
   };
@@ -1356,7 +1350,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       const balance = await qseToken.balanceOf(address);
       return ethers.formatUnits(balance, 18);
     } catch (error) {
-      console.error("Failed to get token balance:", error);
       return "0";
     }
   };
@@ -1366,7 +1359,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     try {
       return await qsePresale.paused();
     } catch (error) {
-      console.error("Failed to get pause status:", error);
       return false;
     }
   };
@@ -1409,7 +1401,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         soldAmount: Number(ethers.formatUnits(round.soldAmount, 18)),
       };
     } catch (error) {
-      console.error("Failed to get round:", error);
       return null;
     }
   };
@@ -1506,7 +1497,6 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       if (!qsePresale) return undefined;
       try {
         const owner = await qsePresale.getOwner();
-        console.log("Contract Owner Address:", owner);
         return owner;
       } catch (error) {
         setNetworkError(`Failed to fetch owner: ${(error as Error).message}`);

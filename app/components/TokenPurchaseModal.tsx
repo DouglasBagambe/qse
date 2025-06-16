@@ -122,14 +122,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
       account.toLowerCase() === contractOwner.toLowerCase()
     );
 
-    console.log({
-      debug_isOwner: isMatch,
-      account: account?.toLowerCase(),
-      contractOwner: contractOwner,
-      accountExists: !!account,
-      contractOwnerExists: !!contractOwner,
-    });
-
     return isMatch;
   }, [account, contractOwner]);
 
@@ -154,15 +146,12 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
 
       // Initialize contract owner if needed
       if (!ownerInitializedRef.current) {
-        console.log("Fetching contract owner...");
         try {
           // Add a small delay to ensure contract is initialized
           await new Promise((resolve) => setTimeout(resolve, 1000));
           const owner = await getContractOwner();
-          console.log("Contract owner fetched:", owner);
           if (mounted) {
             const ownerAddress = owner ? owner.toLowerCase() : null;
-            console.log("Setting contract owner to:", ownerAddress);
             setContractOwner(ownerAddress);
             setIsOwnerInitialized(true);
             ownerInitializedRef.current = true;
@@ -183,7 +172,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
         try {
           // Load balance first
           await loadQSEBalance();
-          console.log("Initial QSE balance loaded:", qseBalance);
 
           const fetchedRounds = await getRounds();
           if (mounted) {
@@ -240,7 +228,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     const updateBalance = async () => {
       try {
         await loadQSEBalance();
-        console.log("Updated QSE balance:", qseBalance);
       } catch (error) {
         console.error("Error updating balance:", error);
       }
@@ -298,7 +285,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   // Add effect to handle round selection changes
   useEffect(() => {
     if (selectedRound) {
-      console.log("Selected round changed to:", selectedRound);
       // Update token amount when round changes
       if (qseAmount) {
         handleInputChange("qse", qseAmount);
@@ -307,7 +293,6 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   }, [selectedRound, qseAmount]);
 
   const handleRoundChange = (roundId: number) => {
-    console.log("Handling round change to:", roundId);
     setSelectedRound(roundId);
     // Reset token amount when changing rounds
     setQseAmount("");
@@ -317,10 +302,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const getSelectedRound = () => {
     if (!selectedRound) return null;
     const round = rounds.find((r) => r.roundId === selectedRound);
-    console.log("Getting selected round:", {
-      selectedRound,
-      foundRound: round,
-    });
+    
     return round;
   };
 
