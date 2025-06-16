@@ -70,6 +70,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const [isOwnerInitialized, setIsOwnerInitialized] = useState(false);
   const ownerInitializedRef = useRef(false);
   const roundsInitializedRef = useRef(false);
+  const [quickBuyDisplayAmounts, setQuickBuyDisplayAmounts] = useState<
+    Record<number, string>
+  >({});
 
   const {
     account,
@@ -302,7 +305,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const getSelectedRound = () => {
     if (!selectedRound) return null;
     const round = rounds.find((r) => r.roundId === selectedRound);
-    
+
     return round;
   };
 
@@ -326,17 +329,65 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     }
   };
 
-  const calculatePaymentFromQSE = (
-    qseValue: number,
-    method: PaymentMethod,
-    roundPrice: number
-  ): string => {
-    const usdValue = qseValue * roundPrice;
-    const paymentRate = getPaymentRateForMethod(method);
-    return paymentRate > 0
-      ? (usdValue / paymentRate).toFixed(method === "ETH" ? 6 : 6)
-      : "0";
-  };
+  const calculatePaymentFromQSE = useCallback(
+    (qseValue: number, method: PaymentMethod, roundPrice: number): string => {
+      const usdValue = qseValue * roundPrice;
+      const paymentRate = getPaymentRateForMethod(method);
+      return paymentRate > 0
+        ? (usdValue / paymentRate).toFixed(method === "ETH" ? 6 : 6)
+        : "0";
+    },
+    [getPaymentRateForMethod]
+  );
+
+  // NEW useEffect for calculating display amounts for Quick Buy options
+  useEffect(() => {
+    const calculateQuickBuyDisplayAmounts = async () => {
+      if (!selectedRound || !getPaymentAmountForTokens) {
+        setQuickBuyDisplayAmounts({});
+        return;
+      }
+
+      const newDisplayAmounts: Record<number, string> = {};
+      const currentRoundData = rounds.find((r) => r.roundId === selectedRound);
+      if (!currentRoundData) {
+        setQuickBuyDisplayAmounts({});
+        return;
+      }
+
+      for (const amount of QUICK_BUY_OPTIONS) {
+        if (selectedPaymentMethod === "ETH") {
+          try {
+            const payment = await getPaymentAmountForTokens(
+              amount.toString(),
+              "ETH",
+              selectedRound
+            );
+            newDisplayAmounts[amount] = payment.toFixed(6); // Format as needed for display
+          } catch (error) {
+            // Silently fail or log a warning for display calculation errors
+            newDisplayAmounts[amount] = "N/A"; // Fallback for error
+          }
+        } else {
+          // For stablecoins, use the existing frontend calculation
+          newDisplayAmounts[amount] = calculatePaymentFromQSE(
+            amount,
+            selectedPaymentMethod,
+            currentRoundData.tokenPrice
+          );
+        }
+      }
+      setQuickBuyDisplayAmounts(newDisplayAmounts);
+    };
+
+    calculateQuickBuyDisplayAmounts();
+  }, [
+    selectedRound,
+    selectedPaymentMethod,
+    rounds,
+    getPaymentAmountForTokens, // Dependency from useWeb3
+    calculatePaymentFromQSE, // Dependency from current component
+  ]);
 
   const handleInputChange = async (type: "payment" | "qse", value: string) => {
     const cleanValue = value.replace(/^0+(?=\d)/, "").replace(/[^\d.]/g, "");
@@ -955,15 +1006,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                                   {amount} QSE
                                 </span>
                                 <span className="text-xs mt-1">
-                                  ={" "}
-                                  {selectedRound &&
-                                    calculatePaymentFromQSE(
-                                      amount,
-                                      selectedPaymentMethod,
-                                      rounds.find(
-                                        (r) => r.roundId === selectedRound
-                                      )?.tokenPrice || 0
-                                    )}{" "}
+                                  = {quickBuyDisplayAmounts[amount] || "..."}{" "}
                                   {selectedPaymentMethod}
                                 </span>
                               </button>
@@ -1067,12 +1110,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                               <span className="font-medium">{amount} QSE</span>
                             </div>
                             <span className="text-sm">
-                              ={" "}
-                              {calculatePaymentFromQSE(
-                                amount,
-                                selectedPaymentMethod,
-                                roundPrice ?? 0
-                              )}{" "}
+                              = {quickBuyDisplayAmounts[amount] || "..."}{" "}
                               {selectedPaymentMethod}
                             </span>
                           </button>
