@@ -317,10 +317,15 @@ const QSEEcosystem = () => {
                 <h3 className="text-2xl font-bold text-gray-800">Roadmap</h3>
               </div>
               <p className="text-gray-600 mb-8 text-lg">
-                Our 2025 roadmap outlines a methodical approach: Q1 foundation
-                building and pilot launch, Q2 careful expansion, Q3 security
-                enhancements with AI and quantum testing, and Q4 wider adoption
-                with full-scale deployment.
+                Our 2025 roadmap outlines a methodical approach:
+                <br />
+                Phase 1: Foundation building and pilot launch;
+                <br />
+                Phase 2: Careful expansion;
+                <br />
+                Phase 3: Security enhancements with AI and quantum testing; and
+                <br />
+                Phase 4: Wider adoption with full-scale deployment.
               </p>
               <div className="flex justify-start">
                 <button

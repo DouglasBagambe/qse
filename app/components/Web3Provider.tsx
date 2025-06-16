@@ -249,7 +249,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       );
       const presale = new ethers.Contract(
         CONTRACTS.QSE_PRESALE,
-        QSEPrivateSaleArtifact,
+        QSEPrivateSaleArtifact.abi,
         signer
       );
 
@@ -565,7 +565,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
 
       const presaleContract = new ethers.Contract(
         CONTRACTS.QSE_PRESALE,
-        QSEPrivateSaleArtifact,
+        QSEPrivateSaleArtifact.abi,
         currentProvider
       );
 

@@ -188,7 +188,7 @@ const TokenTheoryPage = () => {
       opacity: 1,
       transition: {
         duration: 0.8,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut" as const,
       },
     },
   };
@@ -200,7 +200,7 @@ const TokenTheoryPage = () => {
       y: 0,
       transition: {
         duration: 0.7,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeOut" as const,
         staggerChildren: 0.1,
       },
     },
@@ -212,7 +212,7 @@ const TokenTheoryPage = () => {
       x: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 30,
       },
@@ -221,7 +221,7 @@ const TokenTheoryPage = () => {
       x: "-100%",
       opacity: 0,
       transition: {
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut" as const,
         duration: 0.3,
       },
     },
@@ -233,14 +233,14 @@ const TokenTheoryPage = () => {
       opacity: 1,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut" as const,
       },
     },
     exit: {
       opacity: 0,
       transition: {
         duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
+        ease: "easeInOut" as const,
       },
     },
   };

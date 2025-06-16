@@ -17,7 +17,7 @@ import {
   Menu,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 const TokenomicsPage = () => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -106,31 +106,37 @@ const TokenomicsPage = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeInOut" as const,
+      },
+    },
   };
 
-  const contentVariants = {
+  const contentVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.7,
-        ease: "easeOut",
+        ease: "easeOut" as const,
         staggerChildren: 0.1,
       },
     },
   };
 
-  const sidebarVariants = {
+  const sidebarVariants: Variants = {
     hidden: { x: "-100%", opacity: 0 },
     visible: {
       x: 0,
       opacity: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 30,
       },
@@ -139,16 +145,28 @@ const TokenomicsPage = () => {
       x: "-100%",
       opacity: 0,
       transition: {
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
         duration: 0.3,
       },
     },
   };
 
-  const overlayVariants = {
+  const overlayVariants: Variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut" as const,
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut" as const,
+      },
+    },
   };
 
   if (isLoading) {
