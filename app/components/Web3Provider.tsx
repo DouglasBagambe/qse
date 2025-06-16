@@ -52,15 +52,14 @@ const CONTRACTS = {
   },
 };
 
-const PAYMENT_RATES: Record<
-  PaymentMethod,
-  { usdRate: number; symbol: string }
-> = {
-  ETH: { usdRate: 3000, symbol: "ETH" },
+const getPaymentRates = (
+  currentEthPrice: number
+): Record<PaymentMethod, { usdRate: number; symbol: string }> => ({
+  ETH: { usdRate: currentEthPrice, symbol: "ETH" },
   USDT: { usdRate: 1, symbol: "USDT" },
   USDC: { usdRate: 1, symbol: "USDC" },
   DAI: { usdRate: 1, symbol: "DAI" },
-};
+});
 
 export type PaymentMethod = "ETH" | "USDT" | "USDC" | "DAI";
 
@@ -88,6 +87,7 @@ interface Web3ContextType {
   currentRound: Round | null;
   qseBalance: string;
   fundsRaised: string;
+  ethPrice: number;
   supportedPaymentMethods: PaymentMethod[];
   connectWallet: () => Promise<boolean>;
   switchNetwork: (chainId: number) => Promise<boolean>;
@@ -193,6 +193,8 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
   const [qseBalance, setQseBalance] = useState("0");
   const [currentRound, setCurrentRound] = useState<Round | null>(null);
   const [fundsRaised, setFundsRaised] = useState("0");
+  const [ethPrice, setEthPrice] = useState(3000); // Default fallback
+  const [lastEthPriceUpdate, setLastEthPriceUpdate] = useState(0);
 
   const supportedPaymentMethods: PaymentMethod[] = [
     "ETH",
@@ -200,6 +202,32 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     "USDC",
     "DAI",
   ];
+
+  const fetchEthPrice = async (): Promise<void> => {
+    try {
+      const now = Date.now();
+      // Only fetch if it's been more than 5 minutes since last update
+      if (now - lastEthPriceUpdate < 5 * 60 * 1000) {
+        return;
+      }
+
+      const response = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+      );
+      const data = await response.json();
+
+      if (data.ethereum && data.ethereum.usd) {
+        setEthPrice(data.ethereum.usd);
+        setLastEthPriceUpdate(now);
+      }
+    } catch (error) {
+      console.warn(
+        "Failed to fetch ETH price, using previous value:",
+        ethPrice
+      );
+      // Keep using the previous ethPrice value
+    }
+  };
 
   // Define supported chain IDs as a more specific type
   const supportedChainIds = [
@@ -265,6 +293,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
 
       await loadQSEBalance();
       await loadFundsRaised();
+      await fetchEthPrice();
       setupEventListeners(presale);
     } catch (error) {
       setNetworkError(
@@ -288,6 +317,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
         await loadQSEBalance();
       }
       await loadFundsRaised();
+      await fetchEthPrice();
     });
 
     presale.on("RoundEnded", async () => {
@@ -304,10 +334,12 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
 
     presale.on("FundsRefunded", async () => {
       await loadFundsRaised();
+      await fetchEthPrice();
     });
 
     presale.on("FundsWithdrawn", async () => {
       await loadFundsRaised();
+      await fetchEthPrice();
     });
 
     presale.on("Paused", async () => {
@@ -737,6 +769,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       const receipt = await tx.wait();
       await loadQSEBalance();
       await loadFundsRaised();
+      await fetchEthPrice();
       return {
         success: true,
         message: `Purchased ${tokenAmount} QSE tokens: ${receipt.transactionHash}`,
@@ -1377,6 +1410,16 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
+    // Fetch ETH price on mount
+    fetchEthPrice();
+
+    // Set up interval to fetch ETH price every 5 minutes
+    const interval = setInterval(fetchEthPrice, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     if (!window.ethereum) {
       setNetworkError("MetaMask not detected");
       return;
@@ -1442,6 +1485,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     currentRound,
     qseBalance,
     fundsRaised,
+    ethPrice,
     supportedPaymentMethods,
     connectWallet,
     switchNetwork,
@@ -1451,7 +1495,8 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     loadQSEBalance,
     getTokenAmountFromPayment,
     getPaymentAmountForTokens,
-    getPaymentRateForMethod: (method) => PAYMENT_RATES[method].usdRate,
+    getPaymentRateForMethod: (method) =>
+      getPaymentRates(ethPrice)[method].usdRate,
     getContractOwner: async () => {
       if (!qsePresale) return undefined;
       try {

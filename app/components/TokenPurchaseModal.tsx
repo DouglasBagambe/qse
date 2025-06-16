@@ -4,7 +4,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useWeb3, PaymentMethod } from "./Web3Provider";
 import {
   ArrowRight,
@@ -85,7 +91,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
 
   const refreshRounds = useCallback(async () => {
     if (!isConnected || !account) return;
-    
+
     setIsLoadingRounds(true);
     try {
       const fetchedRounds = await getRounds();
@@ -151,7 +157,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
         console.log("Fetching contract owner...");
         try {
           // Add a small delay to ensure contract is initialized
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
           const owner = await getContractOwner();
           console.log("Contract owner fetched:", owner);
           if (mounted) {
@@ -178,7 +184,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
           // Load balance first
           await loadQSEBalance();
           console.log("Initial QSE balance loaded:", qseBalance);
-          
+
           const fetchedRounds = await getRounds();
           if (mounted) {
             if (fetchedRounds && fetchedRounds.length > 0) {
@@ -187,7 +193,9 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
               const activeRound = fetchedRounds.find(
                 (r) => now >= r.startTime && now <= r.endTime
               );
-              setSelectedRound(activeRound?.roundId ?? fetchedRounds[0].roundId);
+              setSelectedRound(
+                activeRound?.roundId ?? fetchedRounds[0].roundId
+              );
             } else {
               setRounds([]);
               setSelectedRound(null);
@@ -216,7 +224,14 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     return () => {
       mounted = false;
     };
-  }, [isConnected, account, getContractOwner, getRounds, loadQSEBalance, qseBalance]);
+  }, [
+    isConnected,
+    account,
+    getContractOwner,
+    getRounds,
+    loadQSEBalance,
+    qseBalance,
+  ]);
 
   // Add a separate effect to handle balance updates
   useEffect(() => {
@@ -257,7 +272,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
             (r) => now >= r.startTime && now <= r.endTime
           );
           // Only update selectedRound if it's not already set or if the current selection is invalid
-          if (!selectedRound || !fetchedRounds.find(r => r.roundId === selectedRound)) {
+          if (
+            !selectedRound ||
+            !fetchedRounds.find((r) => r.roundId === selectedRound)
+          ) {
             setSelectedRound(activeRound?.roundId ?? fetchedRounds[0].roundId);
           }
         }
@@ -299,7 +317,10 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   const getSelectedRound = () => {
     if (!selectedRound) return null;
     const round = rounds.find((r) => r.roundId === selectedRound);
-    console.log("Getting selected round:", { selectedRound, foundRound: round });
+    console.log("Getting selected round:", {
+      selectedRound,
+      foundRound: round,
+    });
     return round;
   };
 
