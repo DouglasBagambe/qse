@@ -10,6 +10,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import { createConfig, http, WagmiProvider } from "wagmi";
@@ -237,17 +238,18 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
   ] as const;
   type SupportedChainId = (typeof supportedChainIds)[number];
 
-  const getCurrentActiveRound = async (
-    rounds: Round[]
-  ): Promise<Round | null> => {
-    const currentTime = Math.floor(Date.now() / 1000);
-    return (
-      rounds.find(
-        (round) =>
-          currentTime >= round.startTime && currentTime <= round.endTime
-      ) || null
-    );
-  };
+  const getCurrentActiveRound = useCallback(
+    async (rounds: Round[]): Promise<Round | null> => {
+      const currentTime = Math.floor(Date.now() / 1000);
+      return (
+        rounds.find(
+          (round) =>
+            currentTime >= round.startTime && currentTime <= round.endTime
+        ) || null
+      );
+    },
+    []
+  );
 
   const initializeContracts = async (signer: ethers.JsonRpcSigner) => {
     try {
@@ -288,7 +290,7 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       const activeRound = await getCurrentActiveRound(rounds);
       setCurrentRound(activeRound);
       if (activeRound) {
-        setTokenPrice(Number(ethers.formatUnits(activeRound.tokenPrice, 6)));
+        setTokenPrice(activeRound.tokenPrice);
       }
 
       await loadQSEBalance();
@@ -302,58 +304,61 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const setupEventListeners = (presale: ethers.Contract) => {
-    presale.on("RoundCreated", async () => {
-      const rounds = await getRounds();
-      const activeRound = await getCurrentActiveRound(rounds);
-      setCurrentRound(activeRound);
-      if (activeRound) {
-        setTokenPrice(Number(ethers.formatUnits(activeRound.tokenPrice, 6)));
-      }
-    });
+  const setupEventListeners = useCallback(
+    (presale: ethers.Contract) => {
+      presale.on("RoundCreated", async () => {
+        const rounds = await getRounds();
+        const activeRound = await getCurrentActiveRound(rounds);
+        setCurrentRound(activeRound);
+        if (activeRound) {
+          setTokenPrice(activeRound.tokenPrice);
+        }
+      });
 
-    presale.on("TokensBought", async (buyer: string) => {
-      if (buyer.toLowerCase() === account?.toLowerCase()) {
-        await loadQSEBalance();
-      }
-      await loadFundsRaised();
-      await fetchEthPrice();
-    });
+      presale.on("TokensBought", async (buyer: string) => {
+        if (buyer.toLowerCase() === account?.toLowerCase()) {
+          await loadQSEBalance();
+        }
+        await loadFundsRaised();
+        await fetchEthPrice();
+      });
 
-    presale.on("RoundEnded", async () => {
-      const rounds = await getRounds();
-      const activeRound = await getCurrentActiveRound(rounds);
-      setCurrentRound(activeRound);
-    });
+      presale.on("RoundEnded", async () => {
+        const rounds = await getRounds();
+        const activeRound = await getCurrentActiveRound(rounds);
+        setCurrentRound(activeRound);
+      });
 
-    presale.on("RoundExtended", async () => {
-      const rounds = await getRounds();
-      const activeRound = await getCurrentActiveRound(rounds);
-      setCurrentRound(activeRound);
-    });
+      presale.on("RoundExtended", async () => {
+        const rounds = await getRounds();
+        const activeRound = await getCurrentActiveRound(rounds);
+        setCurrentRound(activeRound);
+      });
 
-    presale.on("FundsRefunded", async () => {
-      await loadFundsRaised();
-      await fetchEthPrice();
-    });
+      presale.on("FundsRefunded", async () => {
+        await loadFundsRaised();
+        await fetchEthPrice();
+      });
 
-    presale.on("FundsWithdrawn", async () => {
-      await loadFundsRaised();
-      await fetchEthPrice();
-    });
+      presale.on("FundsWithdrawn", async () => {
+        await loadFundsRaised();
+        await fetchEthPrice();
+      });
 
-    presale.on("Paused", async () => {
-      const rounds = await getRounds();
-      const activeRound = await getCurrentActiveRound(rounds);
-      setCurrentRound(activeRound);
-    });
+      presale.on("Paused", async () => {
+        const rounds = await getRounds();
+        const activeRound = await getCurrentActiveRound(rounds);
+        setCurrentRound(activeRound);
+      });
 
-    presale.on("Unpaused", async () => {
-      const rounds = await getRounds();
-      const activeRound = await getCurrentActiveRound(rounds);
-      setCurrentRound(activeRound);
-    });
-  };
+      presale.on("Unpaused", async () => {
+        const rounds = await getRounds();
+        const activeRound = await getCurrentActiveRound(rounds);
+        setCurrentRound(activeRound);
+      });
+    },
+    [account, getCurrentActiveRound]
+  );
 
   // Rename the function to be more generic
   const switchNetwork = async (chainId: number): Promise<boolean> => {
@@ -643,14 +648,14 @@ const Web3ContextProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       // Only update state if we have rounds
-      if (rounds.length > 0) {
-        const activeRound = await getCurrentActiveRound(rounds);
-        setCurrentRound(activeRound);
-        if (activeRound) setTokenPrice(activeRound.tokenPrice);
-      } else {
-        setCurrentRound(null);
-        setTokenPrice(0);
-      }
+      // if (rounds.length > 0) {
+      //   const activeRound = await getCurrentActiveRound(rounds);
+      //   setCurrentRound(activeRound);
+      //   if (activeRound) setTokenPrice(activeRound.tokenPrice);
+      // } else {
+      //   setCurrentRound(null);
+      //   setTokenPrice(0);
+      // }
 
       return rounds;
     } catch (error: any) {
