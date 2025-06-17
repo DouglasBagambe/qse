@@ -50,6 +50,7 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const [isRecalculating, setIsRecalculating] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [qseAmount, setQseAmount] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -387,6 +388,55 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
     rounds,
     getPaymentAmountForTokens, // Dependency from useWeb3
     calculatePaymentFromQSE, // Dependency from current component
+  ]);
+
+  // Handle payment method changes - recalculate amounts
+  useEffect(() => {
+    const recalculateAmounts = async () => {
+      if (!selectedRound || !isConnected) return;
+
+      setIsRecalculating(true);
+      try {
+        // If we have a QSE amount, recalculate payment amount for new method
+        if (
+          qseAmount &&
+          !isNaN(parseFloat(qseAmount)) &&
+          parseFloat(qseAmount) > 0
+        ) {
+          const payment = await getPaymentAmountForTokens(
+            qseAmount,
+            selectedPaymentMethod,
+            selectedRound
+          );
+          setPaymentAmount(payment.toFixed(6));
+        }
+        // If we only have payment amount but no QSE amount, recalculate QSE
+        else if (
+          paymentAmount &&
+          !isNaN(parseFloat(paymentAmount)) &&
+          parseFloat(paymentAmount) > 0
+        ) {
+          const tokens = await getTokenAmountFromPayment(
+            paymentAmount,
+            selectedPaymentMethod,
+            selectedRound
+          );
+          setQseAmount(tokens.toFixed(2));
+        }
+      } catch (error) {
+        console.error("Error recalculating amounts:", error);
+      } finally {
+        setIsRecalculating(false);
+      }
+    };
+
+    recalculateAmounts();
+  }, [
+    selectedPaymentMethod,
+    selectedRound,
+    getPaymentAmountForTokens,
+    getTokenAmountFromPayment,
+    isConnected,
   ]);
 
   const handleInputChange = async (type: "payment" | "qse", value: string) => {
@@ -927,7 +977,11 @@ const TokenPurchaseModal: React.FC<TokenPurchaseModalProps> = ({
                                   ? "bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-lg shadow-indigo-600/30 border border-indigo-500/50"
                                   : "bg-blue-900/50 text-gray-300 hover:bg-indigo-800/60 border border-blue-800/50 hover:text-white"
                               }`}
-                              onClick={() => setSelectedPaymentMethod(method)}
+                              onClick={async () => {
+                                setSelectedPaymentMethod(method);
+                                // Clear any error messages when switching methods
+                                setErrorMessage("");
+                              }}
                             >
                               {method}
                             </button>
