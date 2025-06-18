@@ -60,7 +60,7 @@ interface AdminPanelModalProps {
 const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   isOpen,
   onClose,
-  refreshRounds = async () => { }, // Provide default empty function
+  refreshRounds = async () => {}, // Provide default empty function
 }) => {
   const [activeTab, setActiveTab] = useState("rounds");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,7 +175,7 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       return;
     }
     const roundIdNum = parseInt(roundId);
-    const price = Math.round(parseFloat(tokenPrice) * 100) / 100; 
+    const price = Math.round(parseFloat(tokenPrice) * 100) / 100;
     const amount = parseInt(tokenAmount);
     const startTimestamp = Math.floor(new Date(startTime).getTime() / 1000);
     const endTimestamp = Math.floor(new Date(endTime).getTime() / 1000);
@@ -670,7 +670,7 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
             <div className="p-4 sm:p-6 md:p-8 relative z-10">
               {/* Header */}
               <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-8">
-                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-lg rotate-3 hover:rotate-0 transition-all duration-500">
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-lg transition-all duration-500">
                   <ShieldCheck size={20} className="sm:hidden" />
                   <ShieldCheck
                     size={28}
@@ -700,10 +700,11 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm sm:text-base font-medium rounded-t-lg transition-all duration-300 ${activeTab === tab.id
+                    className={`flex items-center gap-2 px-4 py-2 text-sm sm:text-base font-medium rounded-t-lg transition-all duration-300 ${
+                      activeTab === tab.id
                         ? "bg-blue-700/60 text-blue-100 border-b-2 border-indigo-500"
                         : "text-gray-300 hover:text-white hover:bg-blue-800/40"
-                      }`}
+                    }`}
                   >
                     <tab.icon size={16} />
                     {tab.label}
@@ -721,7 +722,9 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               {errorMessage && (
                 <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-900/40 border border-red-500/30 rounded-lg sm:rounded-xl text-xs sm:text-sm flex items-start gap-2 sm:gap-3 animate-fadeIn w-full max-w-full">
                   <AlertCircle size={16} className="text-red-400 mt-0.5" />
-                  <span className="text-red-200 break-all whitespace-pre-wrap">{errorMessage}</span>
+                  <span className="text-red-200 break-all whitespace-pre-wrap">
+                    {errorMessage}
+                  </span>
                 </div>
               )}
 
@@ -776,7 +779,6 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                           <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-indigo-300 font-medium text-xs sm:text-sm">
                             USD
                           </div>
-   
                         </div>
                       </div>
                       <div className="group">
@@ -1319,10 +1321,11 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       <button
                         disabled={isSubmitting || isPaused}
                         onClick={handlePause}
-                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${isPaused
+                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${
+                          isPaused
                             ? "bg-gray-600"
                             : "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 hover:shadow-red-500/30"
-                          }`}
+                        }`}
                       >
                         {isSubmitting ? (
                           <div className="flex items-center justify-center gap-2">
@@ -1339,10 +1342,11 @@ const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       <button
                         disabled={isSubmitting || !isPaused}
                         onClick={handleUnpause}
-                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${!isPaused
+                        className={`w-full py-3 sm:py-4 text-white rounded-lg sm:rounded-xl font-medium transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 text-sm sm:text-base ${
+                          !isPaused
                             ? "bg-gray-600"
                             : "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 hover:shadow-green-500/30"
-                          }`}
+                        }`}
                       >
                         {isSubmitting ? (
                           <div className="flex items-center justify-center gap-2">
