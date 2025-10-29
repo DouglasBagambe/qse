@@ -317,7 +317,7 @@ const QSEEcosystem = () => {
                 <h3 className="text-2xl font-bold text-gray-800">Roadmap</h3>
               </div>
               <p className="text-gray-600 mb-8 text-lg">
-                Our 2025 roadmap outlines a methodical approach:
+                Our roadmap outlines a methodical approach:
                 <br />
                 Phase 1: Foundation building and pilot launch;
                 <br />

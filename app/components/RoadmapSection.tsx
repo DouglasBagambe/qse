@@ -5,7 +5,7 @@ const RoadmapSection = () => {
   const roadmapItems = [
     {
       phase: "Phase 1",
-      // date: "Q1 2025",
+      // date: "Q1 2026",
       title: "Foundation and Pilot",
       description:
         "We establish the foundational infrastructure and launch our initial pilot program.",
@@ -18,7 +18,7 @@ const RoadmapSection = () => {
     },
     {
       phase: "Phase 2",
-      // date: "Q2 2025",
+      // date: "Q2 2026",
       title: "Careful Expansion",
       description:
         "Expand our pilot program and begin implementing key features for growth.",
@@ -31,7 +31,7 @@ const RoadmapSection = () => {
     },
     {
       phase: "Phase 3",
-      // date: "Q3 2025",
+      // date: "Q3 2026",
       title: "Deeper Security and Optimization",
       description:
         "Enhance platform security and optimize with advanced technologies.",
@@ -44,7 +44,7 @@ const RoadmapSection = () => {
     },
     {
       phase: "Phase 4",
-      // date: "Q4 2025",
+      // date: "Q4 2026",
       title: "Wider Adoption",
       description:
         "Scale deployment and improve user experience for broader market adoption.",
