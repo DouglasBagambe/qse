@@ -74,7 +74,7 @@ const Header = () => {
   const handlePDFView = () => {
     if (!isClient) return;
 
-    const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE-TokenWhitePaper.pdf`;
     window.open(pdfPath, "_blank");
   };
 

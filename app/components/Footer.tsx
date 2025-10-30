@@ -24,7 +24,7 @@ const Footer = () => {
   };
 
   const handleWhitepaperView = () => {
-    const pdfPath = `${window.location.origin}/assets/whitepaper/QSETokenWhitePaper.pdf`;
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE-TokenWhitePaper.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
       newWindow.document.write(`
@@ -108,7 +108,7 @@ const Footer = () => {
   };
 
   const handleUseCaseView = () => {
-    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_Use_Case.pdf`;
+    const pdfPath = `${window.location.origin}/assets/whitepaper/QSE_TokenEVCI_UseCASE.pdf`;
     const newWindow = window.open("", "_blank");
     if (newWindow) {
       newWindow.document.write(`
